@@ -1,11 +1,18 @@
-.tw-banner {
+#tw-banner  {
     position: fixed;
     top: 1em;
     right: 1em;
+    width: 50px;
     z-index: 9999999999;
     border: 1px solid #ccc;
-    border-radius: 25%;
+    border-radius: 20%;
     box-shadow: 0 0 2px #888;
     padding: 0.5em 0.6em;
     background-color:#c8ccc9;
+}
+
+
+#tw-banner-header {
+  padding: 2px;
+  cursor: move;
 }
