@@ -44,7 +44,8 @@
         "https://*.publish.csiro.au/*",
         "https://*.springer.com/*",
         "https://*.wiley.com/*",
-        "https://*.sciencedirect.com/*"
+        "https://*.sciencedirect.com/*",
+        "https://scholar.google.com/*"
       ]
     }
   ]

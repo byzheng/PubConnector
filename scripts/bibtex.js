@@ -1,20 +1,31 @@
 
+
+
 function getElementByXpath(path) {
     return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
 
-var xpath = ["//meta[@name='dc.identifier']",
-    "//meta[@name='dc.Identifier']",
-    "//meta[@name='citation_doi']"];
-var doi;
-for (let i = 0; i < xpath.length; i++) {
-    let doi_element = getElementByXpath(xpath[i]);
-    if (doi_element !== undefined && doi_element !== null) {
-        doi = doi_element.getAttribute("content");
-        doi = doi.replace('doi:', '');
-        break;
+async function gettiddlerCID(cid, item, host) {
+    let filter = encodeURIComponent("[tag[bibtex-entry]field:scholar-cid[" + cid + "]]");
+    const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        const tiddler = await response.json();
+        if (tiddler.length > 0) {
+            var span = document.createElement("span");
+            span.class = "tw-icon";
+            span.innerText = "📖";
+            item.querySelector("div.gs_fl").appendChild(span);
+        }
+    } catch (error) {
+        console.error(error.message);
     }
 }
+
 
 async function gettiddler(doi, host) {
     let filter = encodeURIComponent("[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[" +
@@ -30,7 +41,7 @@ async function gettiddler(doi, host) {
         if (tiddler.length > 0) {
             var div = document.createElement("div");
             div.id = "tw-banner";
-            div.innerText = "TW";
+            div.innerText = "📖";
             dragElement(div);
             document.body.appendChild(div);
         }
@@ -75,14 +86,46 @@ function dragElement(elmnt) {
         document.onmousemove = null;
     }
 }
-
-if (doi !== undefined) {
-    console.log(doi);
-    chrome.storage.sync.get(
-        { host: 'http://localhost:8080'},
-        (items) => {
-            gettiddler(doi, items.host);
+function publisher(host) {
+    var xpath = ["//meta[@name='dc.identifier']",
+        "//meta[@name='dc.Identifier']",
+        "//meta[@name='citation_doi']"];
+    var doi;
+    for (let i = 0; i < xpath.length; i++) {
+        let doi_element = getElementByXpath(xpath[i]);
+        if (doi_element !== undefined && doi_element !== null) {
+            doi = doi_element.getAttribute("content");
+            doi = doi.replace('doi:', '');
+            break;
         }
-    );
-   
+    }
+    if (doi !== undefined) {
+
+        gettiddler(doi, host);
+
+    }
 }
+
+function scholar(host) {
+
+    var items = document.querySelectorAll("div.gs_r.gs_or.gs_scl");
+    for (let i = 0; i < items.length; i++) {
+        var cid = items[i].dataset.cid;
+        gettiddlerCID(cid, items[i], host);
+        console.log(cid);
+    }
+    console.log(items.length);
+}
+chrome.storage.sync.get({
+    host: 'http://localhost:8080'
+},
+    (items) => {
+    var href = window.location.href;
+    // For google scholar
+    if (href.includes("scholar.google.")) {
+        scholar(items.host);
+    } else {
+        publisher(items.host);
+    }
+
+});
