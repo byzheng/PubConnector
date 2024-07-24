@@ -20,6 +20,7 @@ async function gettiddlerCID(cid, item, host) {
             span.class = "tw-icon";
             span.innerText = "📖";
             item.querySelector("div.gs_fl").appendChild(span);
+            item.style.background = "#e6e6e666";
         }
     } catch (error) {
         console.error(error.message);
