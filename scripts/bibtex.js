@@ -16,10 +16,10 @@ for (let i = 0; i < xpath.length; i++) {
     }
 }
 
-async function gettiddler(doi) {
+async function gettiddler(doi, host) {
     let filter = encodeURIComponent("[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[" +
             doi + "]]");
-    const url = "http://localhost/recipes/default/tiddlers.json?filter=" + filter;
+    const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -78,6 +78,11 @@ function dragElement(elmnt) {
 
 if (doi !== undefined) {
     console.log(doi);
-    gettiddler(doi);
+    chrome.storage.sync.get(
+        { host: 'http://localhost:8080'},
+        (items) => {
+            gettiddler(doi, items.host);
+        }
+    );
    
 }
