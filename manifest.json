@@ -1,0 +1,44 @@
+{
+  "name": "TW-Utils",
+  "description": "Utility for Tiddlywiki",
+  "version": "0.0.1",
+  "manifest_version": 3,
+  "icons": {
+    "16": "icons/normal-16.png",
+    "32": "icons/normal-32.png",
+    "48": "icons/normal-48.png",
+    "128": "icons/normal-128.png"
+  },
+   "action": {
+    "default_icon": {   
+    "16": "icons/normal-16.png",
+    "32": "icons/normal-32.png",
+    "48": "icons/normal-48.png",
+    "128": "icons/normal-128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "js": ["scripts/bibtex.js"],
+      "css": ["styles/bibtex.css"],
+       "run_at": "document_end",
+      "matches": [
+        "https://*.frontiersin.org/*",
+        "https://*.cell.com/*",
+        "https://*.iop.org/*",
+        "https://*.pnas.org/*",
+        "https://*.pnas.org/*",
+        "https://*.science.org/*",
+        "https://*.mdpi.com/*",
+        "https://*.nature.com/*",
+        "https://*.tandfonline.com/*",
+        "https://*.biomedcentral.com/*",
+        "https://*.oup.com/*",
+        "https://*.publish.csiro.au/*",
+        "https://*.springer.com/*",
+        "https://*.wiley.com/*",
+        "https://*.sciencedirect.com/*"
+      ]
+    }
+  ]
+}
