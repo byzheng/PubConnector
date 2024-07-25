@@ -42,7 +42,7 @@ async function gettiddlerEID(eid, item, host) {
             var span = document.createElement("span");
             span.classList.add("tw-icon");
             span.innerText = "📖";
-            item.querySelector("div.refAuthorTitle").prepend(span);
+            item.querySelector("div.refAuthorTitle, td[data-type='docTitle']").prepend(span);
             item.style.background = "#e6e6e666";
         }
     } catch (error) {
@@ -50,9 +50,15 @@ async function gettiddlerEID(eid, item, host) {
     }
 }
 
-async function gettiddler(doi, host) {
-    let filter = encodeURIComponent("[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[" +
-            doi + "]]");
+async function gettiddler(id, type, host) {
+    var filter;
+    if (type === "doi") {
+        filter = "[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[" +
+            id + "]]";
+    } else if (type === "eid") {
+        filter = "[tag[bibtex-entry]field:scopus-eid[" + id + "]]";
+    } 
+    filter = encodeURIComponent(filter);
     const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
     try {
         const response = await fetch(url);
@@ -124,40 +130,43 @@ function publisher(host) {
         }
     }
     if (doi !== undefined) {
-
-        gettiddler(doi, host);
-
+        gettiddler(doi, "doi", host);
     }
 }
 
 function scholar(host) {
-
+    
     var items = document.querySelectorAll("div.gs_r.gs_or.gs_scl");
     for (let i = 0; i < items.length; i++) {
         var cid = items[i].dataset.cid;
         gettiddlerCID(cid, items[i], host);
-        console.log(cid);
+        //console.log(cid);
     }
-    console.log(items.length);
+    //console.log(items.length);
 }
 
 
 function scopus(host) {
-
-    // for reference
-    var items = document.querySelectorAll("tr.referencesUL");
+    // Whole page
+    var eid_el = document.querySelector("input#currentRecordPageEID, input#cite");
+    if (eid_el !== undefined) {
+        var eid = eid_el.value;
+        gettiddler(eid, "eid", host);
+    }
+    // for reference and citation
+    var items = document.querySelectorAll("tr.referencesUL, tr.searchArea");
     for (let i = 0; i < items.length; i++) {
         var eid = items[i].querySelector("input").value;
         
         gettiddlerEID(eid, items[i], host);
-        console.log(eid);
+        //console.log(eid);
     }
-    console.log(items.length);
+    //console.log(items.length);
 }
 async function run (host) {
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
-      console.log(mutation.target.textContent)
+      //console.log(mutation.target.textContent)
     })
   })
   
