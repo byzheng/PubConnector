@@ -19,8 +19,7 @@
 }
 
 .tw-icon {
-    border: 1px solid #ccc;
-    border-radius: 20%;
-    background-color:#c8ccc9;
     color:#7096b3;
+    margin: 0em 0.6em;
+    padding: 0em 0.4em;
 }
