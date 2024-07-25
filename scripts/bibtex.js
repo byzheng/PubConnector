@@ -28,6 +28,28 @@ async function gettiddlerCID(cid, item, host) {
 }
 
 
+async function gettiddlerEID(eid, item, host) {
+    let filter = encodeURIComponent("[tag[bibtex-entry]field:scopus-eid[" + eid + "]]");
+    const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        const tiddler = await response.json();
+        if (tiddler.length > 0) {
+            var span = document.createElement("span");
+            span.classList.add("tw-icon");
+            span.innerText = "📖";
+            item.querySelector("div.refAuthorTitle").prepend(span);
+            item.style.background = "#e6e6e666";
+        }
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
 async function gettiddler(doi, host) {
     let filter = encodeURIComponent("[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[" +
             doi + "]]");
@@ -87,6 +109,7 @@ function dragElement(elmnt) {
         document.onmousemove = null;
     }
 }
+
 function publisher(host) {
     var xpath = ["//meta[@name='dc.identifier']",
         "//meta[@name='dc.Identifier']",
@@ -117,14 +140,55 @@ function scholar(host) {
     }
     console.log(items.length);
 }
+
+
+function scopus(host) {
+
+    // for reference
+    var items = document.querySelectorAll("tr.referencesUL");
+    for (let i = 0; i < items.length; i++) {
+        var eid = items[i].querySelector("input").value;
+        
+        gettiddlerEID(eid, items[i], host);
+        console.log(eid);
+    }
+    console.log(items.length);
+}
+async function run (host) {
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      console.log(mutation.target.textContent)
+    })
+  })
+  
+  scopus(host);
+  const targetElements = document.querySelectorAll('.referencesUL')
+  targetElements.forEach((i) => {
+    observer.observe(i, {
+      attributes: true,
+      characterData: true,
+      childList: true,
+      subtree: true,
+      attributeOldValue: true,
+      characterDataOldValue: true
+    })
+  })
+}
 chrome.storage.sync.get({
     host: 'http://localhost:8080'
 },
     (items) => {
     var href = window.location.href;
     // For google scholar
-    if (href.includes("scholar.google.")) {
+    if (href.includes("scholar.google")) {
         scholar(items.host);
+    } else if (href.includes("scopus.com")) {
+        window.addEventListener('load', function load(e){
+              window.removeEventListener('load', load, false);
+              this.setTimeout(() => {
+                run(items.host)
+              }, 3000)
+            }, false);
     } else {
         publisher(items.host);
     }

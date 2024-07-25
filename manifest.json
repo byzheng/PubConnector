@@ -28,7 +28,7 @@
     {
       "js": ["scripts/bibtex.js"],
       "css": ["styles/bibtex.css"],
-       "run_at": "document_end",
+      "run_at": "document_end",
       "matches": [
         "https://*.frontiersin.org/*",
         "https://*.cell.com/*",
@@ -45,6 +45,7 @@
         "https://*.springer.com/*",
         "https://*.wiley.com/*",
         "https://*.sciencedirect.com/*",
+        "https://*.scopus.com/*",
         "https://scholar.google.com/*"
       ]
     }

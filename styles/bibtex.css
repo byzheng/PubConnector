@@ -17,3 +17,10 @@
   padding: 2px;
   cursor: move;
 }
+
+.tw-icon {
+    border: 1px solid #ccc;
+    border-radius: 20%;
+    background-color:#c8ccc9;
+    color:#7096b3;
+}
