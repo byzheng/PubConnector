@@ -1,9 +1,9 @@
 #tw-banner  {
     position: fixed;
-    top: 1em;
-    right: 1em;
-    width: 120px;
-    height: 29px;
+    top: 3em;
+    right: 5em;
+    width: 200px;
+    height: 50px;
     z-index: 9999999999;
     border: 1px solid #ccc;
     border-radius: 5%;
@@ -11,6 +11,7 @@
     box-shadow: 0 0 2px #888;
     padding: 0.1em 0.2em;
     background-color:#c8ccc9;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 
@@ -24,4 +25,14 @@
     margin: 0em 0.2em;
     padding: 0em 0.2em;
     vertical-align: middle;
+}
+
+.tw-svg {
+    width: 40px;
+    height: 50px;
+}
+
+.tw-svg-small {
+    width: 24px;
+    height: 24px;
 }

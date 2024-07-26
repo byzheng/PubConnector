@@ -1,29 +1,23 @@
-function scholarimg() {
+
+
+function scholara(doi) {
     var img = document.createElement("img");
     img.src = chrome.runtime.getURL("images/GoogleScholarSquare.svg");
     img.classList.add("tw-svg");
-    return img;
-}
-
-function scholara(doi) {
     var sa = document.createElement("a");
-    sa.appendChild(scholarimg());
+    sa.appendChild(img);
     sa.setAttribute("href", "https://scholar.google.com/scholar?q=" + doi);
     sa.setAttribute("target", "_blank");
     sa.classList.add("tw-icon");
     return sa;
 }
 
-function scopusimg() {
+function scopusa(eid) {
     var img = document.createElement("img");
     img.src = chrome.runtime.getURL("images/Scopus.svg");
     img.classList.add("tw-svg");
-    return img;
-}
-
-function scopusa(eid) {
     var sa = document.createElement("a");
-    sa.appendChild(scopusimg());
+    sa.appendChild(img);
     sa.setAttribute("href", "https://www.scopus.com/record/display.uri?eid=" + eid + "&origin=resultslist");
     sa.setAttribute("target", "_blank");
     sa.classList.add("tw-icon");
@@ -32,18 +26,13 @@ function scopusa(eid) {
     return sa;
 }
 
-
-function twimg() {
+function twspan(cls) {
     var img = document.createElement("img");
     img.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
-    img.classList.add("tw-svg");
-    return img;
-}
-
-function twspan() {
+    img.classList.add(cls);
     var span = document.createElement("span");
     span.classList.add("tw-icon");
-    span.appendChild(twimg());
+    span.appendChild(img);
     return span;
 }
 
@@ -51,6 +40,11 @@ function getElementByXpath(path) {
     return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
 
+function setItemStyle(item) {
+    item.style.background = "#e6e6e666";
+    item.style["box-shadow"] = "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
+    item.style.padding = "0.4em 0.4em";
+}
 async function gettiddlerCID(cid, item, host) {
     let filter = encodeURIComponent("[tag[bibtex-entry]field:scholar-cid[" + cid + "]]");
     const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
@@ -62,9 +56,9 @@ async function gettiddlerCID(cid, item, host) {
 
         const tiddler = await response.json();
         if (tiddler.length > 0) {
-            var span = twspan();
+            var span = twspan("tw-svg-small");
             item.querySelector("div.gs_fl").appendChild(span);
-            item.style.background = "#e6e6e666";
+            setItemStyle(item);
         }
     } catch (error) {
         console.error(error.message);
@@ -83,7 +77,7 @@ async function gettiddlerEID(eid, item, host) {
 
         const tiddler = await response.json();
         if (tiddler.length > 0) {
-            var span = twspan();
+            var span = twspan("tw-svg-small");
             var label = item.querySelector("label");
             if (label !== null) {
                 if (label.querySelector("span")) {
@@ -94,7 +88,7 @@ async function gettiddlerEID(eid, item, host) {
             } else {
                 item.querySelector("div.refAuthorTitle, td[data-type='docTitle']").prepend(span);
             }
-            item.style.background = "#e6e6e666";
+            setItemStyle(item);
         }
     } catch (error) {
         console.error(error.message);
@@ -121,10 +115,15 @@ async function gettiddler(id, type, host) {
         if (tiddler.length > 0) {
             var div = document.createElement("div");
             div.id = "tw-banner";
-            div.appendChild(twspan());
-            div.appendChild(scholara(id));
-            if (tiddler[0]["scopus-eid"] !== undefined) {
-                div.appendChild(scopusa(tiddler[0]["scopus-eid"]));
+            div.appendChild(twspan("tw-svg"));
+            if (type === "eid") {
+                var doi = getDOI();
+                div.appendChild(scholara(doi));
+            } else {
+                div.appendChild(scholara(id));
+                if (tiddler[0]["scopus-eid"] !== undefined) {
+                    div.appendChild(scopusa(tiddler[0]["scopus-eid"]));
+                }
             }
             dragElement(div);
             document.body.appendChild(div);
@@ -171,7 +170,7 @@ function dragElement(elmnt) {
     }
 }
 
-function publisher(host) {
+function getDOI() {
     var xpath = ["//meta[@name='dc.identifier']",
         "//meta[@name='dc.Identifier']",
         "//meta[@name='citation_doi']"];
@@ -184,6 +183,11 @@ function publisher(host) {
             break;
         }
     }
+    return doi;
+}
+
+function publisher(host) {
+    var doi = getDOI();
     if (doi !== undefined) {
         gettiddler(doi, "doi", host);
     }
