@@ -2,13 +2,14 @@
     position: fixed;
     top: 1em;
     right: 1em;
-    width: 50px;
+    width: 120px;
+    height: 29px;
     z-index: 9999999999;
     border: 1px solid #ccc;
-    border-radius: 20%;
+    border-radius: 5%;
     text-align: center;
     box-shadow: 0 0 2px #888;
-    padding: 0.5em 0.6em;
+    padding: 0.1em 0.2em;
     background-color:#c8ccc9;
 }
 
@@ -20,6 +21,7 @@
 
 .tw-icon {
     color:#7096b3;
-    margin: 0em 0.6em;
-    padding: 0em 0.4em;
+    margin: 0em 0.2em;
+    padding: 0em 0.2em;
+    vertical-align: middle;
 }

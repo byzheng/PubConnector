@@ -16,6 +16,16 @@
     "48": "icons/normal-48.png",
     "128": "icons/normal-128.png"
   },
+  "web_accessible_resources": [
+    {
+       "resources": [
+            "images/Tiddlywiki.svg",
+            "images/Scopus.svg",
+            "images/GoogleScholarSquare.svg"
+        ],
+        "matches": ["*://*/*"]
+    }
+  ],
    "action": {
     "default_icon": {   
     "16": "icons/normal-16.png",

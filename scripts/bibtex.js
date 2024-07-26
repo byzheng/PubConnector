@@ -1,5 +1,51 @@
+function scholarimg() {
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/GoogleScholarSquare.svg");
+    img.classList.add("tw-svg");
+    return img;
+}
+
+function scholara(doi) {
+    var sa = document.createElement("a");
+    sa.appendChild(scholarimg());
+    sa.setAttribute("href", "https://scholar.google.com/scholar?q=" + doi);
+    sa.setAttribute("target", "_blank");
+    sa.classList.add("tw-icon");
+    return sa;
+}
+
+function scopusimg() {
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/Scopus.svg");
+    img.classList.add("tw-svg");
+    return img;
+}
+
+function scopusa(eid) {
+    var sa = document.createElement("a");
+    sa.appendChild(scopusimg());
+    sa.setAttribute("href", "https://www.scopus.com/record/display.uri?eid=" + eid + "&origin=resultslist");
+    sa.setAttribute("target", "_blank");
+    sa.classList.add("tw-icon");
+    
+    
+    return sa;
+}
 
 
+function twimg() {
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
+    img.classList.add("tw-svg");
+    return img;
+}
+
+function twspan() {
+    var span = document.createElement("span");
+    span.classList.add("tw-icon");
+    span.appendChild(twimg());
+    return span;
+}
 
 function getElementByXpath(path) {
     return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
@@ -16,9 +62,7 @@ async function gettiddlerCID(cid, item, host) {
 
         const tiddler = await response.json();
         if (tiddler.length > 0) {
-            var span = document.createElement("span");
-            span.class = "tw-icon";
-            span.innerText = "📖";
+            var span = twspan();
             item.querySelector("div.gs_fl").appendChild(span);
             item.style.background = "#e6e6e666";
         }
@@ -39,9 +83,7 @@ async function gettiddlerEID(eid, item, host) {
 
         const tiddler = await response.json();
         if (tiddler.length > 0) {
-            var span = document.createElement("span");
-            span.classList.add("tw-icon");
-            span.innerText = "📖";
+            var span = twspan();
             var label = item.querySelector("label");
             if (label !== null) {
                 if (label.querySelector("span")) {
@@ -79,7 +121,11 @@ async function gettiddler(id, type, host) {
         if (tiddler.length > 0) {
             var div = document.createElement("div");
             div.id = "tw-banner";
-            div.innerText = "📖";
+            div.appendChild(twspan());
+            div.appendChild(scholara(id));
+            if (tiddler[0]["scopus-eid"] !== undefined) {
+                div.appendChild(scopusa(tiddler[0]["scopus-eid"]));
+            }
             dragElement(div);
             document.body.appendChild(div);
         }
