@@ -36,10 +36,6 @@ function twspan(cls) {
     return span;
 }
 
-function getElementByXpath(path) {
-    return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-}
-
 function setItemStyle(item) {
     item.style.background = "#e6e6e666";
     item.style["box-shadow"] = "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
@@ -171,17 +167,11 @@ function dragElement(elmnt) {
 }
 
 function getDOI() {
-    var xpath = ["//meta[@name='dc.identifier']",
-        "//meta[@name='dc.Identifier']",
-        "//meta[@name='citation_doi']"];
+    var ele = document.querySelector("meta[name='dc.Identifier' i], meta[name='citation_doi' i]");
     var doi;
-    for (let i = 0; i < xpath.length; i++) {
-        let doi_element = getElementByXpath(xpath[i]);
-        if (doi_element !== undefined && doi_element !== null) {
-            doi = doi_element.getAttribute("content");
-            doi = doi.replace('doi:', '');
-            break;
-        }
+    if (ele !== undefined) {
+        doi = ele.getAttribute("content");
+        doi = doi.replace('doi:', '');
     }
     return doi;
 }
