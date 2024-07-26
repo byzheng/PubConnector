@@ -36,7 +36,10 @@
   },
   "content_scripts": [
     {
-      "js": ["scripts/bibtex.js"],
+      "js": [
+        "scripts/utils.js",
+        "scripts/scholar.js",
+        "scripts/bibtex.js"],
       "css": ["styles/bibtex.css"],
       "run_at": "document_end",
       "matches": [
