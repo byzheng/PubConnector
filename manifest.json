@@ -39,6 +39,7 @@
       "js": [
         "scripts/utils.js",
         "scripts/scholar.js",
+        "scripts/scopus.js",
         "scripts/bibtex.js"],
       "css": ["styles/bibtex.css"],
       "run_at": "document_end",
