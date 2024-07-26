@@ -1,7 +1,7 @@
 #tw-banner  {
     position: fixed;
-    top: 3em;
-    right: 5em;
+    top: 1em;
+    right: 2em;
     width: 200px;
     height: 50px;
     z-index: 9999999999;

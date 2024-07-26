@@ -57,7 +57,7 @@ async function gettiddlerCID(cid, item, host) {
         const tiddler = await response.json();
         if (tiddler.length > 0) {
             var span = twspan("tw-svg-small");
-            item.querySelector("div.gs_fl").appendChild(span);
+            item.querySelector("div.gs_fl, h3.gs_ora_tt").appendChild(span);
             setItemStyle(item);
         }
     } catch (error) {
@@ -195,9 +195,15 @@ function publisher(host) {
 
 function scholar(host) {
     
-    var items = document.querySelectorAll("div.gs_r.gs_or.gs_scl");
+    var items = document.querySelectorAll("div.gs_r.gs_or.gs_scl, div.gs_ora");
     for (let i = 0; i < items.length; i++) {
         var cid = items[i].dataset.cid;
+        if (cid === undefined) {
+            cid = items[i].dataset.did;
+            if (cid === undefined) {
+                continue;
+            }
+        }
         gettiddlerCID(cid, items[i], host);
         //console.log(cid);
     }
