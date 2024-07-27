@@ -47,7 +47,35 @@ async function gettiddlerEID(eid, item, host) {
     }
 }
 
-function scopus(host) {
+
+async function gettiddlerEID2(eid, item, host, page_type) {
+    let filter = encodeURIComponent("[tag[bibtex-entry]field:scopus-eid[" + eid + "]]");
+    const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        const tiddler = await response.json();
+        if (tiddler.length > 0) {
+            var span = twspan("tw-svg-small");
+            if (page_type === "authorpage") {
+                item.appendChild(span);
+            }
+            setItemStyle(item);
+        } else {
+            // not found, insert an hidden element
+            var span = twspan("tw-svg-small", true);
+            item.appendChild(span);
+        }
+        item.removeAttribute('data-working')
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+function scopus_pubpage(host, page_type) {
     // Whole page
     var eid_el = document.querySelector("input#currentRecordPageEID, input#cite");
     if (eid_el !== undefined && eid_el !== null) {
@@ -63,6 +91,9 @@ function scopus(host) {
         ]
     var items = document.querySelectorAll(selector_scopus.join(", "));
     for (let i = 0; i < items.length; i++) {
+        if (items[i].querySelector("span.tw-icon") !== null) {
+            continue;
+        }
         var eid;
         // for author profile
         if (items[i].dataset.testid === "results-list-item") {
@@ -107,24 +138,71 @@ function scopus(host) {
 }
 
 
-async function run (host) {
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-        
-      //console.log(mutation.target.textContent)
-    })
-  })
-  
-  scopus(host);
-  const targetElements = document.querySelectorAll(".referencesUL, div#documents-panel")
-  targetElements.forEach((i) => {
-    observer.observe(i, {
-      attributes: true,
-      characterData: true,
-      childList: true,
-      subtree: true,
-      attributeOldValue: true,
-      characterDataOldValue: true
-    })
-  })
+function scopus_authorpage(element, host, page_type) {
+    
+    var items = element.querySelectorAll("li[data-testid='results-list-item']");
+    if (items === null || items.length === 0) {
+        return;
+    }
+    var selector_scopus = [
+        "tr.referencesUL", // for reference list 
+        "tr.searchArea", // for search page
+        "tr[class*='TableItems-module']:has( > td > label)", // for citation list
+        "li[data-testid='results-list-item']" // for author publication list
+        ]
+    // for each item in the page
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].querySelector("span.tw-icon") !== null ||
+            items[i].dataset.working === true) {
+            continue;
+        }
+        var eid;
+        // for author profile
+        if (page_type === "authorpage") {
+            var btn = items[i].querySelector("button[class*='Button-module']");
+            if (btn === null) {
+                // Not find a button, i.e. no links for this publication
+                // insert an empty element 
+                var span = twspan("tw-svg-small", true);
+                items[i].appendChild(span);
+                continue;
+            }
+            eid = btn.dataset.testid.replace('button-abstract-', '');
+        }
+        if (eid === undefined) {
+            // insert an empty element 
+            var span = twspan("tw-svg-small", true);
+            items[i].appendChild(span);
+            continue;
+        }
+        gettiddlerEID2(eid, items[i], host, page_type);
+        items[i].dataset.working = true;
+        //console.log(eid);
+    }
+}
+
+
+async function run_scopus (host) {
+    var page_ele = document.querySelector("div#documents-panel");
+    var page_type = "publication";
+    if (page_ele !== null) {
+        page_type = "authorpage";
+    }
+    if (page_type === "authorpage") {
+      const observer = new MutationObserver(mutationList =>  
+      mutationList.filter(m => m.type === 'childList').forEach(m => {  
+        m.addedNodes.forEach(function(element) {
+            scopus_authorpage(element, host, page_type)
+        });  
+      }));  
+      const targetElements = document.querySelectorAll("div#documents-panel")
+      targetElements.forEach((i) => {
+        observer.observe(i, {
+          childList: true,
+          subtree: true
+          })
+      })
+    } else {
+        scopus_pubpage(host, page_type);
+    }
 }

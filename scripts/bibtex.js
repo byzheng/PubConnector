@@ -1,11 +1,12 @@
 
-function twspan(cls) {
+function twspan(cls, hidden = false) {
     var img = document.createElement("img");
     img.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
     img.classList.add(cls);
     var span = document.createElement("span");
     span.classList.add("tw-icon");
     span.appendChild(img);
+    span.hidden = hidden;
     return span;
 }
 
@@ -111,8 +112,8 @@ chrome.storage.sync.get({
         window.addEventListener('load', function load(e){
               window.removeEventListener('load', load, false);
               this.setTimeout(() => {
-                run(scopus(items.host))
-              }, 5000)
+                run_scopus(items.host)
+              }, 2000)
             }, false);
     } else {
         publisher(items.host);
