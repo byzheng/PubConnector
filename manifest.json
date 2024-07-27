@@ -60,7 +60,7 @@
         "https://*.wiley.com/*",
         "https://*.sciencedirect.com/*",
         "https://*.scopus.com/*",
-        "https://scholar.google.com/*"
+        "https://*.scholar.google.com/*"
       ]
     }
   ]

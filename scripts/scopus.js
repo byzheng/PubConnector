@@ -106,7 +106,8 @@ function scopus_otherpages(host) {
         "tr[class*='TableItems-module']:has( > td > label)" // for search list
         ];
     var page_types = ["reference", "citation", "search"];
-    var items;
+    var items; 
+    var page_type;
     for (let i = 0; i < selector_scopus.length; i++) {
         items = document.querySelectorAll(selector_scopus[i]);
         if (items.length > 0) {
@@ -114,7 +115,7 @@ function scopus_otherpages(host) {
             break;
         }
     }
-    if (items === undefined) {
+    if (items === undefined || page_type === undefined) {
         return;
     }
     // For DOI
