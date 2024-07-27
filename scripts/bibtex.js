@@ -97,6 +97,8 @@ function publisher(host) {
         gettiddler(doi, "doi", host);
     }
 }
+
+
 chrome.storage.sync.get({
     host: 'http://localhost:8080'
 },
@@ -109,8 +111,8 @@ chrome.storage.sync.get({
         window.addEventListener('load', function load(e){
               window.removeEventListener('load', load, false);
               this.setTimeout(() => {
-                run(items.host)
-              }, 3000)
+                run(scopus(items.host))
+              }, 5000)
             }, false);
     } else {
         publisher(items.host);

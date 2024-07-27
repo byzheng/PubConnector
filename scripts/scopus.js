@@ -33,7 +33,12 @@ async function gettiddlerEID(eid, item, host) {
                     label.parentNode.insertBefore(span, label.nextSibling);
                 }
             } else {
-                item.querySelector("div.refAuthorTitle, td[data-type='docTitle']").prepend(span);
+                var icon_ele = item.querySelector("div.refAuthorTitle, td[data-type='docTitle']");
+                if (icon_ele !== null) {
+                    icon_ele.prepend(span);
+                } else {
+                    item.appendChild(span);
+                }
             }
             setItemStyle(item);
         }
@@ -49,15 +54,35 @@ function scopus(host) {
         var eid = eid_el.value;
         gettiddler(eid, "eid", host);
     }
-    // for reference and citation
-    var items = document.querySelectorAll("tr.referencesUL, tr.searchArea, tr[class*='TableItems-module']:has( > td > label)");
+    // for reference and citation, publication list in authors
+    var selector_scopus = [
+        "tr.referencesUL", // for reference list 
+        "tr.searchArea", // for search page
+        "tr[class*='TableItems-module']:has( > td > label)", // for citation list
+        "li[data-testid='results-list-item']" // for author publication list
+        ]
+    var items = document.querySelectorAll(selector_scopus.join(", "));
     for (let i = 0; i < items.length; i++) {
         var eid;
-        var label = items[i].querySelector("td > label[for]");
-        if (label !== null) {
-            eid = label.getAttribute("for").replace("document-",'');
+        // for author profile
+        if (items[i].dataset.testid === "results-list-item") {
+            var btn = items[i].querySelector("button[class*='Button-module']");
+            if (btn === null) {
+                // Not find a button, i.e. no links for this publication
+                continue;
+            }
+            eid = btn.dataset.testid.replace('button-abstract-', '');
         } else {
-            eid = items[i].querySelector("input").value;
+            var label = items[i].querySelector("td > label[for]");
+            
+            if (label !== null) {
+                eid = label.getAttribute("for").replace("document-",'');
+            } else {
+                eid = items[i].querySelector("input").value;
+            }
+        }
+        if (eid === undefined) {
+            continue;
         }
         gettiddlerEID(eid, items[i], host);
         //console.log(eid);
@@ -80,15 +105,18 @@ function scopus(host) {
     }
     //console.log(items.length);
 }
+
+
 async function run (host) {
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
+        
       //console.log(mutation.target.textContent)
     })
   })
   
   scopus(host);
-  const targetElements = document.querySelectorAll('.referencesUL')
+  const targetElements = document.querySelectorAll(".referencesUL, div#documents-panel")
   targetElements.forEach((i) => {
     observer.observe(i, {
       attributes: true,
