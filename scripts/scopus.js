@@ -62,6 +62,22 @@ async function gettiddlerEID2(eid, item, host, page_type) {
             var span = twspan("tw-svg-small");
             if (page_type === "authorpage") {
                 item.appendChild(span);
+            } else {
+                var label = item.querySelector("label");
+                if (label !== null) {
+                    if (label.querySelector("span")) {
+                        label.appendChild(span);
+                    } else {
+                        label.parentNode.insertBefore(span, label.nextSibling);
+                    }
+                } else {
+                    var icon_ele = item.querySelector("div.refAuthorTitle, td[data-type='docTitle']");
+                    if (icon_ele !== null) {
+                        icon_ele.prepend(span);
+                    } else {
+                        item.appendChild(span);
+                    }
+                }
             }
             setItemStyle(item);
         } else {
@@ -69,71 +85,78 @@ async function gettiddlerEID2(eid, item, host, page_type) {
             var span = twspan("tw-svg-small", true);
             item.appendChild(span);
         }
-        item.removeAttribute('data-working')
+        item.removeAttribute('data-working');
     } catch (error) {
         console.error(error.message);
     }
 }
 
-function scopus_pubpage(host, page_type) {
-    // Whole page
+function scopus_otherpages(host) {
+    // Whole page to add a bar with EID
     var eid_el = document.querySelector("input#currentRecordPageEID, input#cite");
     if (eid_el !== undefined && eid_el !== null) {
         var eid = eid_el.value;
         gettiddler(eid, "eid", host);
     }
-    // for reference and citation, publication list in authors
+   
+    // Find page types for list of items
     var selector_scopus = [
         "tr.referencesUL", // for reference list 
-        "tr.searchArea", // for search page
-        "tr[class*='TableItems-module']:has( > td > label)", // for citation list
-        "li[data-testid='results-list-item']" // for author publication list
-        ]
-    var items = document.querySelectorAll(selector_scopus.join(", "));
+        "tr.searchArea", // for citation list
+        "tr[class*='TableItems-module']:has( > td > label)" // for search list
+        ];
+    var page_types = ["reference", "citation", "search"];
+    var items;
+    for (let i = 0; i < selector_scopus.length; i++) {
+        items = document.querySelectorAll(selector_scopus[i]);
+        if (items.length > 0) {
+            page_type = page_types[i];
+            break;
+        }
+    }
+    if (items === undefined) {
+        return;
+    }
+    // For DOI
+    if (page_type === "reference") {
+            // for doi
+        let infos = document.querySelectorAll("div[class*='SourceInfo-module'] > div > dl > dt");
+        for (let i = 0; i < infos.length; i++) {
+            if (infos[i].innerText == "DOI") {
+                let doi_ele = infos[i].nextSibling;
+                let doi = doi_ele.innerText;
+                let doi_link = document.createElement("a");
+                doi_link.innerHTML  = doi;
+                doi_link.setAttribute("href", "https://doi.org/" + doi);
+                doi_link.setAttribute("target", "_blank");
+                var dt_ele = doi_ele.parentElement;
+                dt_ele.removeChild(dt_ele.lastElementChild);
+                dt_ele.appendChild(doi_link);
+                
+            }
+        }
+    }
+    
+    // Process for each item
     for (let i = 0; i < items.length; i++) {
+        // skip if already added
         if (items[i].querySelector("span.tw-icon") !== null) {
             continue;
         }
         var eid;
-        // for author profile
-        if (items[i].dataset.testid === "results-list-item") {
-            var btn = items[i].querySelector("button[class*='Button-module']");
-            if (btn === null) {
-                // Not find a button, i.e. no links for this publication
-                continue;
-            }
-            eid = btn.dataset.testid.replace('button-abstract-', '');
-        } else {
+        if (page_type === "reference" || page_type === "citation") {
+            eid = items[i].querySelector("input").value;
+        } else if (page_type === "search") {
             var label = items[i].querySelector("td > label[for]");
-            
-            if (label !== null) {
-                eid = label.getAttribute("for").replace("document-",'');
-            } else {
-                eid = items[i].querySelector("input").value;
-            }
+            eid = label.getAttribute("for").replace("document-",'');
         }
         if (eid === undefined) {
             continue;
         }
-        gettiddlerEID(eid, items[i], host);
+        gettiddlerEID2(eid, items[i], host, page_type);
         //console.log(eid);
     }
-    // for doi
-    let infos = document.querySelectorAll("div[class*='SourceInfo-module'] > div > dl > dt");
-    for (let i = 0; i < infos.length; i++) {
-        if (infos[i].innerText == "DOI") {
-            let doi_ele = infos[i].nextSibling;
-            let doi = doi_ele.innerText;
-            let doi_link = document.createElement("a");
-            doi_link.innerHTML  = doi;
-            doi_link.setAttribute("href", "https://doi.org/" + doi);
-            doi_link.setAttribute("target", "_blank");
-            var dt_ele = doi_ele.parentElement;
-            dt_ele.removeChild(dt_ele.lastElementChild);
-            dt_ele.appendChild(doi_link);
-            
-        }
-    }
+    
     //console.log(items.length);
 }
 
@@ -144,12 +167,6 @@ function scopus_authorpage(element, host, page_type) {
     if (items === null || items.length === 0) {
         return;
     }
-    var selector_scopus = [
-        "tr.referencesUL", // for reference list 
-        "tr.searchArea", // for search page
-        "tr[class*='TableItems-module']:has( > td > label)", // for citation list
-        "li[data-testid='results-list-item']" // for author publication list
-        ]
     // for each item in the page
     for (let i = 0; i < items.length; i++) {
         if (items[i].querySelector("span.tw-icon") !== null ||
@@ -203,6 +220,6 @@ async function run_scopus (host) {
           })
       })
     } else {
-        scopus_pubpage(host, page_type);
+        scopus_otherpages(host);
     }
 }

@@ -40,7 +40,9 @@ async function gettiddler(id, type, host) {
             div.appendChild(twspan("tw-svg"));
             if (type === "eid") {
                 var doi = getDOI();
-                div.appendChild(scholara(doi));
+                if (doi !== undefined) {
+                    div.appendChild(scholara(doi));
+                }
             } else {
                 div.appendChild(scholara(id));
                 if (tiddler[0]["scopus-eid"] !== undefined) {
