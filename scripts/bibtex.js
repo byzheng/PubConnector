@@ -1,4 +1,17 @@
 
+function tw_link(title, cls, host, hidden = false) {
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
+    img.classList.add(cls);
+    var sa = document.createElement("a");
+    sa.appendChild(img);
+    var url = new URL("#" + title, host);
+    sa.setAttribute("href", url);
+    sa.setAttribute("target", "_blank");
+    sa.classList.add("tw-icon");
+    return sa;
+}
+
 function twspan(cls, hidden = false) {
     var img = document.createElement("img");
     img.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
@@ -74,7 +87,7 @@ async function gettiddler(id, type, host) {
         if (tiddler.length > 0) {
             var div = document.createElement("div");
             div.id = "tw-banner";
-            div.appendChild(twspan("tw-svg"));
+            div.appendChild(tw_link(tiddler[0].title, "tw-svg", host));
             if (type === "eid") {
                 var doi = getDOI();
                 if (doi !== undefined) {
@@ -162,20 +175,20 @@ function publisher(host) {
 chrome.storage.sync.get({
     host: 'http://localhost:8080'
 },
-    (items) => {
+    (options) => {
     var href = window.location.href;
     // For google scholar
     if (href.includes("scholar.google")) {
-        scholar(href, items.host);
+        scholar(href, options.host);
     } else if (href.includes("scopus.com")) {
         window.addEventListener('load', function load(e){
               window.removeEventListener('load', load, false);
               this.setTimeout(() => {
-                run_scopus(items.host)
+                run_scopus(options.host)
               }, 2000)
             }, false);
     } else {
-        publisher(items.host);
+        publisher(options.host);
     }
 
 });

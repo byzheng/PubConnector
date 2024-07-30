@@ -13,41 +13,6 @@ function scopusa(eid) {
     return sa;
 }
 
-async function gettiddlerEID(eid, item, host) {
-    let filter = encodeURIComponent("[tag[bibtex-entry]field:scopus-eid[" + eid + "]]");
-    const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-        const tiddler = await response.json();
-        if (tiddler.length > 0) {
-            var span = twspan("tw-svg-small");
-            var label = item.querySelector("label");
-            if (label !== null) {
-                if (label.querySelector("span")) {
-                    label.appendChild(span);
-                } else {
-                    label.parentNode.insertBefore(span, label.nextSibling);
-                }
-            } else {
-                var icon_ele = item.querySelector("div.refAuthorTitle, td[data-type='docTitle']");
-                if (icon_ele !== null) {
-                    icon_ele.prepend(span);
-                } else {
-                    item.appendChild(span);
-                }
-            }
-            setItemStyle(item);
-        }
-    } catch (error) {
-        //console.error(error.message);
-    }
-}
-
-
 async function gettiddlerEID2(eid, item, host, page_type) {
     let filter = encodeURIComponent("[tag[bibtex-entry]field:scopus-eid[" + eid + "]]");
     const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
@@ -59,7 +24,7 @@ async function gettiddlerEID2(eid, item, host, page_type) {
 
         const tiddler = await response.json();
         if (tiddler.length > 0) {
-            var span = twspan("tw-svg-small");
+            var span = tw_link(tiddler[0].title, "tw-svg-small", host);
             if (page_type === "authorpage") {
                 item.appendChild(span);
             } else {

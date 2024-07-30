@@ -31,7 +31,7 @@ async function gettiddlerCID(id, item, page_type, host) {
 
         const tiddler = await response.json();
         if (tiddler.length > 0) {
-            var span = twspan("tw-svg-small");
+            var span = tw_link(tiddler[0].title, "tw-svg-small", host);
             var qry;
             if (page_type === "scholar") {
                 qry = "div.gs_fl, h3.gs_ora_tt";
