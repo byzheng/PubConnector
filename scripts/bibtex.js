@@ -12,6 +12,23 @@ function tw_link(title, cls, host, hidden = false) {
     return sa;
 }
 
+function tw_span(title, cls, host, hidden = false) {
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
+    img.classList.add(cls);
+    var span = document.createElement("span");
+    span.classList.add("tw-icon");
+    span.appendChild(img);
+    if (!hidden) {
+        span.onclick = function() 
+        { 
+            update_story(title, host);
+        };
+    }
+    span.hidden = hidden;
+    return span;
+}
+
 function twspan(cls, hidden = false) {
     var img = document.createElement("img");
     img.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
@@ -87,7 +104,7 @@ async function gettiddler(id, type, host) {
         if (tiddler.length > 0) {
             var div = document.createElement("div");
             div.id = "tw-banner";
-            div.appendChild(tw_link(tiddler[0].title, "tw-svg", host));
+            div.appendChild(tw_span(tiddler[0].title, "tw-svg", host));
             if (type === "eid") {
                 var doi = getDOI();
                 if (doi !== undefined) {
