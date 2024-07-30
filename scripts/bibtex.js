@@ -10,12 +10,48 @@ function twspan(cls, hidden = false) {
     return span;
 }
 
+function twColleagueEle(tiddler) {
+    var span = document.createElement("span");
+    span.classList.add("tw-colleague");
+    if (tiddler.scopus === undefined) {
+        span.innerText = tiddler.title;
+    } else {
+        var sa = document.createElement("a");
+        sa.innerHTML = tiddler.title;
+        sa.setAttribute("href", tiddler.scopus);
+        sa.setAttribute("target", "_blank");
+        span.appendChild(sa);
+    }
+    return span;
+}
+
 function setItemStyle(item) {
     item.style.background = "#e6e6e666";
     item.style["box-shadow"] = "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
     item.style.padding = "0.2em 0.4em";
 }
+async function tiddlerColleagues(title, element, host) {
+    var filter = "[[" + title + "]tags[]tag[Colleague]]";
+    filter = encodeURIComponent(filter);
+    const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
 
+        const tiddlers = await response.json();
+        if (tiddlers.length > 0) {
+            var div_col = document.createElement("div");
+            for (let i = 0; i < tiddlers.length; i++) {
+                div_col.appendChild(twColleagueEle(tiddlers[i]));
+            }
+            element.insertBefore(div_col, element.firstChild);
+        }
+    } catch (error) {
+        console.error(error.message);
+    }
+}
 
 async function gettiddler(id, type, host) {
     var filter;
@@ -51,6 +87,12 @@ async function gettiddler(id, type, host) {
             }
             dragElement(div);
             document.body.appendChild(div);
+            
+            // insert authors
+            var ele = document.querySelector("div[data-testid='author-list']");
+            if (ele !== undefined || ele !== null) {
+                tiddlerColleagues(tiddler[0].title, ele, host)
+            }
         }
     } catch (error) {
         console.error(error.message);

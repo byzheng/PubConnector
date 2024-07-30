@@ -35,3 +35,14 @@
     width: 24px;
     height: 24px;
 }
+
+.tw-colleague {
+    margin: 0.2em 0.2em;
+    padding: 0.4em 1em;
+    border: 1px solid #ccc;
+    border-radius: 1.5em;
+    text-align: center;
+    background-color:#c8ccc9;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    display: inline-block;
+}

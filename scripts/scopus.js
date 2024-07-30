@@ -130,6 +130,7 @@ function scopus_otherpages(host) {
                 doi_link.innerHTML  = doi;
                 doi_link.setAttribute("href", "https://doi.org/" + doi);
                 doi_link.setAttribute("target", "_blank");
+                doi_link.style.color = "#007398";
                 var dt_ele = doi_ele.parentElement;
                 dt_ele.removeChild(dt_ele.lastElementChild);
                 dt_ele.appendChild(doi_link);
