@@ -43,7 +43,7 @@ async function gettiddlerEID(eid, item, host) {
             setItemStyle(item);
         }
     } catch (error) {
-        console.error(error.message);
+        //console.error(error.message);
     }
 }
 
@@ -87,7 +87,7 @@ async function gettiddlerEID2(eid, item, host, page_type) {
         }
         item.removeAttribute('data-working');
     } catch (error) {
-        console.error(error.message);
+        //console.error(error.message);
     }
 }
 

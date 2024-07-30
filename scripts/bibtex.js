@@ -20,6 +20,7 @@ function twColleagueEle(tiddler) {
         sa.innerHTML = tiddler.title;
         sa.setAttribute("href", tiddler.scopus);
         sa.setAttribute("target", "_blank");
+        sa.classList.add("tw-link");
         span.appendChild(sa);
     }
     return span;
@@ -46,10 +47,10 @@ async function tiddlerColleagues(title, element, host) {
             for (let i = 0; i < tiddlers.length; i++) {
                 div_col.appendChild(twColleagueEle(tiddlers[i]));
             }
-            element.insertBefore(div_col, element.firstChild);
+            element.parentNode.insertBefore(div_col, element);
         }
     } catch (error) {
-        console.error(error.message);
+        //console.error(error.message);
     }
 }
 
@@ -89,13 +90,27 @@ async function gettiddler(id, type, host) {
             document.body.appendChild(div);
             
             // insert authors
-            var ele = document.querySelector("div[data-testid='author-list']");
+            var selector_col = [
+                "div[data-testid='author-list']", // scopus.com
+                "ul[data-test='authors-list']", // nature.com
+                "ul[class*='c-article-author-list']", // biomedcentral.com
+                "div[class*='art-authors']", // mdpi.com
+                "div.literatumAuthors", // tandfonline.com
+                "div.contributors", // science.com
+                "div.app-overview-section", // springer.com
+                "div.authors", // frontiersin.org
+                "span.editors", // publish.csiro.au
+                "div.accordion-tabbed", // wiley.com
+                "div.al-authors-list", // oup.com
+                "div.AuthorGroups" // sciencedirect.com
+            ]
+            var ele = document.querySelector(selector_col.join(", "));
             if (ele !== undefined || ele !== null) {
                 tiddlerColleagues(tiddler[0].title, ele, host)
             }
         }
     } catch (error) {
-        console.error(error.message);
+        //console.error(error.message);
     }
 }
 

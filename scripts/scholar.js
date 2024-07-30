@@ -45,7 +45,7 @@ async function gettiddlerCID(id, item, page_type, host) {
             setItemStyle(item);
         }
     } catch (error) {
-        console.error(error.message);
+        //console.error(error.message);
     }
 }
 
