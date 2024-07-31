@@ -9,17 +9,14 @@ function tw_link(title, cls, host, hidden = false) {
     sa.setAttribute("href", url);
     sa.setAttribute("target", "_blank");
     sa.classList.add("tw-icon");
-    chrome.runtime.sendMessage({
-        from: "webpage",
-        tiddler: title
+    sa.addEventListener("click", function(event){ 
+        event.preventDefault();
+        chrome.runtime.sendMessage({
+            from: "webpage",
+            tiddler: title
+        });       
     });
-    // (async () => {
-        // const response = await chrome.runtime.sendMessage({
-            // from: "webpage",
-            // message: title
-        // });
-      
-    // })();
+    
     return sa;
 }
 
