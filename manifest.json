@@ -34,6 +34,13 @@
     "128": "icons/normal-128.png"
     }
   },
+  "background": {
+       "service_worker": "scripts/background.js",
+       "type": "module"
+   },
+    "externally_connectable": {
+        "matches": ["*://*/*"]
+    },
   "content_scripts": [
     {
       "js": [
@@ -61,6 +68,14 @@
         "https://*.scopus.com/*",
         "https://*.scholar.google.com/*",
         "https://*.scholar.google.com.au/*"
+      ]
+    },
+    {
+      "js": [
+        "scripts/tiddlywiki.js"],
+      "run_at": "document_end",
+      "matches": [
+        "http://localhost/*"
       ]
     }
   ]
