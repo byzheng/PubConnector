@@ -11,15 +11,15 @@ function tw_link(title, cls, host, hidden = false) {
     sa.classList.add("tw-icon");
     chrome.runtime.sendMessage({
         from: "webpage",
-        message: title
+        tiddler: title
     });
-    (async () => {
-        const response = await chrome.runtime.sendMessage({
-            from: "webpage",
-            message: title
-        });
+    // (async () => {
+        // const response = await chrome.runtime.sendMessage({
+            // from: "webpage",
+            // message: title
+        // });
       
-    })();
+    // })();
     return sa;
 }
 
