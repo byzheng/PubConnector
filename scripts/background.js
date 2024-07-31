@@ -11,16 +11,6 @@ chrome.runtime.onMessage.addListener(
                     from: "worker", 
                     tiddler: request.tiddler});
             });
-        // (async () => {
-          
-          // const response = await chrome.tabs.sendMessage(tab.id, {
-            // from: "worker", 
-            // message: request.title});
-          // // // do something with response here, not outside the function
-          // // console.log(response);
-        // })();
-      
-      
     }
   }
 );
