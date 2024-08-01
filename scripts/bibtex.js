@@ -34,25 +34,22 @@ function twspan(cls, hidden = false) {
 function twColleagueEle(tiddler, host) {
     var span = document.createElement("span");
     span.classList.add("tw-colleague");
-    if (tiddler.scopus === undefined) {
-        span.innerText = tiddler.title;
-    } else {
-        var sa = document.createElement("a");
-        sa.innerHTML = tiddler.title;
-        var url = new URL("#" + tiddler.title, host);
-        sa.setAttribute("href", url);
-        sa.setAttribute("target", "_blank");
-        sa.classList.add("tw-link");
-        sa.addEventListener("click", function(event){ 
-            event.preventDefault();
-            chrome.runtime.sendMessage({
-                from: "webpage",
-                tiddler: tiddler.title
-            });       
-        });
-        
-        span.appendChild(sa);
-    }
+    var sa = document.createElement("a");
+    sa.innerHTML = tiddler.title;
+    var url = new URL("#" + tiddler.title, host);
+    sa.setAttribute("href", url);
+    sa.setAttribute("target", "_blank");
+    sa.classList.add("tw-link");
+    sa.addEventListener("click", function(event){ 
+        event.preventDefault();
+        chrome.runtime.sendMessage({
+            from: "webpage",
+            tiddler: tiddler.title
+        });       
+    });
+    
+    span.appendChild(sa);
+ 
     return span;
 }
 
