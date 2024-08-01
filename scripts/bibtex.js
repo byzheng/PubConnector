@@ -31,7 +31,7 @@ function twspan(cls, hidden = false) {
     return span;
 }
 
-function twColleagueEle(tiddler) {
+function twColleagueEle(tiddler, host) {
     var span = document.createElement("span");
     span.classList.add("tw-colleague");
     if (tiddler.scopus === undefined) {
@@ -39,9 +39,18 @@ function twColleagueEle(tiddler) {
     } else {
         var sa = document.createElement("a");
         sa.innerHTML = tiddler.title;
-        sa.setAttribute("href", tiddler.scopus);
+        var url = new URL("#" + tiddler.title, host);
+        sa.setAttribute("href", url);
         sa.setAttribute("target", "_blank");
         sa.classList.add("tw-link");
+        sa.addEventListener("click", function(event){ 
+            event.preventDefault();
+            chrome.runtime.sendMessage({
+                from: "webpage",
+                tiddler: tiddler.title
+            });       
+        });
+        
         span.appendChild(sa);
     }
     return span;
@@ -66,7 +75,7 @@ async function tiddlerColleagues(title, element, host) {
         if (tiddlers.length > 0) {
             var div_col = document.createElement("div");
             for (let i = 0; i < tiddlers.length; i++) {
-                div_col.appendChild(twColleagueEle(tiddlers[i]));
+                div_col.appendChild(twColleagueEle(tiddlers[i], host));
             }
             element.parentNode.insertBefore(div_col, element);
         }
