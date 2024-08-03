@@ -13,7 +13,8 @@ function tw_link(title, cls, host, hidden = false) {
         event.preventDefault();
         chrome.runtime.sendMessage({
             from: "webpage",
-            tiddler: title
+            tiddler: title,
+            host: host
         });       
     });
     
@@ -44,7 +45,8 @@ function twColleagueEle(tiddler, host) {
         event.preventDefault();
         chrome.runtime.sendMessage({
             from: "webpage",
-            tiddler: tiddler.title
+            tiddler: tiddler.title,
+            host: host
         });       
     });
     
@@ -203,6 +205,7 @@ chrome.storage.sync.get({
             }, false);
     } else {
         publisher(options.host);
+        citation_hidden();
     }
 
 });
