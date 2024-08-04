@@ -3,11 +3,25 @@
   <head>
     <title>Utility for TiddlyWiki</title>
   </head>
-  <body>
+  <body style="min-width:500px;">
+   <div style="width:100%">
+    <div>
+    <label for="host">Host</label>
     <input type="text" id="host" name="host" value="http://localhost:8080"> </input>
-    
+    </div>
+    <div>
+    <label for="filters">Filters</label><br>
+    <textarea style="width:100%;min-height:200px" 
+        id="filters" 
+        name="filters" 
+        rows="4" 
+        cols="50">
+    </textarea>
+    </div>
     <div id="status"></div>
     <button id="save">Save</button>
+    <button id="reset">Reset</button>
+   </div>
     <script src="scripts/options.js"></script>
   </body>
 </html>

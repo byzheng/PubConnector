@@ -189,7 +189,8 @@ function publisher(host) {
 
 
 chrome.storage.sync.get({
-    host: 'http://localhost:8080'
+    host: 'http://localhost:8080',
+    filters: ""
 },
     (options) => {
     var href = window.location.href;
@@ -205,7 +206,7 @@ chrome.storage.sync.get({
             }, false);
     } else {
         publisher(options.host);
-        citation_hidden();
+        context_menu(options);
     }
 
 });
