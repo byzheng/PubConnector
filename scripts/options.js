@@ -13,6 +13,12 @@ const defaultConfig = {
             'selector': {
                 'citation': "a[data-xocs-content-type='reference'] > span"
             }
+        }, 
+        {
+            'url': "frontiersin.org",
+            'selector': {
+                'citation': "a[href^='#B']"
+            }
         }
     ]
 };
