@@ -1,16 +1,16 @@
 // Saves options to chrome.storage
 const defaultConfig = { 
     host: 'http://localhost:8080',
-    filters: [
+    selectors: [
         {
             'url': "nature.com",
-            'filter': {
+            'selector': {
                 'citation': "sup:has(>a[data-test='citation-ref'])"
             }
         }, 
         {
             'url': "sciencedirect.com",
-            'filter': {
+            'selector': {
                 'citation': "a[data-xocs-content-type='reference'] > span"
             }
         }
@@ -18,12 +18,12 @@ const defaultConfig = {
 };
 const saveOptions = () => {
   const host = document.getElementById('host').value;
-  const filters = document.getElementById('filters').value;
+  const selectors = document.getElementById('selectors').value;
   
   chrome.storage.sync.set(
     { 
         host: host,
-        filters: filters
+        selectors: selectors
     },
     () => {
       // Update status to let user know options were saved.
@@ -43,15 +43,15 @@ const restoreOptions = () => {
     defaultConfig,
     (items) => {
       document.getElementById('host').value = items.host;
-      document.getElementById('filters').value = items.filters;
+      document.getElementById('selectors').value = items.selectors;
     }
   );
 };
 
 const resetOptions = () => {
   document.getElementById('host').value = defaultConfig.host;
-  let filters = JSON.stringify(defaultConfig.filters, null, 2);
-  document.getElementById('filters').value = filters;
+  let selectors = JSON.stringify(defaultConfig.selectors, null, 2);
+  document.getElementById('selectors').value = selectors;
   saveOptions();
 };
 

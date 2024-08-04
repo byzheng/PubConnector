@@ -11,9 +11,9 @@ function context_menu(options) {
     );
 
     function citation_hidden() {
-        let selectors = JSON.parse(options.filters)
+        let selectors = JSON.parse(options.selectors)
             .map(function(item) {
-                return item.filter.citation;
+                return item.selector.citation;
             })
             .join(",");
         var elements = document.querySelectorAll(selectors);

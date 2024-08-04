@@ -190,7 +190,7 @@ function publisher(host) {
 
 chrome.storage.sync.get({
     host: 'http://localhost:8080',
-    filters: ""
+    selectors: ""
 },
     (options) => {
     var href = window.location.href;
