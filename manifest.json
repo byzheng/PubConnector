@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "manifest_version": 3,
   "permissions": [
-    "storage", "tabs"
+    "storage", "tabs", "contextMenus"
   ],
   "options_ui": {
     "page": "options.html",
@@ -41,6 +41,7 @@
   "content_scripts": [
     {
       "js": [
+        "scripts/context_menu.js",
         "scripts/utils.js",
         "scripts/scholar.js",
         "scripts/scopus.js",

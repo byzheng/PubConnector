@@ -1,4 +1,5 @@
 
+// transfer message
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     console.log(request);
@@ -26,3 +27,29 @@ chrome.runtime.onMessage.addListener(
     }
   }
 );
+
+// Popup menu
+chrome.runtime.onInstalled.addListener(async () => {
+  chrome.contextMenus.create({
+      id: "citation-hidden",
+      title: "Citation Hidden"
+    })
+});
+
+
+
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId === "citation-hidden") {
+    console.log('link info clicked ', info);
+    
+    (async () => {
+      const [tab] = await chrome.tabs.query({active: true, lastFocusedWindow: true});
+      // send message to console.js to ask for details from the DOM about the context link
+      const response = await chrome.tabs.sendMessage(tab.id, {
+            from: "context-menu",
+            menu: "citation-hidden"
+        });
+ 
+    })();
+  }
+});
