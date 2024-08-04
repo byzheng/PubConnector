@@ -1,6 +1,6 @@
 // Saves options to chrome.storage
 const defaultConfig = { 
-    host: 'http://localhost:8080',
+    host: 'http://localhost',
     selectors: [
         {
             'url': "nature.com",
