@@ -93,7 +93,14 @@ function scopus_otherpages(host) {
                 let doi = doi_ele.innerText;
                 let doi_link = document.createElement("a");
                 doi_link.innerHTML  = doi;
-                doi_link.setAttribute("href", "https://doi.org/" + doi);
+                let url = "https://doi.org/" + doi;
+                if (doi.startsWith("10.1071")) {
+                    let prefix = doi.substring(8,10);
+                    let pid = doi.substring(8);
+                    url =                   "https://www.publish.csiro.au/" + 
+                        prefix + "/Fulltext/" + pid;
+                }
+                doi_link.setAttribute("href", url);
                 doi_link.setAttribute("target", "_blank");
                 doi_link.style.color = "#007398";
                 var dt_ele = doi_ele.parentElement;
