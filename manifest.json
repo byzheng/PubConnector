@@ -1,6 +1,6 @@
 {
-  "name": "TW-Utils",
-  "description": "Utility for Tiddlywiki",
+  "name": "Research Utility",
+  "description": "Utility for Researech",
   "version": "0.0.1",
   "manifest_version": 3,
   "permissions": [
