@@ -212,7 +212,7 @@ chrome.storage.sync.get({
             }, false);
     } else {
         publisher(options.host);
-        context_menu(options);
     }
+    context_menu(options);
 
 });
