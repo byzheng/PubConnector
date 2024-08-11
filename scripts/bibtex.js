@@ -32,9 +32,10 @@ function twspan(cls, hidden = false) {
     return span;
 }
 
-function twColleagueEle(tiddler, host) {
+function twTagsEle(tiddler, type, host) {
     var span = document.createElement("span");
-    span.classList.add("tw-colleague");
+    span.classList.add("tw-tag");
+    span.classList.add("tw-" + type.toLowerCase());
     var sa = document.createElement("a");
     sa.innerHTML = tiddler.title;
     var url = new URL("#" + tiddler.title, host);
@@ -60,8 +61,9 @@ function setItemStyle(item) {
     item.style["box-shadow"] = "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
     item.style.padding = "0.2em 0.4em";
 }
-async function tiddlerColleagues(title, element, host) {
-    var filter = "[[" + title + "]tags[]tag[Colleague]]";
+
+async function tiddlerTags(title, element, type, host) {
+    var filter = "[[" + title + "]tags[]tag[" + type + "]]";
     filter = encodeURIComponent(filter);
     const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
     try {
@@ -72,11 +74,11 @@ async function tiddlerColleagues(title, element, host) {
 
         const tiddlers = await response.json();
         if (tiddlers.length > 0) {
-            var div_col = document.createElement("div");
+            var span_col = document.createElement("span");
             for (let i = 0; i < tiddlers.length; i++) {
-                div_col.appendChild(twColleagueEle(tiddlers[i], host));
+                span_col.appendChild(twTagsEle(tiddlers[i], type, host));
             }
-            element.parentNode.insertBefore(div_col, element);
+            element.appendChild(span_col);
         }
     } catch (error) {
         //console.error(error.message);
@@ -135,7 +137,11 @@ async function gettiddler(id, type, host) {
             ]
             var ele = document.querySelector(selector_col.join(", "));
             if (ele !== undefined || ele !== null) {
-                tiddlerColleagues(tiddler[0].title, ele, host)
+                var div_col = document.createElement("div");
+                tiddlerTags(tiddler[0].title, div_col, "Colleague", host);
+                tiddlerTags(tiddler[0].title, div_col, "Domain", host);
+                tiddlerTags(tiddler[0].title, div_col, "Place", host);
+                ele.parentNode.insertBefore(div_col, ele);
             }
         }
     } catch (error) {
