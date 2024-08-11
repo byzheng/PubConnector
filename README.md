@@ -1,4 +1,4 @@
-# chrome-research
+# tw-research
 
 This is an Chrome Extension for my research with these features
 
