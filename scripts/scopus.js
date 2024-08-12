@@ -173,6 +173,30 @@ function scopus_authorpage(element, host, page_type) {
 }
 
 
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function scopus_authorpage_await(page_type, host) {
+    await timeout(2000);
+    let element = document.querySelector("div#documents-panel");
+    scopus_authorpage(element, host, page_type);
+    const observer = new MutationObserver(mutationList =>  
+      mutationList.filter(m => m.type === 'childList').forEach(m => {  
+        m.addedNodes.forEach(function(element) {
+            scopus_authorpage(element, host, page_type)
+        });  
+      }));  
+      const targetElements = document.querySelectorAll("div#documents-panel");
+      targetElements.forEach((i) => {
+        observer.observe(i, {
+          childList: true,
+          subtree: true
+          })
+      })
+    return;
+}
+
 async function run_scopus (host) {
     var page_ele = document.querySelector("div#documents-panel");
     var page_type = "publication";
@@ -180,19 +204,7 @@ async function run_scopus (host) {
         page_type = "authorpage";
     }
     if (page_type === "authorpage") {
-      const observer = new MutationObserver(mutationList =>  
-      mutationList.filter(m => m.type === 'childList').forEach(m => {  
-        m.addedNodes.forEach(function(element) {
-            scopus_authorpage(element, host, page_type)
-        });  
-      }));  
-      const targetElements = document.querySelectorAll("div#documents-panel")
-      targetElements.forEach((i) => {
-        observer.observe(i, {
-          childList: true,
-          subtree: true
-          })
-      })
+        scopus_authorpage_await(page_type, host);
     } else {
         scopus_otherpages(host);
     }
