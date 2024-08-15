@@ -52,13 +52,15 @@ function imgURL(url, icon) {
 }
 
 
-async function getCollage(id, type, host) {
+async function getCollague(id, type, host) {
     if (document.querySelector("#tw-banner") !== null) {  
         return;
     }
     var filter;
     if (type === "scopus") {
         filter = "[tag[Colleague]search:scopus[" + id + "]]";
+    } else if (type === "scholar") {
+        filter = "[tag[Colleague]search:google-scholar[" + id + "]]";
     } else{
         console.error("Not support type " + type); 
     } 

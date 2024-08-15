@@ -51,9 +51,15 @@ async function gettiddlerCID(id, item, page_type, host) {
 
 
 function scholar(href, host) {
+    
     var page_type = "scholar";
     if (href.includes("citations?user=")) {
         page_type = "citation";
+        // Create author toolbar
+        let sid = URL.parse(window.location.href).searchParams.get("user");
+        if (sid !== undefined) {
+            getCollague(sid, "scholar", host);
+        }
     }
     var items = document.querySelectorAll("div.gs_r.gs_or.gs_scl, div.gs_ora, tr.gsc_a_tr");
         for (let i = 0; i < items.length; i++) {
