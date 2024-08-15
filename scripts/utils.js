@@ -6,6 +6,10 @@ let colleague_fields = [
     {
         name: "google-scholar",
         icon: "images/GoogleScholarSquare.svg"
+    },
+    {
+        name: "orcid",
+        icon: "images/Orcid.svg"
     }
     
 ];
@@ -49,6 +53,9 @@ function imgURL(url, icon) {
 
 
 async function getCollage(id, type, host) {
+    if (document.querySelector("#tw-banner") !== null) {  
+        return;
+    }
     var filter;
     if (type === "scopus") {
         filter = "[tag[Colleague]search:scopus[" + id + "]]";
@@ -65,6 +72,7 @@ async function getCollage(id, type, host) {
 
         const tiddler = await response.json();
         if (tiddler.length > 0) {
+            
             var div = document.createElement("div");
             div.id = "tw-banner";
             div.appendChild(tw_link(tiddler[0].title, "tw-svg", host));
