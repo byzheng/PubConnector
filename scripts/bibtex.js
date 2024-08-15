@@ -126,6 +126,7 @@ async function gettiddler(id, type, host) {
                 "ul[data-test='authors-list']", // nature.com
                 "ul[class*='c-article-author-list']", // biomedcentral.com
                 "div[class*='art-authors']", // mdpi.com
+                "ul.author-list", // plos.org
                 "div.literatumAuthors", // tandfonline.com
                 "div.contributors", // science.com
                 "div.app-overview-section", // springer.com

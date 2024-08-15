@@ -134,8 +134,12 @@ function scopus_otherpages(host) {
     //console.log(items.length);
 }
 
-
 function scopus_authorpage(element, host, page_type) {
+    // Create author toolbar
+    let aid = URL.parse(window.location.href).searchParams.get("authorId");
+    if (aid !== undefined) {
+        getCollage(aid, "scopus", host);
+    }
     
     var items = element.querySelectorAll("li[data-testid='results-list-item']");
     if (items === null || items.length === 0) {

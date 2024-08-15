@@ -20,6 +20,7 @@
     {
        "resources": [
             "images/Tiddlywiki.svg",
+            "images/Orcid.svg",
             "images/Scopus.svg",
             "images/GoogleScholarSquare.svg"
         ],
@@ -65,7 +66,8 @@
         "https://*.sciencedirect.com/*",
         "https://*.scopus.com/*",
         "https://*.scholar.google.com/*",
-        "https://*.scholar.google.com.au/*"
+        "https://*.scholar.google.com.au/*",
+        "https://*.plos.org/*"
       ]
     },
     {
