@@ -204,7 +204,13 @@ chrome.storage.sync.get({
     var href = window.location.href;
     // For google scholar
     if (href.includes("scholar.google")) {
-        scholar(href, options.host);
+        window.addEventListener('load', function load(e){
+              window.removeEventListener('load', load, false);
+              this.setTimeout(() => {
+                    run_scholar(options.host)
+              }, 500)
+            }, false);
+        
     } else if (href.includes("scopus.com")) {
         window.addEventListener('load', function load(e){
               window.removeEventListener('load', load, false);

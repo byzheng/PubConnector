@@ -52,7 +52,7 @@ function imgURL(url, icon) {
 }
 
 
-async function getCollague(id, type, host) {
+async function getColleague(id, type, host) {
     if (document.querySelector("#tw-banner") !== null) {  
         return;
     }

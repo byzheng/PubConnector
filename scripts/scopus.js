@@ -138,7 +138,7 @@ function scopus_authorpage(element, host, page_type) {
     // Create author toolbar
     let aid = URL.parse(window.location.href).searchParams.get("authorId");
     if (aid !== undefined) {
-        getCollague(aid, "scopus", host);
+        getColleague(aid, "scopus", host);
     }
     
     var items = element.querySelectorAll("li[data-testid='results-list-item']");
