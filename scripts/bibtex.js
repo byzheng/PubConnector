@@ -36,6 +36,35 @@ function twTagsEle(tiddler, type, host) {
     var span = document.createElement("span");
     span.classList.add("tw-tag");
     span.classList.add("tw-" + type.toLowerCase());
+
+    // icon for colleague
+   
+    if (type === "Colleague") {
+        let img_path = "";
+        img_path = tiddler.image;
+        var img = document.createElement("img");
+        let url_img = new URL(img_path, host);
+        img.src = url_img;
+        img.style.width = "16px";
+        img.style.height = "16px";
+
+        // img.addEventListener('mouseenter', function() {
+            
+        //     img.style.width = "200px";
+        //     img.style.height = "200px";
+        // }, false);
+        
+        // img.addEventListener('mouseleave', function() {
+            
+        //     img.style.width = "16px";
+        //     img.style.height = "16px";
+        // }, false);
+
+        span.appendChild(img);
+    }
+    
+    
+    // link back to tiddlywiki
     var sa = document.createElement("a");
     sa.innerHTML = tiddler.title;
     var url = new URL("#" + tiddler.title, host);
@@ -50,9 +79,11 @@ function twTagsEle(tiddler, type, host) {
             host: host
         });       
     });
-    
     span.appendChild(sa);
- 
+    
+    
+    
+
     return span;
 }
 
