@@ -9,15 +9,15 @@ function tw_link(title, cls, host, hidden = false) {
     sa.setAttribute("href", url);
     sa.setAttribute("target", "_blank");
     sa.classList.add("tw-icon");
-    sa.addEventListener("click", function(event){ 
+    sa.addEventListener("click", function (event) {
         event.preventDefault();
         chrome.runtime.sendMessage({
             from: "webpage",
             tiddler: title,
             host: host
-        });       
+        });
     });
-    
+
     return sa;
 }
 
@@ -38,8 +38,8 @@ function twTagsEle(tiddler, type, host) {
     span.classList.add("tw-" + type.toLowerCase());
 
     // icon for colleague
-   
-    if (type === "Colleague") {
+
+    if (type === "Colleague" && tiddler.image !== undefined && tiddler.image !== "") {
         let img_path = "";
         img_path = tiddler.image;
         var img = document.createElement("img");
@@ -49,21 +49,21 @@ function twTagsEle(tiddler, type, host) {
         img.style.height = "16px";
 
         // img.addEventListener('mouseenter', function() {
-            
+
         //     img.style.width = "200px";
         //     img.style.height = "200px";
         // }, false);
-        
+
         // img.addEventListener('mouseleave', function() {
-            
+
         //     img.style.width = "16px";
         //     img.style.height = "16px";
         // }, false);
 
         span.appendChild(img);
     }
-    
-    
+
+
     // link back to tiddlywiki
     var sa = document.createElement("a");
     sa.innerHTML = tiddler.title;
@@ -71,18 +71,18 @@ function twTagsEle(tiddler, type, host) {
     sa.setAttribute("href", url);
     sa.setAttribute("target", "_blank");
     sa.classList.add("tw-link");
-    sa.addEventListener("click", function(event){ 
+    sa.addEventListener("click", function (event) {
         event.preventDefault();
         chrome.runtime.sendMessage({
             from: "webpage",
             tiddler: tiddler.title,
             host: host
-        });       
+        });
     });
     span.appendChild(sa);
-    
-    
-    
+
+
+
 
     return span;
 }
@@ -123,7 +123,7 @@ async function gettiddler(id, type, host) {
             id + "]]";
     } else if (type === "eid") {
         filter = "[tag[bibtex-entry]field:scopus-eid[" + id + "]]";
-    } 
+    }
     filter = encodeURIComponent(filter);
     const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
     try {
@@ -148,9 +148,10 @@ async function gettiddler(id, type, host) {
                     div.appendChild(scopusa(tiddler[0]["scopus-eid"]));
                 }
             }
+
             dragElement(div);
             document.body.appendChild(div);
-            
+
             // insert authors
             var selector_col = [
                 "div[data-testid='author-list']", // scopus.com
@@ -175,6 +176,14 @@ async function gettiddler(id, type, host) {
                 tiddlerTags(tiddler[0].title, div_col, "Place", host);
                 ele.parentNode.insertBefore(div_col, ele);
             }
+            let totalWidth = 0;
+            for (const child of div.children) {
+                totalWidth += child.offsetWidth;
+            }
+
+            // Optionally add padding or margins
+            const padding = 100; // Example padding
+            div.style.width = `${totalWidth + padding}px`;
         }
     } catch (error) {
         //console.error(error.message);
@@ -183,12 +192,12 @@ async function gettiddler(id, type, host) {
 
 function dragElement(elmnt) {
     var pos1 = 0,
-    pos2 = 0,
-    pos3 = 0,
-    pos4 = 0;
+        pos2 = 0,
+        pos3 = 0,
+        pos4 = 0;
     elmnt.onmousedown = dragMouseDown;
     function dragMouseDown(e) {
-        e = e || window.event;
+
         e.preventDefault();
         // get the mouse cursor position at startup:
         pos3 = e.clientX;
@@ -199,16 +208,27 @@ function dragElement(elmnt) {
     }
 
     function elementDrag(e) {
-        e = e || window.event;
         e.preventDefault();
         // calculate the new cursor position:
         pos1 = pos3 - e.clientX;
         pos2 = pos4 - e.clientY;
         pos3 = e.clientX;
         pos4 = e.clientY;
+        // Get viewport dimensions
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        // pos1 = Math.max(0, Math.min(pos1, viewportWidth - elmnt.offsetWidth));
+        // pos2 = Math.max(0, Math.min(pos2, viewportHeight - elmnt.offsetHeight));
+        var ele_top = elmnt.offsetTop - pos2;
+        var ele_left = elmnt.offsetLeft - pos1;
+        ele_left = Math.max(0, Math.min(ele_left, viewportWidth - elmnt.offsetWidth));
+        ele_top = Math.max(0, Math.min(ele_top, viewportHeight - elmnt.offsetHeight));
+        
+        console.log(ele_top, " ", ele_left)
+
         // set the element's new position:
-        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        elmnt.style.top = ele_top + "px";
+        elmnt.style.left = ele_left + "px";
         elmnt.style.right = "auto";
     }
 
@@ -232,26 +252,26 @@ chrome.storage.sync.get({
     selectors: ""
 },
     (options) => {
-    var href = window.location.href;
-    // For google scholar
-    if (href.includes("scholar.google")) {
-        window.addEventListener('load', function load(e){
-              window.removeEventListener('load', load, false);
-              this.setTimeout(() => {
+        var href = window.location.href;
+        // For google scholar
+        if (href.includes("scholar.google")) {
+            window.addEventListener('load', function load(e) {
+                window.removeEventListener('load', load, false);
+                this.setTimeout(() => {
                     run_scholar(options.host)
-              }, 500)
+                }, 500)
             }, false);
-        
-    } else if (href.includes("scopus.com")) {
-        window.addEventListener('load', function load(e){
-              window.removeEventListener('load', load, false);
-              this.setTimeout(() => {
-                run_scopus(options.host)
-              }, 2000)
-            }, false);
-    } else {
-        publisher(options.host);
-    }
-    context_menu(options);
 
-});
+        } else if (href.includes("scopus.com")) {
+            window.addEventListener('load', function load(e) {
+                window.removeEventListener('load', load, false);
+                this.setTimeout(() => {
+                    run_scopus(options.host)
+                }, 2000)
+            }, false);
+        } else {
+            publisher(options.host);
+        }
+        context_menu(options);
+
+    });
