@@ -1,3 +1,18 @@
+// Search in scopus according to DOI
+function scopus_search_doi(doi) {
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/Scopus.svg");
+    img.classList.add("tw-svg");
+    var sa = document.createElement("a");
+    sa.appendChild(img);
+    sa.setAttribute("href", "https://www.scopus.com/results/results.uri?s=DOI%28" + doi + "%29");
+    sa.setAttribute("target", "_blank");
+    sa.classList.add("tw-icon");
+    
+    
+    return sa;
+}
+
 
 function scopusa(eid) {
     var img = document.createElement("img");

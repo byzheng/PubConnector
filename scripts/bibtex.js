@@ -124,6 +124,14 @@ async function gettiddler(id, type, host) {
     } else if (type === "eid") {
         filter = "[tag[bibtex-entry]field:scopus-eid[" + id + "]]";
     }
+    // Always create a banner in any page if DOI and EID are found
+    var div = document.createElement("div");
+    div.id = "tw-banner";
+    
+    document.body.appendChild(div);
+    dragElement(div);
+        
+
     filter = encodeURIComponent(filter);
     const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
     try {
@@ -131,60 +139,70 @@ async function gettiddler(id, type, host) {
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
-
+        
         const tiddler = await response.json();
-        if (tiddler.length > 0) {
-            var div = document.createElement("div");
-            div.id = "tw-banner";
-            div.appendChild(tw_link(tiddler[0].title, "tw-svg", host));
-            if (type === "eid") {
-                var doi = getDOI();
-                if (doi !== undefined) {
-                    div.appendChild(scholara(doi));
-                }
-            } else {
+        
+        if (tiddler.length == 0) {
+            // Cannot find the tiddler. Add buttons to 
+            // * search from google scholar
+            // * search from Scopus according to DOI
+            if (type === "doi") {
                 div.appendChild(scholara(id));
-                if (tiddler[0]["scopus-eid"] !== undefined) {
-                    div.appendChild(scopusa(tiddler[0]["scopus-eid"]));
-                }
+                div.appendChild(scopus_search_doi(id));
             }
-
-            dragElement(div);
-            document.body.appendChild(div);
-
-            // insert authors
-            var selector_col = [
-                "div[data-testid='author-list']", // scopus.com
-                "ul[data-test='authors-list']", // nature.com
-                "ul[class*='c-article-author-list']", // biomedcentral.com
-                "div[class*='art-authors']", // mdpi.com
-                "ul.author-list", // plos.org
-                "div.literatumAuthors", // tandfonline.com
-                "div.contributors", // science.com
-                "div.app-overview-section", // springer.com
-                "div.authors", // frontiersin.org
-                "span.editors", // publish.csiro.au
-                "div.accordion-tabbed", // wiley.com
-                "div.al-authors-list", // oup.com
-                "div.AuthorGroups" // sciencedirect.com
-            ]
-            var ele = document.querySelector(selector_col.join(", "));
-            if (ele !== undefined || ele !== null) {
-                var div_col = document.createElement("div");
-                tiddlerTags(tiddler[0].title, div_col, "Colleague", host);
-                tiddlerTags(tiddler[0].title, div_col, "Domain", host);
-                tiddlerTags(tiddler[0].title, div_col, "Place", host);
-                ele.parentNode.insertBefore(div_col, ele);
-            }
-            let totalWidth = 0;
-            for (const child of div.children) {
-                totalWidth += child.offsetWidth;
-            }
-
-            // Optionally add padding or margins
-            const padding = 100; // Example padding
-            div.style.width = `${totalWidth + padding}px`;
+            return;
         }
+            
+        // Add a link back to Tiddlywiki
+        div.appendChild(tw_link(tiddler[0].title, "tw-svg", host));
+        
+        // Add a link to google scholar
+        if (type === "eid") {
+            let doi = getDOI();
+            div.appendChild(scholara(doi));
+        } else {
+            div.appendChild(scholara(id));
+        }
+        // Add a link to scopus according EID
+        if (tiddler[0]["scopus-eid"] !== undefined && type !== "eid") {
+            div.appendChild(scopusa(tiddler[0]["scopus-eid"]));
+        }
+        
+
+        
+        // insert authors and research domain into pages 
+        var selector_col = [
+            "div[data-testid='author-list']", // scopus.com
+            "ul[data-test='authors-list']", // nature.com
+            "ul[class*='c-article-author-list']", // biomedcentral.com
+            "div[class*='art-authors']", // mdpi.com
+            "ul.author-list", // plos.org
+            "div.literatumAuthors", // tandfonline.com
+            "div.contributors", // science.com
+            "div.app-overview-section", // springer.com
+            "div.authors", // frontiersin.org
+            "span.editors", // publish.csiro.au
+            "div.accordion-tabbed", // wiley.com
+            "div.al-authors-list", // oup.com
+            "div.AuthorGroups" // sciencedirect.com
+        ]
+        var ele = document.querySelector(selector_col.join(", "));
+        if (ele !== undefined || ele !== null) {
+            var div_col = document.createElement("div");
+            tiddlerTags(tiddler[0].title, div_col, "Colleague", host);
+            tiddlerTags(tiddler[0].title, div_col, "Domain", host);
+            tiddlerTags(tiddler[0].title, div_col, "Place", host);
+            ele.parentNode.insertBefore(div_col, ele);
+        }
+        let totalWidth = 0;
+        for (const child of div.children) {
+            totalWidth += child.offsetWidth;
+        }
+
+        // Optionally add padding or margins
+        const padding = 100; // Example padding
+        div.style.width = `${totalWidth + padding}px`;
+        
     } catch (error) {
         //console.error(error.message);
     }

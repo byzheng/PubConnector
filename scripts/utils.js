@@ -80,11 +80,16 @@ async function getColleague(id, type, host) {
             div.appendChild(tw_link(tiddler[0].title, "tw-svg", host));
           
             for (let i = 0; i < colleague_fields.length; i++) {
-                if (tiddler[0][colleague_fields[i].name] !== undefined) {
-                    let ele = imgURL(tiddler[0][colleague_fields[i].name],
-                        colleague_fields[i].icon);
-                    div.appendChild(ele);
+                if (tiddler[0][colleague_fields[i].name] == undefined) {
+                    continue;
                 }
+                if (tiddler[0][colleague_fields[i].name].length === 0) {
+                    continue;
+                }
+                let ele = imgURL(tiddler[0][colleague_fields[i].name],
+                    colleague_fields[i].icon);
+                div.appendChild(ele);
+            
             }
             dragElement(div);
             document.body.appendChild(div);
