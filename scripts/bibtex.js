@@ -60,7 +60,7 @@ function twTagsEle(tiddler, type, host) {
         //     img.style.height = "16px";
         // }, false);
 
-        span.appendChild(img);
+        //span.appendChild(img);
     }
 
 
@@ -156,6 +156,7 @@ async function gettiddler(id, type, host) {
                 // add a link to publisher
                 div.appendChild(publisher_doi(doi));
             }
+            div.style.backgroundColor = "#8f928f";
             return;
         }
             
