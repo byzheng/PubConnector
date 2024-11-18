@@ -153,6 +153,8 @@ async function gettiddler(id, type, host) {
                 // Add a link to Scholar anyway
                 let doi = getDOI();
                 div.appendChild(scholara(doi));
+                // add a link to publisher
+                div.appendChild(publisher_doi(doi));
             }
             return;
         }

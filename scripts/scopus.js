@@ -1,3 +1,20 @@
+
+
+// Search in scopus according to DOI
+function publisher_doi(doi) {
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/LinkOut.svg");
+    img.classList.add("tw-svg");
+    var sa = document.createElement("a");
+    sa.appendChild(img);
+    sa.setAttribute("href", "https://doi.org/" + doi);
+    sa.setAttribute("target", "_blank");
+    sa.classList.add("tw-icon");
+    
+    
+    return sa;
+}
+
 // Search in scopus according to DOI
 function scopus_search_doi(doi) {
     var img = document.createElement("img");
