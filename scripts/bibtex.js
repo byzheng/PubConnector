@@ -149,6 +149,10 @@ async function gettiddler(id, type, host) {
             if (type === "doi") {
                 div.appendChild(scholara(id));
                 div.appendChild(scopus_search_doi(id));
+            } else {
+                // Add a link to Scholar anyway
+                let doi = getDOI();
+                div.appendChild(scholara(doi));
             }
             return;
         }
