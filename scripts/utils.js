@@ -20,7 +20,10 @@ function getDOI() {
         "meta[name='dc.Identifier' i][scheme='doi' i]",
         "meta[name='dc.Identifier' i]",
         "meta[name='citation_doi' i]",
-        "meta[property='citation_doi' i]"
+        "meta[property='citation_doi' i]",
+        'ul.nova-legacy-e-list li +li a.nova-legacy-e-link[href*="doi.org"]', // for researchgate
+        'div strong +a[href*="doi.org"]', // for IEEE
+        'li[data-test-id="paper-doi"] .doi__link' // for sematic
     ];
     
     var doi;
@@ -30,7 +33,14 @@ function getDOI() {
         if (ele === undefined || ele === null) {
             continue;
         }
-        doi = ele.getAttribute("content");
+        var attributes = ["content", "href"];
+        for (let j = 0; j < attributes.length; j++) {
+            doi = ele.getAttribute(attributes[j]);
+            if (doi !== undefined && doi !== null) {    
+                break;
+            }
+        }
+
         doi = doi.replace('doi:', '');
         doi = doi.replace(/^(https?:\/\/.*?doi\.org\/)?/, '');
         break;
