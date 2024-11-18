@@ -40,13 +40,13 @@ function twTagsEle(tiddler, type, host) {
     // icon for colleague
 
     if (type === "Colleague" && tiddler.image !== undefined && tiddler.image !== "") {
-        let img_path = "";
-        img_path = tiddler.image;
-        var img = document.createElement("img");
-        let url_img = new URL(img_path, host);
-        img.src = url_img;
-        img.style.width = "16px";
-        img.style.height = "16px";
+        // let img_path = "";
+        // img_path = tiddler.image;
+        // var img = document.createElement("img");
+        // let url_img = new URL(img_path, host);
+        // img.src = url_img;
+        // img.style.width = "16px";
+        // img.style.height = "16px";
 
         // img.addEventListener('mouseenter', function() {
 
@@ -171,8 +171,13 @@ async function gettiddler(id, type, host) {
             div.appendChild(scholara(id));
         }
         // Add a link to scopus according EID
-        if (tiddler[0]["scopus-eid"] !== undefined && type !== "eid") {
+        if (type !== "eid" && 
+            tiddler[0]["scopus-eid"] !== undefined && 
+            tiddler[0]["scopus-eid"] !== "") {
             div.appendChild(scopusa(tiddler[0]["scopus-eid"]));
+        } else {
+            // If missing, add a button to search by DOI
+            div.appendChild(scopus_search_doi(id));
         }
         
 
