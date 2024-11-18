@@ -19,7 +19,8 @@ function getDOI() {
     var doi_sel = [
         "meta[name='dc.Identifier' i][scheme='doi' i]",
         "meta[name='dc.Identifier' i]",
-        "meta[name='citation_doi' i]"
+        "meta[name='citation_doi' i]",
+        "meta[property='citation_doi' i]"
     ];
     
     var doi;
@@ -31,6 +32,7 @@ function getDOI() {
         }
         doi = ele.getAttribute("content");
         doi = doi.replace('doi:', '');
+        doi = doi.replace(/^(https?:\/\/.*?doi\.org\/)?/, '');
         break;
     }
     return doi;
