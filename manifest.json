@@ -51,7 +51,8 @@
         "scripts/utils.js",
         "scripts/scholar.js",
         "scripts/scopus.js",
-        "scripts/bibtex.js"
+        "scripts/bibtex.js",
+        "scripts/colleague.js"
       ],
       "css": [
         "styles/bibtex.css"

@@ -45,6 +45,14 @@ function getDOI() {
         doi = doi.replace(/^(https?:\/\/.*?doi\.org\/)?/, '');
         break;
     }
+    function isValidDOI(doi) {
+        const doiRegex = /^10.\d{4,9}\/[-._;()/:a-zA-Z0-9]+$/;
+        return doiRegex.test(doi);
+    }
+    
+    if (!isValidDOI(doi)) {
+        return;
+    }
     return doi;
 }
 
@@ -59,7 +67,6 @@ function imgURL(url, icon) {
     sa.setAttribute("href", url);
     sa.setAttribute("target", "_blank");
     sa.classList.add("tw-icon");
-       
     return sa;
 }
 
@@ -73,6 +80,8 @@ async function getColleague(id, type, host) {
         filter = "[tag[Colleague]search:scopus[" + id + "]]";
     } else if (type === "scholar") {
         filter = "[tag[Colleague]search:google-scholar[" + id + "]]";
+    } else if (type === "url") {
+        filter = "[tag[Colleague]search:url[" + id + "]]";
     } else{
         console.error("Not support type " + type); 
     } 

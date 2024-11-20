@@ -10,8 +10,8 @@ function publisher_doi(doi) {
     sa.setAttribute("href", "https://doi.org/" + doi);
     sa.setAttribute("target", "_blank");
     sa.classList.add("tw-icon");
-    
-    
+
+
     return sa;
 }
 
@@ -25,8 +25,8 @@ function scopus_search_doi(doi) {
     sa.setAttribute("href", "https://www.scopus.com/results/results.uri?s=DOI%28" + doi + "%29");
     sa.setAttribute("target", "_blank");
     sa.classList.add("tw-icon");
-    
-    
+
+
     return sa;
 }
 
@@ -40,8 +40,8 @@ function scopusa(eid) {
     sa.setAttribute("href", "https://www.scopus.com/record/display.uri?eid=" + eid + "&origin=resultslist");
     sa.setAttribute("target", "_blank");
     sa.classList.add("tw-icon");
-    
-    
+
+
     return sa;
 }
 
@@ -95,15 +95,15 @@ function scopus_otherpages(host) {
         var eid = eid_el.value;
         gettiddler(eid, "eid", host);
     }
-   
+
     // Find page types for list of items
     var selector_scopus = [
         "tr.referencesUL", // for reference list 
         "tr.searchArea", // for citation list
         "tr[class*='TableItems-module']:has( > td > label)" // for search list
-        ];
+    ];
     var page_types = ["reference", "citation", "search"];
-    var items; 
+    var items;
     var page_type;
     for (let i = 0; i < selector_scopus.length; i++) {
         items = document.querySelectorAll(selector_scopus[i]);
@@ -117,19 +117,19 @@ function scopus_otherpages(host) {
     }
     // For DOI
     if (page_type === "reference") {
-            // for doi
+        // for doi
         let infos = document.querySelectorAll("div[class*='SourceInfo-module'] > div > dl > dt");
         for (let i = 0; i < infos.length; i++) {
             if (infos[i].innerText == "DOI") {
                 let doi_ele = infos[i].nextSibling;
                 let doi = doi_ele.innerText;
                 let doi_link = document.createElement("a");
-                doi_link.innerHTML  = doi;
+                doi_link.innerHTML = doi;
                 let url = "https://doi.org/" + doi;
                 if (doi.startsWith("10.1071")) {
-                    let prefix = doi.substring(8,10);
+                    let prefix = doi.substring(8, 10);
                     let pid = doi.substring(8);
-                    url =                   "https://www.publish.csiro.au/" + 
+                    url = "https://www.publish.csiro.au/" +
                         prefix + "/Fulltext/" + pid;
                 }
                 doi_link.setAttribute("href", url);
@@ -138,11 +138,11 @@ function scopus_otherpages(host) {
                 var dt_ele = doi_ele.parentElement;
                 dt_ele.removeChild(dt_ele.lastElementChild);
                 dt_ele.appendChild(doi_link);
-                
+
             }
         }
     }
-    
+
     // Process for each item
     for (let i = 0; i < items.length; i++) {
         // skip if already added
@@ -154,7 +154,7 @@ function scopus_otherpages(host) {
             eid = items[i].querySelector("input").value;
         } else if (page_type === "search") {
             var label = items[i].querySelector("td > label[for]");
-            eid = label.getAttribute("for").replace("document-",'');
+            eid = label.getAttribute("for").replace("document-", '');
         }
         if (eid === undefined) {
             continue;
@@ -162,7 +162,7 @@ function scopus_otherpages(host) {
         gettiddlerEID2(eid, items[i], host, page_type);
         //console.log(eid);
     }
-    
+
     //console.log(items.length);
 }
 
@@ -172,7 +172,7 @@ function scopus_authorpage(element, host, page_type) {
     if (aid !== undefined) {
         getColleague(aid, "scopus", host);
     }
-    
+
     var items = element.querySelectorAll("li[data-testid='results-list-item']");
     if (items === null || items.length === 0) {
         return;
@@ -217,23 +217,23 @@ async function scopus_authorpage_await(page_type, host) {
     await timeout(2000);
     let element = document.querySelector("div#documents-panel");
     scopus_authorpage(element, host, page_type);
-    const observer = new MutationObserver(mutationList =>  
-      mutationList.filter(m => m.type === 'childList').forEach(m => {  
-        m.addedNodes.forEach(function(element) {
-            scopus_authorpage(element, host, page_type)
-        });  
-      }));  
-      const targetElements = document.querySelectorAll("div#documents-panel");
-      targetElements.forEach((i) => {
+    const observer = new MutationObserver(mutationList =>
+        mutationList.filter(m => m.type === 'childList').forEach(m => {
+            m.addedNodes.forEach(function (element) {
+                scopus_authorpage(element, host, page_type)
+            });
+        }));
+    const targetElements = document.querySelectorAll("div#documents-panel");
+    targetElements.forEach((i) => {
         observer.observe(i, {
-          childList: true,
-          subtree: true
-          })
-      })
+            childList: true,
+            subtree: true
+        })
+    })
     return;
 }
 
-async function run_scopus (host) {
+async function run_scopus(host) {
     var page_ele = document.querySelector("div#documents-panel");
     var page_type = "publication";
     if (page_ele !== null) {

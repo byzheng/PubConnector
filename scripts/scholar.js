@@ -96,42 +96,43 @@ function scholar_items(host) {
         gettiddlerCID(id, items[i], page_type, host);
         //console.log(cid);
     }
-    
+
 }
 
-async function scholar_await(host) {
-    
-    scholar_items(host);
-    // let element = document.querySelector("div#documents-panel");
-    // scopus_authorpage(element, host, page_type);
-    const observer = new MutationObserver(mutationList =>  
-      mutationList.filter(m => m.type === 'childList').forEach(m => {  
-        m.addedNodes.forEach(function(element) {
-            scholar_items(host);
-        });  
-      }));  
-      const targetElements = document.querySelectorAll("tbody#gsc_a_b,div#gs_ra_b");
-      targetElements.forEach((i) => {
-        observer.observe(i, {
-          childList: true,
-          subtree: true
-          })
-      })
-    return;
-}
+// async function scholar_await(host) {
+
+//     scholar_items(host);
+//     // let element = document.querySelector("div#documents-panel");
+//     // scopus_authorpage(element, host, page_type);
+//     const observer = new MutationObserver(mutationList =>
+//         mutationList.filter(m => m.type === 'childList').forEach(m => {
+//             m.addedNodes.forEach(function (element) {
+//                 scholar_items(host);
+//             });
+//         }));
+//     const targetElements = document.querySelectorAll("tbody#gsc_a_b,div#gs_ra_b");
+//     targetElements.forEach((i) => {
+//         observer.observe(i, {
+//             childList: true,
+//             subtree: true
+//         })
+//     })
+//     return;
+// }
 
 
-async function run_scholar (host) {
-    
+async function run_scholar(host) {
+
     var href = window.location.href;
-    
+
     // Add colleague banner for google scholar
     let sid = URL.parse(href).searchParams.get("user");
     if (sid !== undefined && sid !== null) {
         getColleague(sid, "scholar", host);
     }
-    await scholar_await(host);
-    
+    scholar_items(host);
+    //await scholar_await(host);
+
 }
 
 

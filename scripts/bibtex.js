@@ -302,6 +302,7 @@ chrome.storage.sync.get({
         } else {
             publisher(options.host);
         }
-        context_menu(options);
+        colleague(options.host);
+        //context_menu(options);
 
     });
