@@ -16,14 +16,25 @@ let colleague_fields = [
 
 ];
 
+function getTimestampedFilename(base, ext) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // months are 0-based
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    return base + "/" + `${year}${month}${day}${hours}${minutes}${seconds}` + "." + ext;
+}
 
 
 function isValidORCID(url) {
-    const orcidPattern = /^https?:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4}$/;
+    const orcidPattern = /\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$/;
     return orcidPattern.test(url);
 }
 function isValidGoogleScholarID(url) {
-    const scholarPattern = /^https?:\/\/scholar\.[\w.-]*google\.[a-z.]+\/citations\?user=[a-zA-Z0-9_-]{12}$/;
+    const scholarPattern = /user=[a-zA-Z0-9_-]{12}$/;
     return scholarPattern.test(url);
 }
 

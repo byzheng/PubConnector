@@ -43,12 +43,12 @@ function save_colleague(cls, url, host) {
         data.type = "text/vnd.tiddlywiki"
         data.color = "#ecf8ec"
         data.icon = "$:/images/svg-icon/people-multiple"
-        chrome.runtime.sendMessage({
-            from: "webpage",
-            data: data,
-            method: "new_colleague",
-            host: host
-        });
+        // chrome.runtime.sendMessage({
+        //     from: "webpage",
+        //     data: data,
+        //     method: "new_colleague",
+        //     host: host
+        // });
     });
 
     return sa;
@@ -95,6 +95,35 @@ function colleague_csiro(url, host) {
             google_scholar = "";
         }
     }
+
+
+    let image_ele = getElementAttribute('div.image-cropper.bgi', "style");
+    const urlMatch = image_ele.match(/url\((.*?)\)/);
+    const imageUrl = urlMatch ? urlMatch[1] : null;
+
+    let img_file = null;
+    // Check if a URL was found and open it in a new tab
+    if (imageUrl) {
+        // Extract the file extension using a regular expression
+        const extensionMatch = imageUrl.match(/\.(\w+)(?=\?|$)/);
+        const fileExtension = extensionMatch ? extensionMatch[1] : null;
+        
+        
+        window.open(imageUrl, '_blank'); // Open the extracted URL in a new tab
+        // function downloadImage(url, filename = 'downloaded_image.jpg') {
+        //     const link = document.createElement('a');
+        //     link.href = url;
+        //     link.download = filename;
+        //     document.body.appendChild(link);
+        //     link.click();
+        //     document.body.removeChild(link);
+        // }
+        
+        // img_file = getTimestampedFilename("C:/Users/zhe00a/OneDrive - CSIRO/Working/09-Blog/tiddlywiki/files/images/2024", fileExtension);
+        // downloadImage(imageUrl, img_file);
+        // console.log(img_file)
+    } 
+    
     return {
         title: title,
         text: bio,
