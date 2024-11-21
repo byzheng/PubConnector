@@ -25,7 +25,8 @@
         "images/Orcid.svg",
         "images/Scopus.svg",
         "images/GoogleScholarSquare.svg",
-        "images/LinkOut.svg"
+        "images/LinkOut.svg",
+        "images/Save.svg"
       ],
       "matches": [
         "*://*/*"

@@ -14,6 +14,7 @@ function tw_link(title, cls, host, hidden = false) {
         chrome.runtime.sendMessage({
             from: "webpage",
             tiddler: title,
+            method: "open_tiddler",
             host: host
         });
     });
@@ -76,6 +77,7 @@ function twTagsEle(tiddler, type, host) {
         chrome.runtime.sendMessage({
             from: "webpage",
             tiddler: tiddler.title,
+            method: "open_tiddler",
             host: host
         });
     });

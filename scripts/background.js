@@ -26,7 +26,7 @@ chrome.runtime.onMessage.addListener(
                     });
                     const response = await chrome.tabs.sendMessage(tab.id, {
                         from: "worker",
-                        tiddler: request.tiddler
+                        request: request
                     });
                 }
 

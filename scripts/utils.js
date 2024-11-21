@@ -1,3 +1,5 @@
+
+
 let colleague_fields = [
     {
         name: "scopus",
@@ -11,8 +13,20 @@ let colleague_fields = [
         name: "orcid",
         icon: "images/Orcid.svg"
     }
-    
+
 ];
+
+
+
+function isValidORCID(url) {
+    const orcidPattern = /^https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4}$/;
+    return orcidPattern.test(url);
+}
+
+function isValidGoogleScholarID(url) {
+    const scholarPattern = /^https:\/\/scholar\.[\w.-]*google\.[a-z.]+\/citations\?user=[a-zA-Z0-9_-]{12}$/;
+    return scholarPattern.test(url);
+}
 
 
 function getDOI() {
@@ -25,10 +39,10 @@ function getDOI() {
         'div strong +a[href*="doi.org"]', // for IEEE
         'li[data-test-id="paper-doi"] .doi__link' // for sematic
     ];
-    
+
     var doi;
     for (let i = 0; i < doi_sel.length; i++) {
-            
+
         var ele = document.querySelector(doi_sel[i]);
         if (ele === undefined || ele === null) {
             continue;
@@ -36,7 +50,7 @@ function getDOI() {
         var attributes = ["content", "href"];
         for (let j = 0; j < attributes.length; j++) {
             doi = ele.getAttribute(attributes[j]);
-            if (doi !== undefined && doi !== null) {    
+            if (doi !== undefined && doi !== null) {
                 break;
             }
         }
@@ -49,7 +63,7 @@ function getDOI() {
         const doiRegex = /^10.\d{4,9}\/[-._;()/:a-zA-Z0-9]+$/;
         return doiRegex.test(doi);
     }
-    
+
     if (!isValidDOI(doi)) {
         return;
     }
@@ -72,7 +86,7 @@ function imgURL(url, icon) {
 
 
 async function getColleague(id, type, host) {
-    if (document.querySelector("#tw-banner") !== null) {  
+    if (document.querySelector("#tw-banner") !== null) {
         return;
     }
     var filter;
@@ -82,9 +96,9 @@ async function getColleague(id, type, host) {
         filter = "[tag[Colleague]search:google-scholar[" + id + "]]";
     } else if (type === "url") {
         filter = "[tag[Colleague]search:url[" + id + "]]";
-    } else{
-        console.error("Not support type " + type); 
-    } 
+    } else {
+        console.error("Not support type " + type);
+    }
     filter = encodeURIComponent(filter);
     const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
     try {
@@ -94,28 +108,31 @@ async function getColleague(id, type, host) {
         }
 
         const tiddler = await response.json();
-        if (tiddler.length > 0) {
-            
-            var div = document.createElement("div");
-            div.id = "tw-banner";
-            div.appendChild(tw_link(tiddler[0].title, "tw-svg", host));
-          
-            for (let i = 0; i < colleague_fields.length; i++) {
-                if (tiddler[0][colleague_fields[i].name] == undefined) {
-                    continue;
-                }
-                if (tiddler[0][colleague_fields[i].name].length === 0) {
-                    continue;
-                }
-                let ele = imgURL(tiddler[0][colleague_fields[i].name],
-                    colleague_fields[i].icon);
-                div.appendChild(ele);
-            
-            }
-            dragElement(div);
-            document.body.appendChild(div);
+        if (tiddler.length === 0) {
+            return false;
         }
+        var div = document.createElement("div");
+        div.id = "tw-banner";
+        div.appendChild(tw_link(tiddler[0].title, "tw-svg", host));
+        for (let i = 0; i < colleague_fields.length; i++) {
+            if (tiddler[0][colleague_fields[i].name] == undefined) {
+                continue;
+            }
+            if (tiddler[0][colleague_fields[i].name].length === 0) {
+                continue;
+            }
+            let ele = imgURL(tiddler[0][colleague_fields[i].name],
+                colleague_fields[i].icon);
+            div.appendChild(ele);
+
+        }
+        dragElement(div);
+        document.body.appendChild(div);
+
+        return true;
     } catch (error) {
         //console.error(error.message);
     }
+    return false;
 }
+
