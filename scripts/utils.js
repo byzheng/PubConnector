@@ -71,15 +71,21 @@ function getDOI() {
 
 
 function imgURL(url, icon) {
-    var img = document.createElement("img");
-    img.src = chrome.runtime.getURL(icon);
-    img.classList.add("tw-svg");
-    var sa = document.createElement("a");
-    sa.appendChild(img);
-    sa.setAttribute("href", url);
-    sa.setAttribute("target", "_blank");
-    sa.classList.add("tw-icon");
-    return sa;
+    let links = url.split(" ");
+    let sas = [];
+    for (let i = 0; i < links.length; i++) {
+        var img = document.createElement("img");
+        img.src = chrome.runtime.getURL(icon);
+        img.classList.add("tw-svg");
+        var sa = document.createElement("a");
+        sa.appendChild(img);
+        sa.setAttribute("href", links[i]);
+        sa.setAttribute("target", "_blank");
+        sa.classList.add("tw-icon");
+        sas.push(sa);
+    }
+
+    return sas;
 }
 
 
@@ -119,10 +125,9 @@ async function getColleague(id, type, host) {
             if (tiddler[0][colleague_fields[i].name].length === 0) {
                 continue;
             }
-            let ele = imgURL(tiddler[0][colleague_fields[i].name],
+            let elements = imgURL(tiddler[0][colleague_fields[i].name],
                 colleague_fields[i].icon);
-            div.appendChild(ele);
-
+            elements.forEach(element => div.appendChild(element));
         }
         dragElement(div);
         document.body.appendChild(div);
