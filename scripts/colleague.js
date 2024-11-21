@@ -77,11 +77,17 @@ async function colleague_csiro(url, host) {
     let position = getElementAttribute('meta[name="CSIROPeople.JobTitle"]', 'content');
     let phone = getElementAttribute('meta[name="CSIROPeople.Phone"]', 'content');
     
-    let bu = getElementAttribute('meta[name="CSIROPeople.BusinessUnit"]', 'content').toLowerCase;
-    if (bu === null) {
-        
-    }
+    // Get business unit
+    let bu_string = getElementAttribute('meta[name="CSIROPeople.BusinessUnit"]', 'content').toLowerCase();
     bu = "CSIRO Agriculture & Food"
+    if (bu_string === "data61") {
+        bu = "CSIRO Data61"
+    }
+    // Get location
+    let location = getElementAttribute('meta[name="CSIROPeople.Location"]', 'content');
+    
+    
+
     let orcid_node = document.querySelector('a[href*="orcid.org"]');
 
     let orcid = "";
@@ -131,7 +137,7 @@ async function colleague_csiro(url, host) {
     return {
         title: title,
         text: bio,
-        tags: ["Colleague", bu],
+        tags: ["Colleague", bu, location],
         email: email,
         phone: phone,
         position: position,
