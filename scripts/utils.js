@@ -22,7 +22,7 @@ function isValidORCID(url) {
     return orcidPattern.test(url);
 }
 function isValidGoogleScholarID(url) {
-    const scholarPattern = /user=[a-zA-Z0-9_-]{12}$/;
+    const scholarPattern = /user=[a-zA-Z0-9_-]{12}/;
     return scholarPattern.test(url);
 }
 

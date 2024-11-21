@@ -85,7 +85,7 @@ async function colleague_csiro(url, host) {
     }
     // Get location
     let location = getElementAttribute('meta[name="CSIROPeople.Location"]', 'content');
-    
+    location = location.replace(/ WA$/, '');
     
 
     let orcid_node = document.querySelector('a[href*="orcid.org"]');
@@ -119,19 +119,6 @@ async function colleague_csiro(url, host) {
         const extensionMatch = imageUrl.match(/\.(\w+)(?=\?|$)/);
         const fileExtension = extensionMatch ? extensionMatch[1] : null;
         image = await convertImageToBase64(imageUrl);
-        //window.open(imageUrl, '_blank'); // Open the extracted URL in a new tab
-        // function downloadImage(url, filename = 'downloaded_image.jpg') {
-        //     const link = document.createElement('a');
-        //     link.href = url;
-        //     link.download = filename;
-        //     document.body.appendChild(link);
-        //     link.click();
-        //     document.body.removeChild(link);
-        // }
-        
-        // img_file = getTimestampedFilename("C:/Users/zhe00a/OneDrive - CSIRO/Working/09-Blog/tiddlywiki/files/images/2024", fileExtension);
-        // downloadImage(imageUrl, img_file);
-        // console.log(img_file)
     } 
     
     return {
