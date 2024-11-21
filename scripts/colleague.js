@@ -31,25 +31,30 @@ function save_colleague(cls, url, host) {
     sa.setAttribute("href", sa_url);
     sa.setAttribute("target", "_blank");
     sa.classList.add("tw-icon");
-    sa.addEventListener("click", function (event) {
+    sa.addEventListener("click", async function (event) {
         event.preventDefault();
         let data;
+        
         if (url.includes("people-my.csiro.au")) {
-            data = colleague_csiro(url, host)
+            data = await colleague_csiro(url, host);  
         }
+        
         if (data === undefined) {
-            return;
+            return;  // Exit if no data is returned
         }
-        data.type = "text/vnd.tiddlywiki"
-        data.color = "#ecf8ec"
-        data.icon = "$:/images/svg-icon/people-multiple"
-        // chrome.runtime.sendMessage({
-        //     from: "webpage",
-        //     data: data,
-        //     method: "new_colleague",
-        //     host: host
-        // });
+    
+        data.type = "text/vnd.tiddlywiki";
+        data.color = "#ecf8ec";
+        data.icon = "$:/images/svg-icon/people-multiple";
+    
+        chrome.runtime.sendMessage({
+            from: "webpage",
+            data: data,
+            method: "new_colleague",
+            host: host
+        });
     });
+    
 
     return sa;
 }
@@ -65,7 +70,7 @@ function getElementAttribute(cssSelector, attributeName) {
     }
 }
 
-function colleague_csiro(url, host) {
+async function colleague_csiro(url, host) {
     let title = getElementAttribute('meta[name="CSIROPeople.ProfileName"]', 'content');
     let bio = getElementAttribute('meta[name="CSIROpeople.Biography"]', 'content');
     let email = getElementAttribute('meta[name="CSIROPeople.Email"]', 'content');
@@ -101,15 +106,14 @@ function colleague_csiro(url, host) {
     const urlMatch = image_ele.match(/url\((.*?)\)/);
     const imageUrl = urlMatch ? urlMatch[1] : null;
 
-    let img_file = null;
+    let image = null;
     // Check if a URL was found and open it in a new tab
     if (imageUrl) {
         // Extract the file extension using a regular expression
         const extensionMatch = imageUrl.match(/\.(\w+)(?=\?|$)/);
         const fileExtension = extensionMatch ? extensionMatch[1] : null;
-        
-        
-        window.open(imageUrl, '_blank'); // Open the extracted URL in a new tab
+        image = await convertImageToBase64(imageUrl);
+        //window.open(imageUrl, '_blank'); // Open the extracted URL in a new tab
         // function downloadImage(url, filename = 'downloaded_image.jpg') {
         //     const link = document.createElement('a');
         //     link.href = url;
@@ -135,7 +139,41 @@ function colleague_csiro(url, host) {
         orcid: orcid,
         scopus: "",
         "google-scholar": google_scholar,
-        url: url
+        url: url,
+        image: image
 
+    }
+}
+
+
+async function convertImageToBase64(imageUrl) {
+    try {
+        // Fetch the image as a Blob
+        const response = await fetch(imageUrl);
+        
+        // Check if the response is OK (status code 200)
+        if (!response.ok) {
+            throw new Error('Failed to fetch image');
+        }
+
+        const blob = await response.blob();
+
+        // Convert Blob to base64 using FileReader
+        const reader = new FileReader();
+
+        return new Promise((resolve, reject) => {
+            reader.onloadend = () => {
+                resolve(reader.result);  // Resolve with base64 string
+            };
+
+            reader.onerror = (error) => {
+                reject('Error reading the image blob: ' + error);
+            };
+
+            reader.readAsDataURL(blob);  // Start reading the Blob as base64
+        });
+
+    } catch (error) {
+        throw new Error('Error fetching the image: ' + error.message);
     }
 }
