@@ -40,6 +40,9 @@ function save_colleague(cls, url, host) {
         if (data === undefined) {
             return;
         }
+        data.type = "text/vnd.tiddlywiki"
+        data.color = "#ecf8ec"
+        data.icon = "$:/images/svg-icon/people-multiple"
         chrome.runtime.sendMessage({
             from: "webpage",
             data: data,
@@ -68,8 +71,12 @@ function colleague_csiro(url, host) {
     let email = getElementAttribute('meta[name="CSIROPeople.Email"]', 'content');
     let position = getElementAttribute('meta[name="CSIROPeople.JobTitle"]', 'content');
     let phone = getElementAttribute('meta[name="CSIROPeople.Phone"]', 'content');
-
-
+    
+    let bu = getElementAttribute('meta[name="CSIROPeople.BusinessUnit"]', 'content').toLowerCase;
+    if (bu === null) {
+        
+    }
+    bu = "CSIRO Agriculture & Food"
     let orcid_node = document.querySelector('a[href*="orcid.org"]');
 
     let orcid = "";
@@ -83,7 +90,7 @@ function colleague_csiro(url, host) {
     let scholor_node = document.querySelector('a[href*="scholar.google"]');
     let google_scholar = "";
     if (scholor_node !== null) {
-        google_scholar < - xml_attr(scholor_node, "href")
+        google_scholar = scholor_node.getAttribute("href");
         if (!isValidGoogleScholarID(google_scholar)) {
             google_scholar = "";
         }
@@ -91,18 +98,15 @@ function colleague_csiro(url, host) {
     return {
         title: title,
         text: bio,
-        type: "text/vnd.tiddlywiki",
-        tags: ["Colleague", "CSIRO Agriculture & Food"],
+        tags: ["Colleague", bu],
         email: email,
         phone: phone,
-        color: "#ecf8ec",
         position: position,
         researchgate: "",
         orcid: orcid,
         scopus: "",
         "google-scholar": google_scholar,
-        url: url,
-        icon: "$:/images/svg-icon/people-multiple"
+        url: url
 
     }
 }

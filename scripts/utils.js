@@ -19,12 +19,11 @@ let colleague_fields = [
 
 
 function isValidORCID(url) {
-    const orcidPattern = /^https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4}$/;
+    const orcidPattern = /^https?:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{4}$/;
     return orcidPattern.test(url);
 }
-
 function isValidGoogleScholarID(url) {
-    const scholarPattern = /^https:\/\/scholar\.[\w.-]*google\.[a-z.]+\/citations\?user=[a-zA-Z0-9_-]{12}$/;
+    const scholarPattern = /^https?:\/\/scholar\.[\w.-]*google\.[a-z.]+\/citations\?user=[a-zA-Z0-9_-]{12}$/;
     return scholarPattern.test(url);
 }
 
@@ -95,7 +94,7 @@ async function getColleague(id, type, host) {
     } else if (type === "scholar") {
         filter = "[tag[Colleague]search:google-scholar[" + id + "]]";
     } else if (type === "url") {
-        filter = "[tag[Colleague]search:url[" + id + "]]";
+        filter = "[tag[Colleague]] :filter[get[url]match:caseinsensitive[" + id + "]]";
     } else {
         console.error("Not support type " + type);
     }
