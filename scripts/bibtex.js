@@ -182,17 +182,19 @@ async function gettiddler(id, type, host) {
         if (type === "eid") {
             let doi = getDOI();
             div.appendChild(scholara(doi));
+            div.appendChild(publisher_doi(doi));
         } else {
             div.appendChild(scholara(id));
         }
         // Add a link to scopus according EID
-        if (type !== "eid" &&
-            tiddler[0]["scopus-eid"] !== undefined &&
-            tiddler[0]["scopus-eid"] !== "") {
-            div.appendChild(scopusa(tiddler[0]["scopus-eid"]));
-        } else {
-            // If missing, add a button to search by DOI
-            div.appendChild(scopus_search_doi(id));
+        if (type !== "eid") {
+            if (tiddler[0]["scopus-eid"] !== undefined &&
+                tiddler[0]["scopus-eid"] !== "") {
+                div.appendChild(scopusa(tiddler[0]["scopus-eid"]));
+            } else {
+                // If missing, add a button to search by DOI
+                div.appendChild(scopus_search_doi(id));
+            }
         }
 
         // Add a tag reading
