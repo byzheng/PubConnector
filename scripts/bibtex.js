@@ -22,6 +22,17 @@ function tw_link(title, cls, host, hidden = false) {
     return sa;
 }
 
+
+function reading_span() {
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/ReadOutlined.svg");
+    img.classList.add("tw-svg");
+    var span = document.createElement("span");
+    span.classList.add("tw-icon");
+    span.appendChild(img);
+    return span;
+}
+
 function twspan(cls, hidden = false) {
     var img = document.createElement("img");
     img.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
@@ -32,6 +43,8 @@ function twspan(cls, hidden = false) {
     span.hidden = hidden;
     return span;
 }
+
+
 
 function twTagsEle(tiddler, type, host) {
     var span = document.createElement("span");
@@ -129,10 +142,10 @@ async function gettiddler(id, type, host) {
     // Always create a banner in any page if DOI and EID are found
     var div = document.createElement("div");
     div.id = "tw-banner";
-    
+
     document.body.appendChild(div);
     dragElement(div);
-        
+
 
     filter = encodeURIComponent(filter);
     const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
@@ -141,9 +154,9 @@ async function gettiddler(id, type, host) {
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
-        
+
         const tiddler = await response.json();
-        
+
         if (tiddler.length == 0) {
             // Cannot find the tiddler. Add buttons to 
             // * search from google scholar
@@ -161,10 +174,10 @@ async function gettiddler(id, type, host) {
             div.style.backgroundColor = "#8f928f";
             return;
         }
-            
+
         // Add a link back to Tiddlywiki
         div.appendChild(tw_link(tiddler[0].title, "tw-svg", host));
-        
+
         // Add a link to google scholar
         if (type === "eid") {
             let doi = getDOI();
@@ -173,17 +186,21 @@ async function gettiddler(id, type, host) {
             div.appendChild(scholara(id));
         }
         // Add a link to scopus according EID
-        if (type !== "eid" && 
-            tiddler[0]["scopus-eid"] !== undefined && 
+        if (type !== "eid" &&
+            tiddler[0]["scopus-eid"] !== undefined &&
             tiddler[0]["scopus-eid"] !== "") {
             div.appendChild(scopusa(tiddler[0]["scopus-eid"]));
         } else {
             // If missing, add a button to search by DOI
             div.appendChild(scopus_search_doi(id));
         }
-        
 
-        
+        // Add a tag reading
+        if (tiddler[0].tags.includes("Reading")) {
+            div.appendChild(reading_span());
+        }
+
+
         // insert authors and research domain into pages 
         var selector_col = [
             "div[data-testid='author-list']", // scopus.com
@@ -216,7 +233,7 @@ async function gettiddler(id, type, host) {
         // Optionally add padding or margins
         const padding = 100; // Example padding
         div.style.width = `${totalWidth + padding}px`;
-        
+
     } catch (error) {
         //console.error(error.message);
     }
@@ -255,7 +272,7 @@ function dragElement(elmnt) {
         var ele_left = elmnt.offsetLeft - pos1;
         ele_left = Math.max(0, Math.min(ele_left, viewportWidth - elmnt.offsetWidth));
         ele_top = Math.max(0, Math.min(ele_top, viewportHeight - elmnt.offsetHeight));
-        
+
         console.log(ele_top, " ", ele_left)
 
         // set the element's new position:
