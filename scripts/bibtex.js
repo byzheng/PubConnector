@@ -164,13 +164,15 @@ async function gettiddler(id, type, host) {
             if (type === "doi") {
                 div.appendChild(scholara(id));
                 div.appendChild(scopus_search_doi(id));
+                div.appendChild(publisher_doi(id));
             } else {
                 // Add a link to Scholar anyway
                 let doi = getDOI();
                 div.appendChild(scholara(doi));
-                // add a link to publisher
                 div.appendChild(publisher_doi(doi));
             }
+            // add a link to publisher
+            
             div.style.backgroundColor = "#8f928f";
             return;
         }
