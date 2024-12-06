@@ -1,6 +1,6 @@
 # Icon License Information
 
-This file contains licensing information for the third-party icons used in this project. All icons are stored in the `/icons` folder. For more information about these icons, visit [svgicons.com](https://svgicons.com/).
+This file contains licensing information for the third-party icons used in this project. All icons are stored in the `/images` folder. For more information about these icons, visit [svgicons.com](https://svgicons.com/).
 
 1. **Tiddlywiki.svg**
    - **Icon Set**: Simple Icons
