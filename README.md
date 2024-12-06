@@ -69,4 +69,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ### Icons
 
-The icons used in this project are stored in the `/icons` folder. Please refer to the [LICENSES.md](icons/LICENSES.md) file in the `/icons` folder for detailed licensing information about the third-party icons used in this project.
+The icons used in this project are stored in the `/images` folder. Please refer to the [LICENSES.md](images/LICENSES.md) file in the `/images` folder for detailed licensing information about the third-party icons used in this project.
