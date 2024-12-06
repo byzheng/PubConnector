@@ -3,6 +3,7 @@
   "description": "Utility for Researech",
   "version": "0.0.1",
   "manifest_version": 3,
+  "license": "MIT",
   "permissions": [
     "storage",
     "tabs",
