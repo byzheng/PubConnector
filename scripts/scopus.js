@@ -1,28 +1,28 @@
 // Functions to scopus.com
 
 // Main functions for scopus
-async function run_scopus(host) {
+async function run_scopus(options) {
     var page_ele = document.querySelector("div#documents-panel");
     var page_type = "publication";
     if (page_ele !== null) {
         page_type = "authorpage";
     }
     if (page_type === "authorpage") {
-        scopus_authorpage_await(host);
+        scopus_authorpage_await(options);
     } else {
-        scopus_otherpages(host);
+        scopus_otherpages(options);
     }
 }
 
 // Helper function for author page
-async function scopus_authorpage_await(host) {
+async function scopus_authorpage_await(options) {
     await timeout(2000);
     let element = document.querySelector("div#documents-panel");
-    scopus_authorpage(element, host);
+    scopus_authorpage(element, options);
     const observer = new MutationObserver(mutationList =>
         mutationList.filter(m => m.type === 'childList').forEach(m => {
             m.addedNodes.forEach(function (element) {
-                scopus_authorpage(element, host)
+                scopus_authorpage(element, options)
             });
         }));
     const targetElements = document.querySelectorAll("div#documents-panel");
@@ -36,7 +36,7 @@ async function scopus_authorpage_await(host) {
 }
 
 // create span in the author page
-function scopus_authorpage(element, host, page_type) {
+function scopus_authorpage(element, options, page_type) {
 
     // Check all items in the authorpage and create button to link to tiddlywiki
     var items = element.querySelectorAll("li[data-testid='results-list-item']");
@@ -66,7 +66,7 @@ function scopus_authorpage(element, host, page_type) {
             items[i].appendChild(span);
             continue;
         }
-        addIconTW(eid, items[i], host, "authorpage");
+        addIconTW(eid, items[i], options.tiddlywikihost, "authorpage");
         items[i].dataset.working = true;
         //console.log(eid);
     }
@@ -74,17 +74,17 @@ function scopus_authorpage(element, host, page_type) {
     // Create author banner
     let aid = URL.parse(window.location.href).searchParams.get("authorId");
     if (aid !== undefined) {
-        getColleague(aid, "scopus", host);
+        getColleague(aid, "scopus", options.tiddlywikihost);
     }
 }
 
 // Helper functions to create banner in other pages, e.g. search list, citation list
-function scopus_otherpages(host) {
+function scopus_otherpages(options) {
     // Whole page to add a bar with EID
     var eid_el = document.querySelector("input#currentRecordPageEID, input#cite");
     if (eid_el !== undefined && eid_el !== null) {
         var eid = eid_el.value;
-        addBannerScopusPublication(eid, host);
+        addBannerScopusPublication(eid, options);
     }
 
     // Find page types for list of items
@@ -124,7 +124,7 @@ function scopus_otherpages(host) {
         if (eid === undefined) {
             continue;
         }
-        addIconTW(eid, items[i], host, page_type);
+        addIconTW(eid, items[i], options.tiddlywikihost, page_type);
         //console.log(eid);
     }
 
@@ -173,18 +173,18 @@ async function addIconTW(eid, item, host, page_type) {
 }
 
 // Add banner to scopus publication
-async function addBannerScopusPublication(eid, host) {
+async function addBannerScopusPublication(eid, options) {
     var banner = createBanner(); // Create a banner
-    const tiddlers = await getTiddlerByEID(eid, host);
+    const tiddlers = await getTiddlerByEID(eid, options.tiddlywikihost);
     // if tiddler is found, add icons link to Tiddlywiki and Reading
     if (tiddlers.length > 0) {
-        banner.appendChild(tw_link(tiddlers[0].title, "tw-svg", host)); // Add link back to TiddlyWiki 
+        banner.appendChild(tw_link(tiddlers[0].title, "tw-svg", options.tiddlywikihost)); // Add link back to TiddlyWiki 
         // Add Reading tag icon if applicable
         if (tiddlers[0].tags.includes("Reading")) {
             banner.appendChild(reading_span());
         }
         // Insert colleague and domain info
-        insertColleagueAndDomainInfo(tiddlers[0], host); 
+        insertColleagueAndDomainInfo(tiddlers[0], options.tiddlywikihost); 
     } else {
         banner.style.backgroundColor = "#8f928f"; // Set background color to indicate no TiddlyWiki data
     }
@@ -192,6 +192,9 @@ async function addBannerScopusPublication(eid, host) {
     if (doi !== undefined) {
         banner.appendChild(scholara(doi)); // add link to google scholar
         banner.appendChild(publisher_doi(doi)); // add link to publisher
+        // Add Zotero related icons
+        await addZoteroIconsDOI(banner, doi, options.zoterohost);
+
     }
     bannerSetWidth(banner);
 }

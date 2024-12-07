@@ -117,7 +117,7 @@ async function performZoteroRequest(request) {
         const data = await response.json();
         return { success: true, data };  // Return the data as a resolved result
     } catch (error) {
-        console.error("Error in background fetch:", error);
+        //console.error("Error in background fetch:", error);
         return { success: false, error: error.message };  // Return error as a result
     }
 }

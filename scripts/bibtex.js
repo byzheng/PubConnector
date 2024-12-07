@@ -19,7 +19,7 @@ chrome.storage.sync.get({
             window.addEventListener('load', function load(e) {
                 window.removeEventListener('load', load, false);
                 this.setTimeout(() => {
-                    run_scopus(options.tiddlywikihost)
+                    run_scopus(options)
                 }, 2000)
             }, false);
         } else {
