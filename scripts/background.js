@@ -102,7 +102,11 @@ async function performZoteroRequest(request) {
         const response = await fetch(url, {
             method: "GET",
             headers: {
-                "Zotero-API-Version": "3"
+                "Zotero-API-Version": "3",
+                "Content-Type": "application/json",
+                "x-zotero-connector-api-version": "2",
+                "zotero-allowed-request": ""
+
             }
         });
 

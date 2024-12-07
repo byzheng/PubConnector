@@ -14,27 +14,63 @@ function buildZoteroApiUrl(host, path, query = {}) {
 }
 
 
+// Perform a request to zotero
+function zoteroRequest(url) {
+
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(
+            {
+                from: "fetchZoteroData",  // Identifier to tell background script the type of request
+                url: url                  // The URL to be passed to Zotero API
+            },
+            function(response) {
+                if (response.success) {
+                    //console.log("Zotero data fetched successfully:", response.data);
+                    resolve(response.data); // Resolve with the data
+                } else {
+                    //console.error("Failed to fetch Zotero data:", response.error);
+                    reject(new Error(response.error)); // Reject with the error message
+                }
+            }
+        );
+    });
+}
+
 // Fetch metadata from Zotero API by item key or identifier
-async function zoteroSearchItemsByDOI(doi, host) {
-    const path = "/users/7515/items";
+function zoteroSearchItemsByDOI(doi, host) {
+    const path = "/users/0/items";
     const query = {
         q: doi,
         qmode: "everything",
     };
 
     const url = buildZoteroApiUrl(host, path, query);
-    chrome.runtime.sendMessage(
-        {
-            from: "fetchZoteroData",  // Identifier to tell background script the type of request
-            url: url                  // The URL to be passed to Zotero API
-        },
-        function(response) {
-            // Handle the response here
-            if (response.success) {
-                console.log("Zotero data fetched successfully:", response.data);
-            } else {
-                console.error("Failed to fetch Zotero data:", response.error);
-            }
-        }
-    );
+
+    return zoteroRequest(url);
+}
+
+
+// Fetch first PDF attachment for an item
+function zoteroChildren(key, host) {
+    const path = "/users/0/items/" + key + "/children";
+    const query = {};
+
+    const url = buildZoteroApiUrl(host, path, query);
+    return zoteroRequest(url);
+}
+
+
+
+// get zotero item key
+function getZoteroItemKey(item) {
+    if (item === undefined || item === null) {
+        return null;
+    }
+    if (item.data === undefined || item.data === null) {
+        return null;
+    }
+    if (item.data.key === undefined || item.data.key === null) {
+        return null;
+    }
+    return item.data.key;
 }
