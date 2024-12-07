@@ -129,3 +129,10 @@ async function getColleague(id, type, host) {
     return;
 }
 
+
+
+function setItemStyle(item) {
+    item.style.background = "#e6e6e666";
+    item.style["box-shadow"] = "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
+    item.style.padding = "0.2em 0.4em";
+}

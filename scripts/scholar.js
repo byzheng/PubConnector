@@ -1,49 +1,28 @@
 
 
+// Main function for Google Scholar
+async function run_scholar(host) {
 
-async function gettiddlerCID(id, item, page_type, host) {
-    var filter;
-    if (page_type === "scholar") {
-        filter = "[tag[bibtex-entry]field:scholar-cid[" + id + "]]";
-    } else if (page_type === "citation") {
-        filter = "[tag[bibtex-entry]field:scholar-cites[" + id + "]]";
-    }
-    if (filter === undefined) {
-        return;
-    }
-    const url = host + "/recipes/default/tiddlers.json?filter=" + encodeURIComponent(filter);
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-        const tiddler = await response.json();
-        if (tiddler.length > 0) {
-            var span = tw_link(tiddler[0].title, "tw-svg-small", host);
-            var qry;
-            if (page_type === "scholar") {
-                qry = "div.gs_fl, h3.gs_ora_tt";
-            } else if (page_type === "citation") {
-                qry = "td.gsc_a_y";
-            }
-            if (qry === undefined) {
-                return;
-            }
-            item.querySelector(qry).appendChild(span);
-            setItemStyle(item);
-        }
-    } catch (error) {
-        //console.error(error.message);
-    }
-}
-
-function scholar_items(host) {
     var href = window.location.href;
-    var page_type = "scholar";
+
+    // Add colleague banner for google scholar
     let sid = URL.parse(href).searchParams.get("user");
     if (sid !== undefined && sid !== null) {
-        page_type = "citation";
+        getColleague(sid, "scholar", host);
+    }
+    scholar_items(host);
+    //await scholar_await(host);
+
+}
+
+
+// Helper function to add tiddlywiki icon to exist items
+function scholar_items(host) {
+    var href = window.location.href;
+    var page_type = "scholar"; // search page
+    let sid = URL.parse(href).searchParams.get("user");
+    if (sid !== undefined && sid !== null) {
+        page_type = "citation"; // for user home page
     }
     var items = document.querySelectorAll("div.gs_r.gs_or.gs_scl, div.gs_ora, tr.gsc_a_tr");
     for (let i = 0; i < items.length; i++) {
@@ -87,6 +66,38 @@ function scholar_items(host) {
 
 }
 
+
+
+
+
+async function gettiddlerCID(id, item, page_type, host) {
+    var filter;
+    if (page_type === "scholar") {
+        filter = "[tag[bibtex-entry]field:scholar-cid[" + id + "]]";
+    } else if (page_type === "citation") {
+        filter = "[tag[bibtex-entry]field:scholar-cites[" + id + "]]";
+    }
+    if (filter === undefined) {
+        return;
+    }
+    const tiddlers = await tiddlywikiGetTiddlers(filter, host);
+    if (tiddlers.length === 0) {
+        return
+    }
+    var span = tw_link(tiddlers[0].title, "tw-svg-small", host);
+    var qry;
+    if (page_type === "scholar") {
+        qry = "div.gs_fl, h3.gs_ora_tt";
+    } else if (page_type === "citation") {
+        qry = "td.gsc_a_y";
+    }
+    if (qry === undefined) {
+        return;
+    }
+    item.querySelector(qry).appendChild(span);
+    setItemStyle(item);
+}
+
 // async function scholar_await(host) {
 
 //     scholar_items(host);
@@ -107,23 +118,3 @@ function scholar_items(host) {
 //     })
 //     return;
 // }
-
-
-async function run_scholar(host) {
-
-    var href = window.location.href;
-
-    // Add colleague banner for google scholar
-    let sid = URL.parse(href).searchParams.get("user");
-    if (sid !== undefined && sid !== null) {
-        getColleague(sid, "scholar", host);
-    }
-    scholar_items(host);
-    //await scholar_await(host);
-
-}
-
-
-
-
-
