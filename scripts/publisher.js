@@ -19,6 +19,11 @@ async function publisher(options) {
     } else {
         addDefaultIconsDOI(banner, doi);
     }
+
+    // Add Zotero related icons
+    addZoteroIconsDOI(banner, doi, options.zoterohost);
+
+    // Set finally width of banner
     bannerSetWidth(banner);
 
 }
@@ -39,6 +44,20 @@ function addTiddlyWikiIconsDOI(div, tiddler, doi, host) {
         div.appendChild(reading_span()); 
     }
 }
+
+
+// Helper function to add TiddlyWiki icons and links to the banner
+async function addZoteroIconsDOI(div, doi, host) {
+    
+    const items = await zoteroSearchItemsByDOI(doi, host);
+
+    // if (items.length === 0) {
+    //     return;
+    // }
+    // div.appendChild(addZeteroSpan(items[0])); // Add Scopus link if scopus-eid is found
+}
+
+
 
 
 // Helper function to add default icons when no TiddlyWiki tiddler is found
