@@ -1,27 +1,21 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Utility for TiddlyWiki</title>
-  </head>
-  <body style="min-width:500px;">
-   <div style="width:100%">
+
+<head>
+  <title>Utility for TiddlyWiki</title>
+</head>
+
+<body style="min-width:500px;min-height:500px;">
+  <div style="width:100%">
     <div>
-    <label for="host">Host</label>
-    <input type="text" id="host" name="host" value="http://localhost:8080"> </input>
-    </div>
-    <div>
-    <label for="selectors">Selector</label><br>
-    <textarea style="width:100%;min-height:200px" 
-        id="selectors" 
-        name="selectors" 
-        rows="4" 
-        cols="50">
-    </textarea>
+      <label for="tiddlywikihost">TiddlyWIKI Host</label>
+      <input type="text" id="tiddlywikihost" name="tiddlywikihost" value="http://localhost:8080"> </input>
     </div>
     <div id="status"></div>
     <button id="save">Save</button>
     <button id="reset">Reset</button>
-   </div>
-    <script src="scripts/options.js"></script>
-  </body>
+  </div>
+  <script src="scripts/options.js"></script>
+</body>
+
 </html>

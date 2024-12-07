@@ -3,7 +3,6 @@
   "description": "Utility for Researech",
   "version": "0.0.1",
   "manifest_version": 3,
-  "license": "MIT",
   "permissions": [
     "storage",
     "tabs",
@@ -55,7 +54,11 @@
         "scripts/scholar.js",
         "scripts/scopus.js",
         "scripts/bibtex.js",
-        "scripts/colleague.js"
+        "scripts/publisher.js",
+        "scripts/banner.js",
+        "scripts/colleague.js",
+        "scripts/tags.js",
+        "scripts/api/tiddlywiki-api.js"
       ],
       "css": [
         "styles/bibtex.css"
