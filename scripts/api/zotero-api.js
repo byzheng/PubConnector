@@ -29,7 +29,7 @@ function zoteroRequest(url) {
                     resolve(response.data); // Resolve with the data
                 } else {
                     //console.error("Failed to fetch Zotero data:", response.error);
-                    reject(new Error(response.error)); // Reject with the error message
+                    resolve(null);
                 }
             }
         );
