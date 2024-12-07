@@ -1,134 +1,41 @@
 
-function tw_link(title, cls, host, hidden = false) {
-    var img = document.createElement("img");
-    img.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
-    img.classList.add(cls);
-    var sa = document.createElement("a");
-    sa.appendChild(img);
-    var url = new URL("#" + title, host);
-    sa.setAttribute("href", url);
-    sa.setAttribute("target", "_blank");
-    sa.classList.add("tw-icon");
-    sa.addEventListener("click", function (event) {
-        event.preventDefault();
-        chrome.runtime.sendMessage({
-            from: "webpage",
-            tiddler: title,
-            method: "open_tiddler",
-            host: host
-        });
+// Main function for chrome extension
+chrome.storage.sync.get({
+    tiddlywikihost: 'http://localhost:8080'
+},
+    (options) => {
+        var href = window.location.href;
+        // For google scholar
+        if (href.includes("scholar.google")) {
+            window.addEventListener('load', function load(e) {
+                window.removeEventListener('load', load, false);
+                this.setTimeout(() => {
+                    run_scholar(options.tiddlywikihost)
+                }, 500)
+            }, false);
+
+        } else if (href.includes("scopus.com")) {
+            window.addEventListener('load', function load(e) {
+                window.removeEventListener('load', load, false);
+                this.setTimeout(() => {
+                    run_scopus(options.tiddlywikihost)
+                }, 2000)
+            }, false);
+        } else {
+            publisher(options);
+        }
+        colleague(options.tiddlywikihost);
+        //context_menu(options);
+
     });
 
-    return sa;
-}
 
 
-function reading_span() {
-    var img = document.createElement("img");
-    img.src = chrome.runtime.getURL("images/ReadOutlined.svg");
-    img.classList.add("tw-svg");
-    var span = document.createElement("span");
-    span.classList.add("tw-icon");
-    span.appendChild(img);
-    return span;
-}
-
-function twspan(cls, hidden = false) {
-    var img = document.createElement("img");
-    img.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
-    img.classList.add(cls);
-    var span = document.createElement("span");
-    span.classList.add("tw-icon");
-    span.appendChild(img);
-    span.hidden = hidden;
-    return span;
-}
-
-
-
-function twTagsEle(tiddler, type, host) {
-    var span = document.createElement("span");
-    span.classList.add("tw-tag");
-    span.classList.add("tw-" + type.toLowerCase());
-
-    // icon for colleague
-
-    if (type === "Colleague" && tiddler.image !== undefined && tiddler.image !== "") {
-        // let img_path = "";
-        // img_path = tiddler.image;
-        // var img = document.createElement("img");
-        // let url_img = new URL(img_path, host);
-        // img.src = url_img;
-        // img.style.width = "16px";
-        // img.style.height = "16px";
-
-        // img.addEventListener('mouseenter', function() {
-
-        //     img.style.width = "200px";
-        //     img.style.height = "200px";
-        // }, false);
-
-        // img.addEventListener('mouseleave', function() {
-
-        //     img.style.width = "16px";
-        //     img.style.height = "16px";
-        // }, false);
-
-        //span.appendChild(img);
-    }
-
-
-    // link back to tiddlywiki
-    var sa = document.createElement("a");
-    sa.innerHTML = tiddler.title;
-    var url = new URL("#" + tiddler.title, host);
-    sa.setAttribute("href", url);
-    sa.setAttribute("target", "_blank");
-    sa.classList.add("tw-link");
-    sa.addEventListener("click", function (event) {
-        event.preventDefault();
-        chrome.runtime.sendMessage({
-            from: "webpage",
-            tiddler: tiddler.title,
-            method: "open_tiddler",
-            host: host
-        });
-    });
-    span.appendChild(sa);
-
-
-
-
-    return span;
-}
 
 function setItemStyle(item) {
     item.style.background = "#e6e6e666";
     item.style["box-shadow"] = "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
     item.style.padding = "0.2em 0.4em";
-}
-
-async function tiddlerTags(title, element, type, host) {
-    var filter = "[[" + title + "]tags[]tag[" + type + "]]";
-    filter = encodeURIComponent(filter);
-    const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-        const tiddlers = await response.json();
-        if (tiddlers.length > 0) {
-            var span_col = document.createElement("span");
-            for (let i = 0; i < tiddlers.length; i++) {
-                span_col.appendChild(twTagsEle(tiddlers[i], type, host));
-            }
-            element.appendChild(span_col);
-        }
-    } catch (error) {
-        //console.error(error.message);
-    }
 }
 
 async function gettiddler(id, type, host) {
@@ -292,40 +199,5 @@ function dragElement(elmnt) {
     }
 }
 
-function publisher(host) {
-    var doi = getDOI();
-    if (doi !== undefined) {
-        gettiddler(doi, "doi", host);
-    }
-}
 
 
-chrome.storage.sync.get({
-    host: 'http://localhost:8080',
-    selectors: ""
-},
-    (options) => {
-        var href = window.location.href;
-        // For google scholar
-        if (href.includes("scholar.google")) {
-            window.addEventListener('load', function load(e) {
-                window.removeEventListener('load', load, false);
-                this.setTimeout(() => {
-                    run_scholar(options.host)
-                }, 500)
-            }, false);
-
-        } else if (href.includes("scopus.com")) {
-            window.addEventListener('load', function load(e) {
-                window.removeEventListener('load', load, false);
-                this.setTimeout(() => {
-                    run_scopus(options.host)
-                }, 2000)
-            }, false);
-        } else {
-            publisher(options.host);
-        }
-        colleague(options.host);
-        //context_menu(options);
-
-    });

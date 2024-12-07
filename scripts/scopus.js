@@ -1,49 +1,5 @@
 
 
-// Search in scopus according to DOI
-function publisher_doi(doi) {
-    var img = document.createElement("img");
-    img.src = chrome.runtime.getURL("images/LinkOut.svg");
-    img.classList.add("tw-svg");
-    var sa = document.createElement("a");
-    sa.appendChild(img);
-    sa.setAttribute("href", "https://doi.org/" + doi);
-    sa.setAttribute("target", "_blank");
-    sa.classList.add("tw-icon");
-
-
-    return sa;
-}
-
-// Search in scopus according to DOI
-function scopus_search_doi(doi) {
-    var img = document.createElement("img");
-    img.src = chrome.runtime.getURL("images/Scopus.svg");
-    img.classList.add("tw-svg");
-    var sa = document.createElement("a");
-    sa.appendChild(img);
-    sa.setAttribute("href", "https://www.scopus.com/results/results.uri?s=DOI%28" + doi + "%29");
-    sa.setAttribute("target", "_blank");
-    sa.classList.add("tw-icon");
-
-
-    return sa;
-}
-
-
-function scopusa(eid) {
-    var img = document.createElement("img");
-    img.src = chrome.runtime.getURL("images/Scopus.svg");
-    img.classList.add("tw-svg");
-    var sa = document.createElement("a");
-    sa.appendChild(img);
-    sa.setAttribute("href", "https://www.scopus.com/record/display.uri?eid=" + eid + "&origin=resultslist");
-    sa.setAttribute("target", "_blank");
-    sa.classList.add("tw-icon");
-
-
-    return sa;
-}
 
 async function gettiddlerEID2(eid, item, host, page_type) {
     let filter = encodeURIComponent("[tag[bibtex-entry]field:scopus-eid[" + eid + "]]");

@@ -1,35 +1,13 @@
 // Saves options to chrome.storage
 const defaultConfig = { 
-    host: 'http://localhost',
-    selectors: [
-        {
-            'url': "nature.com",
-            'selector': {
-                'citation': "sup:has(>a[data-test='citation-ref'])"
-            }
-        }, 
-        {
-            'url': "sciencedirect.com",
-            'selector': {
-                'citation': "a[data-xocs-content-type='reference'] > span"
-            }
-        }, 
-        {
-            'url': "frontiersin.org",
-            'selector': {
-                'citation': "a[href^='#B']"
-            }
-        }
-    ]
+  tiddlywikihost: 'http://localhost:8080'
 };
 const saveOptions = () => {
-  const host = document.getElementById('host').value;
-  const selectors = document.getElementById('selectors').value;
-  
+  const tiddlywikihost = document.getElementById('tiddlywikihost').value;
+
   chrome.storage.sync.set(
     { 
-        host: host,
-        selectors: selectors
+      tiddlywikihost: tiddlywikihost
     },
     () => {
       // Update status to let user know options were saved.
@@ -48,16 +26,13 @@ const restoreOptions = () => {
   chrome.storage.sync.get(
     defaultConfig,
     (items) => {
-      document.getElementById('host').value = items.host;
-      document.getElementById('selectors').value = items.selectors;
+      document.getElementById('tiddlywikihost').value = items.tiddlywikihost;
     }
   );
 };
 
 const resetOptions = () => {
-  document.getElementById('host').value = defaultConfig.host;
-  let selectors = JSON.stringify(defaultConfig.selectors, null, 2);
-  document.getElementById('selectors').value = selectors;
+  document.getElementById('tiddlywikihost').value = defaultConfig.tiddlywikihost;
   saveOptions();
 };
 

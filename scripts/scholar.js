@@ -1,17 +1,5 @@
 
 
-function scholara(doi) {
-    var img = document.createElement("img");
-    img.src = chrome.runtime.getURL("images/GoogleScholarSquare.svg");
-    img.classList.add("tw-svg");
-    var sa = document.createElement("a");
-    sa.appendChild(img);
-    sa.setAttribute("href", "https://scholar.google.com/scholar?q=" + doi);
-    sa.setAttribute("target", "_blank");
-    sa.classList.add("tw-icon");
-    return sa;
-}
-
 
 async function gettiddlerCID(id, item, page_type, host) {
     var filter;
