@@ -69,7 +69,7 @@ function getDOI() {
 }
 
 
-
+// Helper function to create icon to different platforms
 function imgURL(url, icon) {
     let links = url.split(" ");
     let sas = [];
@@ -88,11 +88,13 @@ function imgURL(url, icon) {
     return sas;
 }
 
-
+// Helper function to get colleague information
 async function getColleague(id, type, host) {
+    // skip if banner is already existed 
     if (document.querySelector("#tw-banner") !== null) {
         return;
     }
+    // create filter
     var filter;
     if (type === "scopus") {
         filter = "[tag[Colleague]search:scopus[" + id + "]]";
@@ -103,39 +105,27 @@ async function getColleague(id, type, host) {
     } else {
         console.error("Not support type " + type);
     }
-    filter = encodeURIComponent(filter);
-    const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-        const tiddler = await response.json();
-        if (tiddler.length === 0) {
-            return false;
-        }
-        var div = document.createElement("div");
-        div.id = "tw-banner";
-        div.appendChild(tw_link(tiddler[0].title, "tw-svg", host));
-        for (let i = 0; i < colleague_fields.length; i++) {
-            if (tiddler[0][colleague_fields[i].name] == undefined) {
-                continue;
-            }
-            if (tiddler[0][colleague_fields[i].name].length === 0) {
-                continue;
-            }
-            let elements = imgURL(tiddler[0][colleague_fields[i].name],
-                colleague_fields[i].icon);
-            elements.forEach(element => div.appendChild(element));
-        }
-        dragElement(div);
-        document.body.appendChild(div);
-
-        return true;
-    } catch (error) {
-        //console.error(error.message);
+    const tiddlers = await tiddlywikiGetTiddlers(filter, host);
+    // not found
+    if (tiddlers.length === 0) {
+        return;
     }
-    return false;
+    var banner = createBanner();
+    // create an icon to link back to Tiddlywiki
+    banner.appendChild(tw_link(tiddlers[0].title, "tw-svg", host));
+
+    // create link to other platforms
+    for (let i = 0; i < colleague_fields.length; i++) {
+        if (tiddlers[0][colleague_fields[i].name] == undefined) {
+            continue;
+        }
+        if (tiddlers[0][colleague_fields[i].name].length === 0) {
+            continue;
+        }
+        let elements = imgURL(tiddlers[0][colleague_fields[i].name],
+            colleague_fields[i].icon);
+        elements.forEach(element => banner.appendChild(element));
+    }
+    return;
 }
 

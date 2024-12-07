@@ -19,14 +19,17 @@ function insertColleagueAndDomainInfo(tiddler, host) {
         "div.AuthorGroups" // sciencedirect.com
     ]
     var ele = document.querySelector(selector_col.join(", "));
-    if (ele !== undefined || ele !== null) {
-        var div_col = document.createElement("div");
-        tiddlerTags(tiddler.title, div_col, "Colleague", host);
-        tiddlerTags(tiddler.title, div_col, "Domain", host);
-        tiddlerTags(tiddler.title, div_col, "Place", host);
-        ele.parentNode.insertBefore(div_col, ele);
+    if (ele === undefined) {
+        return;
     }
-
+    if (ele === null) {
+        return;
+    }
+    var div_col = document.createElement("div");
+    tiddlerTags(tiddler.title, div_col, "Colleague", host);
+    tiddlerTags(tiddler.title, div_col, "Domain", host);
+    tiddlerTags(tiddler.title, div_col, "Place", host);
+    ele.parentNode.insertBefore(div_col, ele);
 }
 
 

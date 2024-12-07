@@ -1,55 +1,90 @@
+// Functions to scopus.com
 
-
-
-async function gettiddlerEID2(eid, item, host, page_type) {
-    let filter = encodeURIComponent("[tag[bibtex-entry]field:scopus-eid[" + eid + "]]");
-    const url = host + "/recipes/default/tiddlers.json?filter=" + filter;
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-        const tiddler = await response.json();
-        if (tiddler.length > 0) {
-            var span = tw_link(tiddler[0].title, "tw-svg-small", host);
-            if (page_type === "authorpage") {
-                item.appendChild(span);
-            } else {
-                var label = item.querySelector("label");
-                if (label !== null) {
-                    if (label.querySelector("span")) {
-                        label.appendChild(span);
-                    } else {
-                        label.parentNode.insertBefore(span, label.nextSibling);
-                    }
-                } else {
-                    var icon_ele = item.querySelector("div.refAuthorTitle, td[data-type='docTitle']");
-                    if (icon_ele !== null) {
-                        icon_ele.prepend(span);
-                    } else {
-                        item.appendChild(span);
-                    }
-                }
-            }
-            setItemStyle(item);
-        } else {
-            // not found, insert an hidden element
-            var span = twspan("tw-svg-small", true);
-            item.appendChild(span);
-        }
-        item.removeAttribute('data-working');
-    } catch (error) {
-        //console.error(error.message);
+// Main functions for scopus
+async function run_scopus(host) {
+    var page_ele = document.querySelector("div#documents-panel");
+    var page_type = "publication";
+    if (page_ele !== null) {
+        page_type = "authorpage";
+    }
+    if (page_type === "authorpage") {
+        scopus_authorpage_await(host);
+    } else {
+        scopus_otherpages(host);
     }
 }
 
+// Helper function for author page
+async function scopus_authorpage_await(host) {
+    await timeout(2000);
+    let element = document.querySelector("div#documents-panel");
+    scopus_authorpage(element, host);
+    const observer = new MutationObserver(mutationList =>
+        mutationList.filter(m => m.type === 'childList').forEach(m => {
+            m.addedNodes.forEach(function (element) {
+                scopus_authorpage(element, host)
+            });
+        }));
+    const targetElements = document.querySelectorAll("div#documents-panel");
+    targetElements.forEach((i) => {
+        observer.observe(i, {
+            childList: true,
+            subtree: true
+        })
+    })
+    return;
+}
+
+// create span in the author page
+function scopus_authorpage(element, host, page_type) {
+
+    // Check all items in the authorpage and create button to link to tiddlywiki
+    var items = element.querySelectorAll("li[data-testid='results-list-item']");
+    if (items === null || items.length === 0) {
+        return;
+    }
+    // for each item in the page
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].querySelector("span.tw-icon") !== null ||
+            items[i].dataset.working === true) {
+            continue;
+        }
+        var eid;
+        // for author profile
+        var btn = items[i].querySelector("button[class*='Button-module']");
+        if (btn === null) {
+            // Not find a button, i.e. no links for this publication
+            // insert an empty element 
+            var span = twspan("tw-svg-small", true);
+            items[i].appendChild(span);
+            continue;
+        }
+        eid = btn.dataset.testid.replace('button-abstract-', '');
+        if (eid === undefined) {
+            // insert an empty element 
+            var span = twspan("tw-svg-small", true);
+            items[i].appendChild(span);
+            continue;
+        }
+        addIconTW(eid, items[i], host, "authorpage");
+        items[i].dataset.working = true;
+        //console.log(eid);
+    }
+
+    // Create author banner
+    let aid = URL.parse(window.location.href).searchParams.get("authorId");
+    if (aid !== undefined) {
+        getColleague(aid, "scopus", host);
+    }
+}
+
+// Helper functions to create banner in other pages, e.g. search list, citation list
 function scopus_otherpages(host) {
     // Whole page to add a bar with EID
     var eid_el = document.querySelector("input#currentRecordPageEID, input#cite");
     if (eid_el !== undefined && eid_el !== null) {
         var eid = eid_el.value;
-        gettiddler(eid, "eid", host);
+        addBannerScopusPublication(eid, host);
     }
 
     // Find page types for list of items
@@ -71,33 +106,7 @@ function scopus_otherpages(host) {
     if (items === undefined || page_type === undefined) {
         return;
     }
-    // For DOI
-    if (page_type === "reference") {
-        // for doi
-        let infos = document.querySelectorAll("div[class*='SourceInfo-module'] > div > dl > dt");
-        for (let i = 0; i < infos.length; i++) {
-            if (infos[i].innerText == "DOI") {
-                let doi_ele = infos[i].nextSibling;
-                let doi = doi_ele.innerText;
-                let doi_link = document.createElement("a");
-                doi_link.innerHTML = doi;
-                let url = "https://doi.org/" + doi;
-                if (doi.startsWith("10.1071")) {
-                    let prefix = doi.substring(8, 10);
-                    let pid = doi.substring(8);
-                    url = "https://www.publish.csiro.au/" +
-                        prefix + "/Fulltext/" + pid;
-                }
-                doi_link.setAttribute("href", url);
-                doi_link.setAttribute("target", "_blank");
-                doi_link.style.color = "#007398";
-                var dt_ele = doi_ele.parentElement;
-                dt_ele.removeChild(dt_ele.lastElementChild);
-                dt_ele.appendChild(doi_link);
 
-            }
-        }
-    }
 
     // Process for each item
     for (let i = 0; i < items.length; i++) {
@@ -115,53 +124,76 @@ function scopus_otherpages(host) {
         if (eid === undefined) {
             continue;
         }
-        gettiddlerEID2(eid, items[i], host, page_type);
+        addIconTW(eid, items[i], host, page_type);
         //console.log(eid);
     }
 
     //console.log(items.length);
 }
 
-function scopus_authorpage(element, host, page_type) {
-    // Create author toolbar
-    let aid = URL.parse(window.location.href).searchParams.get("authorId");
-    if (aid !== undefined) {
-        getColleague(aid, "scopus", host);
-    }
 
-    var items = element.querySelectorAll("li[data-testid='results-list-item']");
-    if (items === null || items.length === 0) {
+// Helper function to get tiddler by EID
+async function getTiddlerByEID(eid, host) {
+    let filter = `[tag[bibtex-entry]field:scopus-eid[${eid}]]`;
+    const tiddlers = await tiddlywikiGetTiddlers(filter, host);
+    return tiddlers;
+}
+
+// Helper function to render span to items by eid
+async function addIconTW(eid, item, host, page_type) {
+    const tiddlers = await getTiddlerByEID(eid, host);
+    // not found, insert an hidden element. Skip to check next time
+    if (tiddlers.length === 0) {
+        var span = twspan("tw-svg-small", true);
+        item.appendChild(span);
         return;
     }
-    // for each item in the page
-    for (let i = 0; i < items.length; i++) {
-        if (items[i].querySelector("span.tw-icon") !== null ||
-            items[i].dataset.working === true) {
-            continue;
-        }
-        var eid;
-        // for author profile
-        if (page_type === "authorpage") {
-            var btn = items[i].querySelector("button[class*='Button-module']");
-            if (btn === null) {
-                // Not find a button, i.e. no links for this publication
-                // insert an empty element 
-                var span = twspan("tw-svg-small", true);
-                items[i].appendChild(span);
-                continue;
+
+    var span = tw_link(tiddlers[0].title, "tw-svg-small", host);
+    if (page_type === "authorpage") {
+        item.appendChild(span);
+    } else {
+        var label = item.querySelector("label");
+        if (label !== null) {
+            if (label.querySelector("span")) {
+                label.appendChild(span);
+            } else {
+                label.parentNode.insertBefore(span, label.nextSibling);
             }
-            eid = btn.dataset.testid.replace('button-abstract-', '');
+        } else {
+            var icon_ele = item.querySelector("div.refAuthorTitle, td[data-type='docTitle']");
+            if (icon_ele !== null) {
+                icon_ele.prepend(span);
+            } else {
+                item.appendChild(span);
+            }
         }
-        if (eid === undefined) {
-            // insert an empty element 
-            var span = twspan("tw-svg-small", true);
-            items[i].appendChild(span);
-            continue;
-        }
-        gettiddlerEID2(eid, items[i], host, page_type);
-        items[i].dataset.working = true;
-        //console.log(eid);
     }
+    setItemStyle(item);
+}
+
+// Add banner to scopus publication
+async function addBannerScopusPublication(eid, host) {
+    var banner = createBanner(); // Create a banner
+    const tiddlers = await getTiddlerByEID(eid, host);
+    // if tiddler is found, add icons link to Tiddlywiki and Reading
+    if (tiddlers.length > 0) {
+        banner.appendChild(tw_link(tiddlers[0].title, "tw-svg", host)); // Add link back to TiddlyWiki 
+        // Add Reading tag icon if applicable
+        if (tiddlers[0].tags.includes("Reading")) {
+            banner.appendChild(reading_span());
+        }
+        // Insert colleague and domain info
+        insertColleagueAndDomainInfo(tiddlers[0], host); 
+    } else {
+        banner.style.backgroundColor = "#8f928f"; // Set background color to indicate no TiddlyWiki data
+    }
+    let doi = getDOI(); // Get DOI if available
+    if (doi !== undefined) {
+        banner.appendChild(scholara(doi)); // add link to google scholar
+        banner.appendChild(publisher_doi(doi)); // add link to publisher
+    }
+    bannerSetWidth(banner);
 }
 
 
@@ -169,35 +201,3 @@ function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function scopus_authorpage_await(page_type, host) {
-    await timeout(2000);
-    let element = document.querySelector("div#documents-panel");
-    scopus_authorpage(element, host, page_type);
-    const observer = new MutationObserver(mutationList =>
-        mutationList.filter(m => m.type === 'childList').forEach(m => {
-            m.addedNodes.forEach(function (element) {
-                scopus_authorpage(element, host, page_type)
-            });
-        }));
-    const targetElements = document.querySelectorAll("div#documents-panel");
-    targetElements.forEach((i) => {
-        observer.observe(i, {
-            childList: true,
-            subtree: true
-        })
-    })
-    return;
-}
-
-async function run_scopus(host) {
-    var page_ele = document.querySelector("div#documents-panel");
-    var page_type = "publication";
-    if (page_ele !== null) {
-        page_type = "authorpage";
-    }
-    if (page_type === "authorpage") {
-        scopus_authorpage_await(page_type, host);
-    } else {
-        scopus_otherpages(host);
-    }
-}
