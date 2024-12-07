@@ -137,6 +137,36 @@ function scopusa(eid) {
 }
 
 
+// Helper function to create a icon to zotero item
+function addZeteroSpan(key) {
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/ZoteroSquare.svg");
+    img.classList.add("tw-svg");
+    var sa = document.createElement("a");
+    sa.appendChild(img);
+    sa.setAttribute("href", "zotero://select/library/items/" + key);
+    sa.setAttribute("target", "_blank");
+    sa.classList.add("tw-icon");
+    return sa;
+}
+
+
+// Helper function to create a icon to open zotero pdf
+function addZeteroPDFSpan(key) {
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/FilePdfFilled.svg");
+    img.classList.add("tw-svg");
+    var sa = document.createElement("a");
+    sa.appendChild(img);
+    sa.setAttribute("href", "zotero://open-pdf/library/items/" + key);
+    sa.setAttribute("target", "_blank");
+    sa.classList.add("tw-icon");
+    return sa;
+}
+
+
+
+
 // Helper function to drag banner
 function dragElement(elmnt) {
     var pos1 = 0,

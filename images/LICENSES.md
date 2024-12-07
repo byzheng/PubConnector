@@ -36,3 +36,13 @@ This file contains licensing information for the third-party icons used in this 
    - **Icon Set**: Akar Icons
    - **Author**: Arturo Wibawa
    - **License**: [MIT](https://opensource.org/licenses/MIT)
+
+8. **ZoteroSquare.svg**
+   - **Icon Set**: Academicons
+   - **Author**: James Walsh
+   - **License**: [Open Font License](https://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web)
+
+9. **FilePdfFilled.svg**
+   - **Icon Set**: Ant Design Icons
+   - **Author**: HeskeyBaozi
+   - **License**: [MIT](https://opensource.org/licenses/MIT)

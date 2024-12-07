@@ -1,7 +1,8 @@
 
 // Main function for chrome extension
 chrome.storage.sync.get({
-    tiddlywikihost: 'http://localhost:8080'
+    tiddlywikihost: 'http://localhost:8080',
+    zoterohost: 'http://localhost:23119/api/'
 },
     (options) => {
         var href = window.location.href;
@@ -18,7 +19,7 @@ chrome.storage.sync.get({
             window.addEventListener('load', function load(e) {
                 window.removeEventListener('load', load, false);
                 this.setTimeout(() => {
-                    run_scopus(options.tiddlywikihost)
+                    run_scopus(options)
                 }, 2000)
             }, false);
         } else {
