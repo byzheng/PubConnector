@@ -1,16 +1,23 @@
-# tw-research
+# PubConnector
 
-This is a Chrome Extension to link colleagues and references in several publication websites, including [Scopus](https://www.scopus.com/), [Google Scholar](https://scholar.google.com/), and [ResearchGate](https://www.researchgate.net/), to a [Node.js](https://tiddlywiki.com/static/Installing%2520TiddlyWiki%2520on%2520Node.js.html)-based [TiddlyWiki](https://tiddlywiki.com/).
 
-## Motivation
+**PubConnector** is a Chrome extension designed to streamline research by linking publications from multiple platforms. With PubConnector, you can manage publications in [Zotero](https://www.zotero.org) and [TiddlyWiki](https://tiddlywiki.com) directly from your web browser.  
 
-I have been using [Zotero](https://www.zotero.org/) and [Refnotes](https://kookma.github.io/TW-Refnotes/) in [TiddlyWiki](https://tiddlywiki.com/) to manage my references. When I search and read new literature online, it is not always easy to:
+## Features:  
+- Access your [Zotero](https://www.zotero.org) items and open associated PDF files.  
+- Navigate to specific [TiddlyWiki](https://tiddlywiki.com) tiddlers for organized research notes.  
+- Link to scholarly resources, including [Scopus](https://www.scopus.com), [Google Scholar](https://scholar.google.com), publishers, and more.  
 
-- Remember which literature already exists in [Zotero](https://www.zotero.org/) and [TiddlyWiki](https://tiddlywiki.com/).
-- Search the same literature across platforms (e.g., [Scopus](https://www.scopus.com/), [Google Scholar](https://scholar.google.com/)).
-- Link back to [TiddlyWiki](https://tiddlywiki.com/).
+## Motivation  
 
-This Chrome extension is designed to ease these problems.
+I have been using [Zotero](https://www.zotero.org/) and [Refnotes](https://kookma.github.io/TW-Refnotes/) in [TiddlyWiki](https://tiddlywiki.com/) to manage my references. However, when searching for and reading new literature online, I often encounter the following challenges:  
+
+- **Keeping track of existing literature**: It's not always easy to remember which references are already stored in [Zotero](https://www.zotero.org/) and [TiddlyWiki](https://tiddlywiki.com/).  
+- **Cross-platform searching**: Searching for the same literature across platforms like [Scopus](https://www.scopus.com/) and [Google Scholar](https://scholar.google.com/) can be tedious.  
+- **Linking back to TiddlyWiki**: Navigating back to specific notes or tiddlers in [TiddlyWiki](https://tiddlywiki.com/) is not always straightforward.  
+
+This Chrome extension is designed to address these issues, streamlining the research process and improving efficiency.  
+
 
 ## Installation
 
