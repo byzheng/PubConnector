@@ -29,14 +29,11 @@ Before using **PubConnector**, ensure that your TiddlyWiki and Zotero are proper
    - Install [Node.js](https://nodejs.org/) if it is not already installed.  
    - Set up TiddlyWiki in Node.js mode by following the [official guide](https://tiddlywiki.com/#Installing%20TiddlyWiki%20on%20Node.js).  
 
-2. **Enable CORS (Cross-Origin Resource Sharing)**:  
-   - Use a proxy server like [NGINX](https://nginx.org/) or configure TiddlyWiki directly to accept requests from the browser by adding the appropriate CORS headers.  
-
-3. **Install the TW-Connector Plugin**:  
+2. **Install the TW-Connector Plugin**:  
    - Install the [TW-Connector](https://github.com/byzheng/TW-Connector) plugin, a small TiddlyWiki extension that allows opening tiddlers from other tabs in the web browser.  
    - Follow the instructions provided in the [TW-Connector repository](https://github.com/byzheng/TW-Connector) to install the plugin.  
 
-4. **Data Structure**  
+3. **Data Structure**  
    **PubConnector** utilizes information stored in TiddlyWiki to render on web pages:
 
    - Tiddlers with the tag `Colleague` are used for researcher information, including fields like `scopus`, `orcid`, and `google-scholar` for profile links on [Scopus](https://www.scopus.com), [ORCID](https://orcid.org/), and [Google Scholar](https://scholar.google.com).

@@ -7,6 +7,19 @@ chrome.runtime.onMessage.addListener(
         if (request.from == "webpage") {
             linkTiddlywiki(request);
         }
+        
+        if (request.from === "fetchTiddlyWikiData") {
+            performTiddlyWikiRequest(request)
+                .then(response => {
+                    sendResponse(response);  // Send the result back to the sender
+                })
+                .catch(error => {
+                    sendResponse({ success: false, error: error.message });  // Handle any errors
+                });
+
+            // Return true to indicate asynchronous response
+            return true;
+        }
 
         if (request.from === "fetchZoteroData") {
             performZoteroRequest(request)
@@ -112,6 +125,29 @@ async function performZoteroRequest(request) {
 
         if (!response.ok) {
             throw new Error(`Failed to fetch Zotero data: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return { success: true, data };  // Return the data as a resolved result
+    } catch (error) {
+        //console.error("Error in background fetch:", error);
+        return { success: false, error: error.message };  // Return error as a result
+    }
+}
+
+
+
+
+// Perform a tiddlywiki api request
+async function performTiddlyWikiRequest(request) {
+    const url = request.url;
+    try {
+        const response = await fetch(url, {
+            method: "GET"
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch TiddlyWiki data: ${response.status}`);
         }
 
         const data = await response.json();
