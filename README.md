@@ -1,12 +1,7 @@
 # PubConnector
 
 
-**PubConnector** is a Chrome extension designed to streamline research by linking publications from multiple platforms. With PubConnector, you can manage publications in [Zotero](https://www.zotero.org) and [TiddlyWiki](https://tiddlywiki.com) directly from your web browser.  
-
-## Features:  
-- Access your [Zotero](https://www.zotero.org) items and open associated PDF files.  
-- Navigate to specific [TiddlyWiki](https://tiddlywiki.com) tiddlers for organized research notes.  
-- Link to scholarly resources, including [Scopus](https://www.scopus.com), [Google Scholar](https://scholar.google.com), publishers, and more.  
+**PubConnector** is a Chrome extension designed to streamline research by linking publications from multiple platforms. With PubConnector, you can view publications in [Zotero](https://www.zotero.org) and [TiddlyWiki](https://tiddlywiki.com) directly from your web browser.  
 
 ## Motivation  
 
@@ -17,6 +12,11 @@ I have been using [Zotero](https://www.zotero.org/) and [Refnotes](https://kookm
 - **Linking back to TiddlyWiki**: Navigating back to specific notes or tiddlers in [TiddlyWiki](https://tiddlywiki.com/) is not always straightforward.  
 
 This Chrome extension is designed to address these issues, streamlining the research process and improving efficiency.  
+
+## Features:  
+- Access your [Zotero](https://www.zotero.org) items and open associated PDF files.  
+- Navigate to specific [TiddlyWiki](https://tiddlywiki.com) tiddlers for organized research notes.  
+- Link to scholarly resources, including [Scopus](https://www.scopus.com), [Google Scholar](https://scholar.google.com), publishers, and more.  
 
 ## Prerequisites  
 
