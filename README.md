@@ -53,16 +53,6 @@ If you encounter any issues, feel free to report them in the [Issues](https://gi
 
 ## TiddlyWiki
 
-## Features
-
-Show toolbar over webpage with DOI in the TiddlyWiki
-  * show Tiddlywiki icon in Google Scholar
-  * show Tiddlywiki icon in Scopus for paper page, citation list, search result
-  * show authors for publications in the Tiddlywiki
-  * link back to authors and publications in Tiddlywiki
-
-
-
 ## Contributing
 
 Contributions are welcome! Please submit a pull request or raise an issue if you have ideas for improvements or bug fixes.
