@@ -18,6 +18,44 @@ I have been using [Zotero](https://www.zotero.org/) and [Refnotes](https://kookm
 
 This Chrome extension is designed to address these issues, streamlining the research process and improving efficiency.  
 
+## Prerequisites  
+
+Before using **PubConnector**, ensure that your TiddlyWiki and Zotero are properly configured to support integration with the extension. 
+
+### TiddlyWiki  
+
+1. **Run TiddlyWiki in Node.js Mode**:  
+   - **PubConnector** uses the TiddlyWiki [WebAPI](https://tiddlywiki.com/static/WebServer%2520API.html) to access publications stored in TiddlyWiki.  
+   - Install [Node.js](https://nodejs.org/) if it is not already installed.  
+   - Set up TiddlyWiki in Node.js mode by following the [official guide](https://tiddlywiki.com/#Installing%20TiddlyWiki%20on%20Node.js).  
+
+2. **Enable CORS (Cross-Origin Resource Sharing)**:  
+   - Use a proxy server like [NGINX](https://nginx.org/) or configure TiddlyWiki directly to accept requests from the browser by adding the appropriate CORS headers.  
+
+3. **Install the TW-Connector Plugin**:  
+   - Install the [TW-Connector](https://github.com/byzheng/TW-Connector) plugin, a small TiddlyWiki extension that allows opening tiddlers from other tabs in the web browser.  
+   - Follow the instructions provided in the [TW-Connector repository](https://github.com/byzheng/TW-Connector) to install the plugin.  
+
+4. **Data Structure**  
+   **PubConnector** utilizes information stored in TiddlyWiki to render on web pages:
+
+   - Tiddlers with the tag `Colleague` are used for researcher information, including fields like `scopus`, `orcid`, and `google-scholar` for profile links on [Scopus](https://www.scopus.com), [ORCID](https://orcid.org/), and [Google Scholar](https://scholar.google.com).
+   
+   - Tiddlers with the tag `bibtex-entry` (imported via [Refnotes](https://kookma.github.io/TW-Refnotes/)) are used for publications, including fields like:  
+     - `scopus-eid` for the Scopus identifier,  
+     - `scholar-cid` and `scholar-cites` for the Google Scholar identifier (which might not always be accurate).  
+     
+     These fields can be programmatically retrieved using [R scripts](https://github.com/byzheng/RPubConnector).
+
+### Zotero  
+
+1. **Enable Third-Party API Access**:  
+   - Open Zotero and go to **Settings > Advanced.  
+   - Enable `Allow other application on this computer to communicate with Zotero`.  
+
+After completing these prerequisites, **PubConnector** will be ready to link your references across TiddlyWiki, Zotero, and other platforms.  
+
+
 
 ## Installation
 
@@ -50,8 +88,6 @@ Follow these steps to install the extension directly from the source code:
 
 If you encounter any issues, feel free to report them in the [Issues](https://github.com/your-username/tw-research/issues) section.
 
-
-## TiddlyWiki
 
 ## Contributing
 
