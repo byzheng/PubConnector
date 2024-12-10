@@ -138,35 +138,3 @@ async function colleague_csiro(url, host) {
     }
 }
 
-
-async function convertImageToBase64(imageUrl) {
-    try {
-        // Fetch the image as a Blob
-        const response = await fetch(imageUrl);
-        
-        // Check if the response is OK (status code 200)
-        if (!response.ok) {
-            throw new Error('Failed to fetch image');
-        }
-
-        const blob = await response.blob();
-
-        // Convert Blob to base64 using FileReader
-        const reader = new FileReader();
-
-        return new Promise((resolve, reject) => {
-            reader.onloadend = () => {
-                resolve(reader.result);  // Resolve with base64 string
-            };
-
-            reader.onerror = (error) => {
-                reject('Error reading the image blob: ' + error);
-            };
-
-            reader.readAsDataURL(blob);  // Start reading the Blob as base64
-        });
-
-    } catch (error) {
-        throw new Error('Error fetching the image: ' + error.message);
-    }
-}

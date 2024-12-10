@@ -26,6 +26,6 @@ chrome.storage.sync.get({
             publisher(options);
         }
         colleague(options.tiddlywikihost);
-        //context_menu(options);
+        context_menu(options);
 
     });

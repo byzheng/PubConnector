@@ -1,6 +1,6 @@
 {
-  "name": "Research Utility",
-  "description": "Utility for Researech",
+  "name": "PubConnector",
+  "description": "Connection publications for researchers",
   "version": "0.0.1",
   "manifest_version": 3,
   "permissions": [
@@ -55,7 +55,7 @@
         "scripts/utils.js",
         "scripts/scholar.js",
         "scripts/scopus.js",
-        "scripts/bibtex.js",
+        "scripts/content.js",
         "scripts/publisher.js",
         "scripts/banner.js",
         "scripts/colleague.js",
