@@ -56,15 +56,28 @@ After completing these prerequisites, **PubConnector** will be ready to link you
 
 **PubConnector** renders a banner at the top right corner of webpages depending on domains.
 
-### **publisher website**: any pages can find an **DOI** 
+### **Publisher website**: any pages can find an **DOI**
+
 
 * A link back to TiddlyWiki and open the tiddler by matching **DOI**
 * A link to [Google Scholar](https://scholar.google.com) by searching **DOI**
 * A link to [Scopus](https://scopus.com) by
- * opening **eid** if `scopus-eid` is available in TiddlyWiki
- * or by searching **DOI** if `scopus-eid` is not available in TiddlyWiki
+  * opening **eid** if `scopus-eid` is available in TiddlyWiki
+  * or by searching **DOI** if `scopus-eid` is not available in TiddlyWiki
+* A icon **Reading** if tag `Reading` is in the tiddler 
+* A link to open Zotero Item by matching **DOI**
+* A link to open first PDF file in a Zotero Item  by matching **DOI**
+
 
 <img width="336" alt="image" src="https://github.com/user-attachments/assets/bb964b84-1630-473d-bb99-fc7c8349e600">
+
+These icons depends whether TiddlyWiki and Zotero APIs are available.
+
+### scopus.com
+
+
+### scholar.google.com
+
 
 
 ## Installation
