@@ -42,7 +42,7 @@ Before using **PubConnector**, ensure that your TiddlyWiki and Zotero are proper
      - `scopus-eid` for the Scopus identifier,  
      - `scholar-cid` and `scholar-cites` for the Google Scholar identifier (which might not always be accurate).  
      
-     These fields can be programmatically retrieved using [R scripts](https://github.com/byzheng/RPubConnector).
+     These fields can be programmatically retrieved using [R scripts](https://rpubconnector.bangyou.me/).
 
 ### Zotero  
 
