@@ -54,12 +54,14 @@ After completing these prerequisites, **PubConnector** will be ready to link you
 
 ## Features
 
-**PubConnector** renders a banner at the top right corner of webpages depending on domains.
+**PubConnector** renders a banner at the top right corner of webpages depending on domains. The icons depend on whether TiddlyWiki and Zotero Servers are available.
 
-### **Publisher website**: any pages can find an **DOI**
+### **Publisher website**
+
+In any pages which can find an **DOI**.
 
 
-* A link back to TiddlyWiki and open the tiddler by matching **DOI**
+* A link back to TiddlyWiki and open tiddler with tag `bibtex-entry` by matching **DOI** in field `bibtex-doi`
 * A link to [Google Scholar](https://scholar.google.com) by searching **DOI**
 * A link to [Scopus](https://scopus.com) by
   * opening **eid** if `scopus-eid` is available in TiddlyWiki
@@ -67,25 +69,47 @@ After completing these prerequisites, **PubConnector** will be ready to link you
 * A icon **Reading** if tag `Reading` is in the tiddler 
 * A link to open Zotero Item by matching **DOI**
 * A link to open first PDF file in a Zotero Item  by matching **DOI**
+* links above author list back to TiddlyWiki for all tags with tag `Colleague`, `Domain` and `Place`
 
 
 <img width="336" alt="image" src="https://github.com/user-attachments/assets/bb964b84-1630-473d-bb99-fc7c8349e600">
 
-These icons depends whether TiddlyWiki and Zotero APIs are available.
 
 ### scopus.com
+
+In author profile page with **authorId** in url
+
+* A link back to Tiddlywiki and open tiddler with tag `Colleague` by matching field **authorId** in field `scopus` 
+* A link to Google Scholar author profile by looking for field `google-scholar` if available in the tiddler 
+* A link to ORCID author profile by looking for field `orcid` if available in the tiddler
 
 <img width="336" alt="image" src="https://github.com/user-attachments/assets/48e6099d-0154-4c42-bd19-bdd0ff5669a2">
 
 
+In publication page with **eid** in url
+
+* A link back to TiddlyWiki and open tiddler with tag `bibtex-entry` by matching **DOI** in field `scopus-eid`
+* A link to [Google Scholar](https://scholar.google.com) by searching **DOI**
+* A icon **Reading** if tag `Reading` is in the tiddler 
+* A link to open Zotero Item by matching **DOI**
+* A link to open first PDF file in a Zotero Item  by matching **DOI**
+* links above author list back to TiddlyWiki for all tags with tag `Colleague`, `Domain` and `Place`
+
+In all pages with item lists, e.g. author profile, search, reference and citation, any items with matching **eid** in field `scopus-eid`
+will be highlighed with an icon link back to Tiddlywiki. 
+
 <img width="336" alt="image" src="https://github.com/user-attachments/assets/6888a334-c55e-4454-8206-7d9c21d725aa">
-
-![image](https://github.com/user-attachments/assets/6888a334-c55e-4454-8206-7d9c21d725aa)
-
 
 ### scholar.google.com
 
+In author profile page with **user** in url,
 
+* A link back to Tiddlywiki and open tiddler with tag `Colleague` by matching field **authorId** in field `scopus` 
+* A link to Scopus author profile by looking for field `scopus` if available in the tiddler 
+* A link to ORCID author profile by looking for field `orcid` if available in the tiddler
+
+In all pages with item lists, e.g. author profile, search and citation, any items with matching **cid** or **cites** in field `scholar-cid` 
+or `scholar-cites`, respetively will be highlighed with an icon link back to Tiddlywiki. 
 
 ## Installation
 
