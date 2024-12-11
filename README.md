@@ -52,6 +52,19 @@ Before using **PubConnector**, ensure that your TiddlyWiki and Zotero are proper
 
 After completing these prerequisites, **PubConnector** will be ready to link your references across TiddlyWiki, Zotero, and other platforms.  
 
+## Features
+
+**PubConnector** renders a banner at the top right corner of webpages depending on domains.
+
+### **publisher website**: any pages can find an **DOI** 
+
+* A link back to TiddlyWiki and open the tiddler by matching **DOI**
+* A link to [Google Scholar](https://scholar.google.com) by searching **DOI**
+* A link to [Scopus](https://scopus.com) by
+ * opening **eid** if `scopus-eid` is available in TiddlyWiki
+ * or by searching **DOI** if `scopus-eid` is not available in TiddlyWiki
+
+<img width="336" alt="image" src="https://github.com/user-attachments/assets/bb964b84-1630-473d-bb99-fc7c8349e600">
 
 
 ## Installation
