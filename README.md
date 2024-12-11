@@ -63,9 +63,9 @@ Follow these steps to install the extension directly from the source code:
 1. **Clone the Repository**
    - Use Git to clone the repository:
      ```bash
-     git clone https://github.com/your-username/tw-research.git
+     git clone https://github.com/byzheng/PubConnector.git
      ```
-   - Alternatively, download the repository as a `.zip` file from the [main branch](https://github.com/your-username/tw-research) and extract it.
+   - Alternatively, download the repository as a `.zip` file from the [main branch](https://github.com/byzheng/PubConnector) and extract it.
 
 2. **Open Chrome Extensions Page**
    - In Chrome, navigate to `chrome://extensions/`.
@@ -83,7 +83,7 @@ Follow these steps to install the extension directly from the source code:
 
 ---
 
-If you encounter any issues, feel free to report them in the [Issues](https://github.com/your-username/tw-research/issues) section.
+If you encounter any issues, feel free to report them in the [Issues](https://github.com/byzheng/PubConnector/issues) section.
 
 
 ## Contributing
