@@ -75,8 +75,10 @@ These icons depends whether TiddlyWiki and Zotero APIs are available.
 
 ### scopus.com
 
-![image](https://github.com/user-attachments/assets/48e6099d-0154-4c42-bd19-bdd0ff5669a2)
+<img width="336" alt="image" src="https://github.com/user-attachments/assets/48e6099d-0154-4c42-bd19-bdd0ff5669a2">
 
+
+<img width="336" alt="image" src="https://github.com/user-attachments/assets/6888a334-c55e-4454-8206-7d9c21d725aa">
 
 ![image](https://github.com/user-attachments/assets/6888a334-c55e-4454-8206-7d9c21d725aa)
 
