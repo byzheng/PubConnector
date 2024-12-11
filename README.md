@@ -78,6 +78,9 @@ These icons depends whether TiddlyWiki and Zotero APIs are available.
 ![image](https://github.com/user-attachments/assets/48e6099d-0154-4c42-bd19-bdd0ff5669a2)
 
 
+![image](https://github.com/user-attachments/assets/6888a334-c55e-4454-8206-7d9c21d725aa)
+
+
 ### scholar.google.com
 
 
