@@ -16,7 +16,7 @@ async function run_scopus(options) {
 
 // Helper function for author page
 async function scopus_authorpage_await(options) {
-    await timeout(2000);
+    //await timeout(2000);
     let element = document.querySelector("div#documents-panel");
     scopus_authorpage(element, options);
     const observer = new MutationObserver(mutationList =>
@@ -37,6 +37,12 @@ async function scopus_authorpage_await(options) {
 
 // create span in the author page
 function scopus_authorpage(element, options, page_type) {
+
+    // Create author banner
+    let aid = URL.parse(window.location.href).searchParams.get("authorId");
+    if (aid !== undefined) {
+        getColleague(aid, "scopus", options.tiddlywikihost);
+    }
 
     // Check all items in the authorpage and create button to link to tiddlywiki
     var items = element.querySelectorAll("li[data-testid='results-list-item']");
@@ -71,11 +77,7 @@ function scopus_authorpage(element, options, page_type) {
         //console.log(eid);
     }
 
-    // Create author banner
-    let aid = URL.parse(window.location.href).searchParams.get("authorId");
-    if (aid !== undefined) {
-        getColleague(aid, "scopus", options.tiddlywikihost);
-    }
+
 }
 
 // Helper functions to create banner in other pages, e.g. search list, citation list
@@ -184,7 +186,7 @@ async function addBannerScopusPublication(eid, options) {
             banner.appendChild(reading_span());
         }
         // Insert colleague and domain info
-        insertColleagueAndDomainInfo(tiddlers[0], options.tiddlywikihost); 
+        insertColleagueAndDomainInfo(tiddlers[0], options.tiddlywikihost);
     } else {
         banner.style.backgroundColor = "#8f928f"; // Set background color to indicate no TiddlyWiki data
     }
