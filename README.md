@@ -98,7 +98,7 @@ In publication page with **eid** in url
 In all pages with item lists, e.g. author profile, search, reference and citation, any items with matching **eid** in field `scopus-eid`
 will be highlighed with an icon link back to Tiddlywiki. 
 
-<img width="336" alt="image" src="https://github.com/user-attachments/assets/6888a334-c55e-4454-8206-7d9c21d725aa">
+<img width="550" alt="image" src="https://github.com/user-attachments/assets/6888a334-c55e-4454-8206-7d9c21d725aa">
 
 ### scholar.google.com
 
