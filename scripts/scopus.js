@@ -16,6 +16,12 @@ async function run_scopus(options) {
 
 // Helper function for author page
 async function scopus_authorpage_await(options) {
+    // Create author banner
+    let aid = URL.parse(window.location.href).searchParams.get("authorId");
+    if (aid !== undefined) {
+        getColleague(aid, "scopus", options.tiddlywikihost);
+    }
+
     //await timeout(2000);
     let element = document.querySelector("div#documents-panel");
     scopus_authorpage(element, options);
@@ -38,11 +44,6 @@ async function scopus_authorpage_await(options) {
 // create span in the author page
 function scopus_authorpage(element, options, page_type) {
 
-    // Create author banner
-    let aid = URL.parse(window.location.href).searchParams.get("authorId");
-    if (aid !== undefined) {
-        getColleague(aid, "scopus", options.tiddlywikihost);
-    }
 
     // Check all items in the authorpage and create button to link to tiddlywiki
     var items = element.querySelectorAll("li[data-testid='results-list-item']");
@@ -83,11 +84,16 @@ function scopus_authorpage(element, options, page_type) {
 // Helper functions to create banner in other pages, e.g. search list, citation list
 function scopus_otherpages(options) {
     // Whole page to add a bar with EID
-    var eid_el = document.querySelector("input#currentRecordPageEID, input#cite");
-    if (eid_el !== undefined && eid_el !== null) {
-        var eid = eid_el.value;
+    var url = new URL(window.location.href);
+    var eid = url.searchParams.get("eid") || url.searchParams.get("cite");
+    if (eid) {
         addBannerScopusPublication(eid, options);
     }
+    // var eid_el = document.querySelector("input#currentRecordPageEID, input#cite");
+    // if (eid_el !== undefined && eid_el !== null) {
+    //     var eid = eid_el.value;
+    //     addBannerScopusPublication(eid, options);
+    // }
 
     // Find page types for list of items
     var selector_scopus = [
