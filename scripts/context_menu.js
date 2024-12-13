@@ -5,17 +5,23 @@ function context_menu(options) {
             if (request.from == "context-menu") {
                 var info = request.info;
                 if (info.menuItemId === "tw-send-image") {
-                    tiddlywiki_send_image(info.srcURL)
+                    tiddlywiki_send_image(info.srcUrl)
                 } 
             }
         }
     );
 
-    async function tiddlywiki_send_image(srcURL) {
-        if (srcURL === undefined || srcURL === null) {
+    async function tiddlywiki_send_image(srcUrl) {
+        if (srcUrl === undefined || srcUrl === null) {
             return;
         }
-        let image = await convertImageToBase64(imageUrl);
+        let image = await convertImageToBase64(srcUrl);
+        chrome.runtime.sendMessage({
+            from: "webpage",
+            image: image,
+            method: "new_image",
+            host: options.tiddlywikihost
+        });
     }
     // function item_hidden() {
     //     var href = window.location.href;

@@ -37,41 +37,41 @@ chrome.runtime.onMessage.addListener(
 
 
 // Popup menu
-// chrome.runtime.onInstalled.addListener(async () => {
-//     chrome.contextMenus.create({
-//         title: "Send image to Tiddlywiki",
-//         id: "tw-send-image",
-//         contexts: ["image"]
-//     });
-//     // chrome.contextMenus.create({
-//     //     parentId: "tw-research",
-//     //     id: "item-hidden",
-//     //     title: "Show/Hide Exist Item"
-//     // })
-//     // chrome.contextMenus.create({
-//     // parentId: "tw-research",
-//     // id: "citation-hidden",
-//     // title: "Citation Hidden"
-//     // })
-// });
+chrome.runtime.onInstalled.addListener(async () => {
+    chrome.contextMenus.create({
+        title: "Send image to Tiddlywiki",
+        id: "tw-send-image",
+        contexts: ["image"]
+    });
+    // chrome.contextMenus.create({
+    //     parentId: "tw-research",
+    //     id: "item-hidden",
+    //     title: "Show/Hide Exist Item"
+    // })
+    // chrome.contextMenus.create({
+    // parentId: "tw-research",
+    // id: "citation-hidden",
+    // title: "Citation Hidden"
+    // })
+});
 
-// chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-//     let context_menus = ['tw-send-image'];
-//     if (context_menus.includes(info.menuItemId)) {
-//         (async () => {
-//             const [tab] = await chrome.tabs.query({
-//                 active: true,
-//                 lastFocusedWindow: true
-//             });
-//             // send message to console.js to ask for details from the DOM about the context link
-//             const response = await chrome.tabs.sendMessage(tab.id, {
-//                 from: "context-menu",
-//                 info: info
-//             });
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+    let context_menus = ['tw-send-image'];
+    if (context_menus.includes(info.menuItemId)) {
+        (async () => {
+            const [tab] = await chrome.tabs.query({
+                active: true,
+                lastFocusedWindow: true
+            });
+            // send message to console.js to ask for details from the DOM about the context link
+            const response = await chrome.tabs.sendMessage(tab.id, {
+                from: "context-menu",
+                info: info
+            });
 
-//         })();
-//     }
-// });
+        })();
+    }
+});
 
 
 
