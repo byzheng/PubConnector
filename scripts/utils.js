@@ -107,6 +107,9 @@ async function getColleague(id, type, host) {
     }
     const tiddlers = await tiddlywikiGetTiddlers(filter, host);
     // not found
+    if (tiddlers === null) {
+        return;
+    }
     if (tiddlers.length === 0) {
         return;
     }

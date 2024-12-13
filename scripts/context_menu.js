@@ -19,6 +19,7 @@ function context_menu(options) {
         chrome.runtime.sendMessage({
             from: "webpage",
             image: image,
+            url: srcUrl,
             method: "new_image",
             host: options.tiddlywikihost
         });
