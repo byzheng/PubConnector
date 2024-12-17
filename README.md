@@ -17,6 +17,8 @@ This Chrome extension is designed to address these issues, streamlining the rese
 - Access your [Zotero](https://www.zotero.org) items and open associated PDF files.  
 - Navigate to specific [TiddlyWiki](https://tiddlywiki.com) tiddlers for organized research notes.  
 - Link to scholarly resources, including [Scopus](https://www.scopus.com), [Google Scholar](https://scholar.google.com), publishers, and more.  
+- Send image to Tiddlywki
+
 
 ## Prerequisites  
 
@@ -52,7 +54,7 @@ Before using **PubConnector**, ensure that your TiddlyWiki and Zotero are proper
 
 After completing these prerequisites, **PubConnector** will be ready to link your references across TiddlyWiki, Zotero, and other platforms.  
 
-## Features
+## Connect to scholar websites
 
 **PubConnector** renders a banner at the top right corner of webpages depending on domains. The icons depend on whether TiddlyWiki and Zotero Servers are available.
 
@@ -110,6 +112,8 @@ In author profile page with **user** in url,
 
 In all pages with item lists, e.g. author profile, search and citation, any items with matching **cid** or **cites** in field `scholar-cid` 
 or `scholar-cites`, respetively will be highlighed with an icon link back to Tiddlywiki. 
+
+## Send image to TiddlyWiki
 
 ## Installation
 
