@@ -61,23 +61,14 @@
         "scripts/colleague.js",
         "scripts/tags.js",
         "scripts/api/tiddlywiki-api.js",
-        "scripts/api/zotero-api.js"
+        "scripts/api/zotero-api.js",
+        "scripts/tiddlywiki.js"
       ],
       "css": [
         "styles/bibtex.css"
       ],
       "run_at": "document_end",
-      "matches": ["<all_urls>"],  
-      "exclude_matches": ["http://localhost/"]
-    },
-    {
-      "js": [
-        "scripts/tiddlywiki.js"
-      ],
-      "run_at": "document_end",
-      "matches": [
-        "http://localhost/*"
-      ]
+      "matches": ["<all_urls>"]
     }
   ]
 }
