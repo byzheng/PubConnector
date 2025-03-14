@@ -30,22 +30,29 @@ async function publisher(options) {
 
 
 // Helper function to add TiddlyWiki icons and links to the banner
-function addTiddlyWikiIconsDOI(div, tiddler, doi, host, tiddly_only = false) {
-    div.appendChild(tw_link(tiddler.title, "tw-svg", host)); // Add link back to TiddlyWiki 
-    if (tiddly_only) {
-        return;
-    }
-    div.appendChild(scholara(doi)); // Add Scholar link through searching DOI
+function addTiddlyWikiIconsDOI(divs, tiddler, doi, host, tiddly_only = false) {
+    const divList = Array.isArray(divs) ? divs : [divs];
+    divList.forEach(div => {
+        tw_svgs = div.querySelectorAll(".tw-svg");
+        if (tw_svgs.length > 0) {
+            return;
+        }
+        div.appendChild(tw_link(tiddler.title, "tw-svg", host)); // Add link back to TiddlyWiki 
+        if (tiddly_only) {
+            return;
+        }
+        div.appendChild(scholara(doi)); // Add Scholar link through searching DOI
 
-    if (tiddler["scopus-eid"]) {
-        div.appendChild(scopusa(tiddler["scopus-eid"])); // Add Scopus link if scopus-eid is found
-    } else {
-        div.appendChild(scopus_search_doi(doi)); // Add link to search Scopus by DOI
-    }
-    // Add Reading tag icon if applicable
-    if (tiddler.tags.includes("Reading")) {
-        div.appendChild(reading_span());
-    }
+        if (tiddler["scopus-eid"]) {
+            div.appendChild(scopusa(tiddler["scopus-eid"])); // Add Scopus link if scopus-eid is found
+        } else {
+            div.appendChild(scopus_search_doi(doi)); // Add link to search Scopus by DOI
+        }
+        // Add Reading tag icon if applicable
+        if (tiddler.tags.includes("Reading")) {
+            div.appendChild(reading_span());
+        }
+    })
 }
 
 
@@ -117,13 +124,13 @@ function injectReference(options) {
         // Check scopus eid first, if find skip it. 
         let eid = extractScopusEID(reference_element.innerHTML);
         if (eid !== null) {
-            injectReferenceByEID(element, eid, options);
+            injectReferenceByEID([element, reference_element], eid, options);
             return;
         }
         // Then check doi
         let dois = extractDOIs(reference_element.innerHTML);
         dois.forEach(doi => {
-            injectReferenceByDOI(element, doi, options);
+            injectReferenceByDOI([element, reference_element], doi, options);
         })
     });
 }
@@ -151,6 +158,5 @@ async function injectReferenceByEID(element, eid, options) {
     if (doi.length !== 1) {
         return;
     }
-    console.log(doi);
     addTiddlyWikiIconsDOI(element, tiddlers[0], doi, options.tiddlywikihost, tiddly_only = true);
 }
