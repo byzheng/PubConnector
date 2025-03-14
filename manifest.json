@@ -62,7 +62,8 @@
         "scripts/tags.js",
         "scripts/api/tiddlywiki-api.js",
         "scripts/api/zotero-api.js",
-        "scripts/tiddlywiki.js"
+        "scripts/tiddlywiki.js",
+        "scripts/autocomplete.js"
       ],
       "css": [
         "styles/bibtex.css"
