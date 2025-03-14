@@ -15,17 +15,27 @@ async function publisher(options) {
         // Add TiddlyWiki-related icons or actions
         addTiddlyWikiIconsDOI(banner, tiddlers[0], doi, options.tiddlywikihost);
         // Insert colleague and domain info
-        insertColleagueAndDomainInfo(tiddlers[0], options.tiddlywikihost);
+        // insertColleagueAndDomainInfo(tiddlers[0], options.tiddlywikihost);
     } else {
         addDefaultIconsDOI(banner, doi);
     }
     // Add Zotero related icons
     await addZoteroIconsDOI(banner, doi, options.zoterohost);
-
     // Set finally width of banner
     bannerSetWidth(banner);
+
+    // Add other information into pages
+    
+    // Wait to load page as some website will render the whole page later
+    await waitForLoading();
+
+    // Insert author and domain information
+    if (tiddlers.length > 0) {
+        insertColleagueAndDomainInfo(tiddlers[0], options.tiddlywikihost);
+    }    
+
     // inject reference
-    injectReference(options);
+    injectReference(doi, options);
 }
 
 
@@ -68,7 +78,7 @@ async function addZoteroIconsDOI(div, doi, host) {
     if (item_key === null) {
         return;
     }
-    div.appendChild(addZeteroSpan(item_key)); 
+    div.appendChild(addZeteroSpan(item_key));
 
     // Get children for pdfs
     const items_children = await zoteroChildren(item_key, host);
@@ -101,35 +111,57 @@ function addDefaultIconsDOI(div, id) {
     div.style.backgroundColor = "#8f928f"; // Set background color to indicate no TiddlyWiki data
 }
 
-function injectReference(options) {
+function injectReference(thisdoi, options) {
     let href = window.location.href;
     if (href == undefined) {
         return;
     }
     let css_reference;
-    if (href.includes("https://www.sciencedirect.com/")) {
+    if (href.includes("sciencedirect.com")) {
         css_reference = 'a.anchor.anchor-primary[data-xocs-content-type="reference"]';
+    } else if (href.includes("link.springer.com")) {
+        css_reference = 'a[data-track-action="reference anchor"]';
+    } else {
+        return;
     }
     if (css_reference === undefined) {
         return;
     }
     const elements = document.querySelectorAll(css_reference);
     elements.forEach(element => {
-        let ref_href = element.getAttribute("name");
-        let css_reference_element = 'li:has(span > a.anchor.anchor-primary[href="#' + ref_href + '"])';
-        let reference_element = document.querySelector(css_reference_element);
-        if (reference_element === null) {
+
+        let reference_text;
+        let reference_element;
+        if (href.includes("sciencedirect.com")) {
+            let ref_href = element.getAttribute("name");
+            let css_reference_element = 'li:has(span > a.anchor.anchor-primary[href="#' + ref_href + '"])';
+            reference_element = document.querySelector(css_reference_element);
+            if (reference_element === undefined || reference_element === null) {
+                return;
+            }
+            // Check scopus eid first, if find skip it. 
+            reference_text = reference_element.innerHTML;
+            let eid = extractScopusEID(reference_text);
+            if (eid !== null) {
+                injectReferenceByEID([element, reference_element], eid, options);
+                return;
+            }
+        } else if (href.includes("link.springer.com")) {
+            reference_element = element;
+            reference_text = element.title;
+        } else {
             return;
         }
-        // Check scopus eid first, if find skip it. 
-        let eid = extractScopusEID(reference_element.innerHTML);
-        if (eid !== null) {
-            injectReferenceByEID([element, reference_element], eid, options);
+
+        if (reference_text === undefined || reference_element === undefined) {
             return;
         }
         // Then check doi
-        let dois = extractDOIs(reference_element.innerHTML);
+        let dois = extractDOIs(reference_text);
         dois.forEach(doi => {
+            if (doi === thisdoi) {
+                return;
+            }
             injectReferenceByDOI([element, reference_element], doi, options);
         })
     });
@@ -159,4 +191,19 @@ async function injectReferenceByEID(element, eid, options) {
         return;
     }
     addTiddlyWikiIconsDOI(element, tiddlers[0], doi, options.tiddlywikihost, tiddly_only = true);
+}
+
+function waitForLoading() {
+
+    let href = window.location.href;
+    if (href == undefined) {
+        return;
+    }
+    let timeout = 0;
+    if (href.includes("sciencedirect.com")) {
+        timeout = 1500;
+    } else {
+        return;
+    }
+    return new Promise(resolve => setTimeout(resolve, timeout));
 }
