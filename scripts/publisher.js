@@ -40,14 +40,14 @@ async function publisher(options) {
 
 
 // Helper function to add TiddlyWiki icons and links to the banner
-function addTiddlyWikiIconsDOI(divs, tiddler, doi, host, tiddly_only = false) {
+function addTiddlyWikiIconsDOI(divs, tiddler, doi, host, tiddly_only = false, tw_class="tw-svg") {
     const divList = Array.isArray(divs) ? divs : [divs];
     divList.forEach(div => {
-        tw_svgs = div.querySelectorAll(".tw-svg");
+        tw_svgs = div.querySelectorAll("." + tw_class);
         if (tw_svgs.length > 0) {
             return;
         }
-        div.appendChild(tw_link(tiddler.title, "tw-svg", host)); // Add link back to TiddlyWiki 
+        div.appendChild(tw_link(tiddler.title, tw_class, host)); // Add link back to TiddlyWiki 
         if (tiddly_only) {
             return;
         }
@@ -174,7 +174,8 @@ async function injectReferenceByDOI(element, doi, options) {
     if (tiddlers.length !== 1) {
         return;
     }
-    addTiddlyWikiIconsDOI(element, tiddlers[0], doi, options.tiddlywikihost, tiddly_only = true);
+    addTiddlyWikiIconsDOI(element, tiddlers[0], doi, options.tiddlywikihost, 
+        tiddly_only = true, tw_class="tw-svg-small");
 }
 
 
@@ -190,7 +191,8 @@ async function injectReferenceByEID(element, eid, options) {
     if (doi.length !== 1) {
         return;
     }
-    addTiddlyWikiIconsDOI(element, tiddlers[0], doi, options.tiddlywikihost, tiddly_only = true);
+    addTiddlyWikiIconsDOI(element, tiddlers[0], doi, options.tiddlywikihost, 
+        tiddly_only = true, tw_class="tw-svg-small");
 }
 
 function waitForLoading() {
