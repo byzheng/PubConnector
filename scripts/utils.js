@@ -16,6 +16,18 @@ let colleague_fields = [
 
 ];
 
+function extractDOIs(text) {
+    const doiPattern = /10\.\d{4,9}\/[-._;()/:A-Z0-9]+/gi;
+    const matches = text.match(doiPattern) || [];
+    return [...new Set(matches)];
+}
+
+function extractScopusEID(text) {
+    const scopusPattern = /eid=([\w.-]+)/;
+    const match = text.match(scopusPattern);
+    return match ? match[1] : null; // Return EID if found, otherwise null
+}
+
 
 function isValidORCID(url) {
     const orcidPattern = /\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$/;

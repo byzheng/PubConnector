@@ -24,13 +24,17 @@ async function publisher(options) {
 
     // Set finally width of banner
     bannerSetWidth(banner);
-
+    // inject reference
+    injectReference(options);
 }
 
 
 // Helper function to add TiddlyWiki icons and links to the banner
-function addTiddlyWikiIconsDOI(div, tiddler, doi, host) {
+function addTiddlyWikiIconsDOI(div, tiddler, doi, host, tiddly_only = false) {
     div.appendChild(tw_link(tiddler.title, "tw-svg", host)); // Add link back to TiddlyWiki 
+    if (tiddly_only) {
+        return;
+    }
     div.appendChild(scholara(doi)); // Add Scholar link through searching DOI
 
     if (tiddler["scopus-eid"]) {
@@ -90,3 +94,63 @@ function addDefaultIconsDOI(div, id) {
     div.style.backgroundColor = "#8f928f"; // Set background color to indicate no TiddlyWiki data
 }
 
+function injectReference(options) {
+    let href = window.location.href;
+    if (href == undefined) {
+        return;
+    }
+    let css_reference;
+    if (href.includes("https://www.sciencedirect.com/")) {
+        css_reference = 'a.anchor.anchor-primary[data-xocs-content-type="reference"]';
+    }
+    if (css_reference === undefined) {
+        return;
+    }
+    const elements = document.querySelectorAll(css_reference);
+    elements.forEach(element => {
+        let ref_href = element.getAttribute("name");
+        let css_reference_element = 'li:has(span > a.anchor.anchor-primary[href="#' + ref_href + '"])';
+        let reference_element = document.querySelector(css_reference_element);
+        if (reference_element === null) {
+            return;
+        }
+        // Check scopus eid first, if find skip it. 
+        let eid = extractScopusEID(reference_element.innerHTML);
+        if (eid !== null) {
+            injectReferenceByEID(element, eid, options);
+            return;
+        }
+        // Then check doi
+        let dois = extractDOIs(reference_element.innerHTML);
+        dois.forEach(doi => {
+            injectReferenceByDOI(element, doi, options);
+        })
+    });
+}
+
+async function injectReferenceByDOI(element, doi, options) {
+    // Make the request to TiddlyWiki
+    var filter = `[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[${doi}]]`;
+    const tiddlers = await tiddlywikiGetTiddlers(filter, options.tiddlywikihost);
+    if (tiddlers.length !== 1) {
+        return;
+    }
+    addTiddlyWikiIconsDOI(element, tiddlers[0], doi, options.tiddlywikihost, tiddly_only = true);
+}
+
+
+async function injectReferenceByEID(element, eid, options) {
+    eid = eid.toLowerCase();
+    var filter = `[tag[bibtex-entry]] :filter[get[scopus-eid]lowercase[]match[${eid}]]`;
+    const tiddlers = await tiddlywikiGetTiddlers(filter, options.tiddlywikihost);
+    if (tiddlers.length !== 1) {
+        return;
+    }
+    const bibtex_doi = tiddlers[0]["bibtex-doi"];
+    let doi = extractDOIs(bibtex_doi);
+    if (doi.length !== 1) {
+        return;
+    }
+    console.log(doi);
+    addTiddlyWikiIconsDOI(element, tiddlers[0], doi, options.tiddlywikihost, tiddly_only = true);
+}
