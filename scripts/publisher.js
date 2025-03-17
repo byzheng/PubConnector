@@ -121,6 +121,8 @@ function injectReference(thisdoi, options) {
         css_reference = 'a.anchor.anchor-primary[data-xocs-content-type="reference"]';
     } else if (href.includes("link.springer.com")) {
         css_reference = 'a[data-track-action="reference anchor"]';
+    } else if (href.includes("www.mdpi.com")) {
+        css_reference = 'a.html-bibr'
     } else {
         return;
     }
@@ -132,32 +134,46 @@ function injectReference(thisdoi, options) {
 
         let reference_text;
         let reference_element;
+        let ref_selector;
         if (href.includes("sciencedirect.com")) {
             let ref_href = element.getAttribute("name");
-            let css_reference_element = 'li:has(span > a.anchor.anchor-primary[href="#' + ref_href + '"])';
-            reference_element = document.querySelector(css_reference_element);
+            ref_selector = 'li:has(span > a.anchor.anchor-primary[href="#' + ref_href + '"])';
+        } else if (href.includes("link.springer.com")) {
+            reference_element = element;
+            reference_text = element.title;
+        }  else if (href.includes("www.mdpi.com")) {
+            let ref_href = element.getAttribute("href");
+            ref_href = ref_href.replace("#", "");
+            ref_selector = `ol > li[id=${ref_href}]`;
+        } else {
+            return;
+        }
+
+
+        if (reference_element === undefined) {
+            reference_element = document.querySelector(ref_selector);
             if (reference_element === undefined || reference_element === null) {
                 return;
             }
             // Check scopus eid first, if find skip it. 
-            reference_text = reference_element.innerHTML;
+            reference_text = reference_element.outerHTML;
+        }
+        if (reference_text === undefined || reference_element === undefined) {
+            return;
+        }
+
+        // for sciencedirect.com only to find eid
+        if (href.includes("sciencedirect.com")) {
             let eid = extractScopusEID(reference_text);
             if (eid !== null) {
                 injectReferenceByEID([element, reference_element], eid, options);
                 return;
             }
-        } else if (href.includes("link.springer.com")) {
-            reference_element = element;
-            reference_text = element.title;
-        } else {
-            return;
         }
 
-        if (reference_text === undefined || reference_element === undefined) {
-            return;
-        }
         // Then check doi
         let dois = extractDOIs(reference_text);
+        console.log(dois);
         dois.forEach(doi => {
             if (doi === thisdoi) {
                 return;
