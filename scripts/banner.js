@@ -61,9 +61,9 @@ function publisher_doi(doi) {
 
 
 // Helper function to create an icon link to tiddlywiki by title
-function tw_link(title, cls, host, hidden = false) {
+function tw_link(title, cls, host, icon = "images/Tiddlywiki.svg", hidden = false) {
     var img = document.createElement("img");
-    img.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
+    img.src = chrome.runtime.getURL(icon);
     img.classList.add(cls);
     var sa = document.createElement("a");
     sa.appendChild(img);
@@ -83,6 +83,9 @@ function tw_link(title, cls, host, hidden = false) {
 
     return sa;
 }
+
+
+
 
 // Helper function to create an icon of reading
 function reading_span() {

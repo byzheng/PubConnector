@@ -40,30 +40,38 @@ async function publisher(options) {
 
 
 // Helper function to add TiddlyWiki icons and links to the banner
-function addTiddlyWikiIconsDOI(divs, tiddler, doi, host, tiddly_only = false, tw_class="tw-svg") {
+function addTiddlyWikiIconsDOI(div, tiddler, doi, host) {
+    div.appendChild(tw_link(tiddler.title, "tw-svg", host, "images/Tiddlywiki.svg")); // Add link back to TiddlyWiki 
+    div.appendChild(scholara(doi)); // Add Scholar link through searching DOI
+
+    if (tiddler["scopus-eid"]) {
+        div.appendChild(scopusa(tiddler["scopus-eid"])); // Add Scopus link if scopus-eid is found
+    } else {
+        div.appendChild(scopus_search_doi(doi)); // Add link to search Scopus by DOI
+    }
+    // Add Reading tag icon if applicable
+    if (tiddler.tags.includes("Reading")) {
+        div.appendChild(reading_span());
+    }
+}
+
+
+
+// Helper function to add TiddlyWiki icons and links to the banner
+function addTiddlyWikiIconsDOIinText(divs, tiddler, doi, host) {
     const divList = Array.isArray(divs) ? divs : [divs];
+    let tw_class = "tw-svg-inline";
     divList.forEach(div => {
         tw_svgs = div.querySelectorAll("." + tw_class);
         if (tw_svgs.length > 0) {
             return;
         }
-        div.appendChild(tw_link(tiddler.title, tw_class, host)); // Add link back to TiddlyWiki 
-        if (tiddly_only) {
-            return;
-        }
-        div.appendChild(scholara(doi)); // Add Scholar link through searching DOI
-
-        if (tiddler["scopus-eid"]) {
-            div.appendChild(scopusa(tiddler["scopus-eid"])); // Add Scopus link if scopus-eid is found
-        } else {
-            div.appendChild(scopus_search_doi(doi)); // Add link to search Scopus by DOI
-        }
-        // Add Reading tag icon if applicable
-        if (tiddler.tags.includes("Reading")) {
-            div.appendChild(reading_span());
-        }
+        div.appendChild(tw_link(tiddler.title, tw_class, host, "images/TiddlywikiSmall.svg"));
     })
 }
+
+
+
 
 
 // Helper function to add TiddlyWiki icons and links to the banner
@@ -173,7 +181,6 @@ function injectReference(thisdoi, options) {
 
         // Then check doi
         let dois = extractDOIs(reference_text);
-        console.log(dois);
         dois.forEach(doi => {
             if (doi === thisdoi) {
                 return;
@@ -190,8 +197,7 @@ async function injectReferenceByDOI(element, doi, options) {
     if (tiddlers.length !== 1) {
         return;
     }
-    addTiddlyWikiIconsDOI(element, tiddlers[0], doi, options.tiddlywikihost, 
-        tiddly_only = true, tw_class="tw-svg-small");
+    addTiddlyWikiIconsDOIinText(element, tiddlers[0], doi, options.tiddlywikihost);
 }
 
 
@@ -207,8 +213,7 @@ async function injectReferenceByEID(element, eid, options) {
     if (doi.length !== 1) {
         return;
     }
-    addTiddlyWikiIconsDOI(element, tiddlers[0], doi, options.tiddlywikihost, 
-        tiddly_only = true, tw_class="tw-svg-small");
+    addTiddlyWikiIconsDOIinText(element, tiddlers[0], doi, options.tiddlywikihost);
 }
 
 function waitForLoading() {
