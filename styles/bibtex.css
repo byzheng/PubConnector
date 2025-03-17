@@ -101,3 +101,42 @@
   background-color: transparent;
   text-decoration: underline;
 }
+
+
+
+
+.icon-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  background-color: #fdfdfd;
+  color: #3a3a3a;
+  text-align: left;
+  padding: 5px 8px;
+  border-radius: 5px;
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: normal; 
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  font-size: 12px;
+  pointer-events: none;
+  width: auto;  
+  max-width: 600px;
+  min-width: 400px;
+  height: auto;  
+  word-wrap: break-word;
+}
+
+
+
+
+.icon-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
