@@ -187,6 +187,8 @@ function injectReference(thisdoi, options) {
         css_reference = 'a.html-bibr'
     } else if (href.includes("nature.com")) {
         css_reference = 'a[data-track-action="reference anchor"]'
+    } else if (href.includes("cell.com")) {
+        css_reference = 'span.reference-citations > a[role="doc-biblioref"]'
     } else {
         return;
     }
@@ -216,6 +218,10 @@ function injectReference(thisdoi, options) {
             }
             ref_href = ref_href.split("#")[1];
             ref_selector = `li:has(> p[id=${ref_href}])`;
+        } else if (href.includes("cell.com")) {
+            let ref_href = element.getAttribute("id");
+            ref_href = "#" + ref_href;
+            ref_selector = `div.citations:has(a[href="${ref_href}"])`;
         } else {
             return;
         }
