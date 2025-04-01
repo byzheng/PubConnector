@@ -275,7 +275,7 @@ function injectReference(thisdoi, options) {
 
         // Extract and process DOIs
         let dois = extractDOIs(reference_text);
-        console.log(dois);
+        //console.log(dois);
         dois.forEach(doi => {
             if (doi !== thisdoi) {
                 injectReferenceByDOI([element, reference_element], doi, options);

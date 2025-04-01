@@ -71,39 +71,54 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
 });
 
-
-
-// link to tiddlywiki
+// Link to TiddlyWiki
 function linkTiddlywiki(request) {
-    let url = new URL("/", request.host);
-    url = url.toString();
-    chrome.tabs.query({
-        url: url
-    }, function (tabs) {
-        async function active_tab() {
-            let tab;
-            if (tabs.length == 0) {
-                tab = await chrome.tabs.create({
-                    url: url
-                });
-            } else {
-                tab = tabs[0];
-                chrome.windows.update(tab.windowId, {
-                    focused: true
-                });
-                chrome.tabs.update(tab.id, {
-                    active: true
-                });
-                const response = await chrome.tabs.sendMessage(tab.id, {
-                    from: "worker",
-                    request: request
-                });
-            }
+    let url = new URL("/", request.host).toString();
 
+    chrome.tabs.query({ url: url }, async function (tabs) {
+        let tab;
+
+        if (tabs.length === 0) {
+            tab = await new Promise((resolve) => {
+                chrome.tabs.create({ url: url }, resolve);
+            });
+        } else {
+            tab = tabs[0];
         }
-        active_tab();
+
+        // Ensure tab has a windowId before updating
+        if (!tab.windowId) {
+            tab = await new Promise((resolve) => {
+                chrome.tabs.get(tab.id, resolve);
+            });
+        }
+
+        // Ensure window and tab are focused
+        await chrome.windows.update(tab.windowId, { focused: true });
+        await chrome.tabs.update(tab.id, { active: true });
+        
+        // Check tab status before waiting
+        let tabInfo = await new Promise((resolve) => chrome.tabs.get(tab.id, resolve));
+
+        if (tabInfo.status !== "complete") {
+            // Wait only if the tab is still loading
+            await new Promise((resolve) => {
+                chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
+                    if (tabId === tab.id && changeInfo.status === "complete") {
+                        chrome.tabs.onUpdated.removeListener(listener);
+                        resolve();
+                    }
+                });
+            });
+        }
+        // Now send the message
+        chrome.tabs.sendMessage(tab.id, {
+            from: "worker",
+            request: request
+        });
     });
 }
+
 
 // Perform a zotero api request
 async function performZoteroRequest(request) {
