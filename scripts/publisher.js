@@ -203,6 +203,40 @@ function injectReference(thisdoi, options) {
         "cell.com": {
             css_reference: 'span.reference-citations > a[role="doc-biblioref"]',
             getRefSelector: element => `div.citations:has(a[href="#${element.getAttribute("id")}"])`
+        },
+        "wiley.com": {
+            css_reference: 'span > a.bibLink',
+            getRefSelector: element => {
+                let ref_href = element.getAttribute("href");
+                if (!ref_href.includes("#")) return null;
+                ref_href = ref_href.split("#")[1];
+                return `li[data-bib-id="${ref_href}"]`;
+            }
+        },
+        "biomedcentral.com": {
+            css_reference: 'a[data-track-action="reference anchor"]',
+            getRefSelector: element => {
+                let ref_href = element.getAttribute("href");
+                if (!ref_href.includes("#")) return null;
+                ref_href = ref_href.split("#")[1];
+                return `li:has(p[id="${ref_href}"])`;
+            }
+        },
+        "academic.oup.com": {
+            css_reference: 'a.link.link-ref',
+            getRefSelector: element => {
+                let ref_href = element.getAttribute("reveal-id");
+                return `div[content-id="${ref_href}"]`;
+            }
+        },
+        "publish.csiro.au/": {
+            css_reference: 'a.reftools',
+            getRefSelector: element => {
+                let ref_href = element.getAttribute("href");
+                if (!ref_href.includes("#")) return null;
+                ref_href = ref_href.split("#")[1];
+                return `div#${ref_href} ~ a.reftools`;
+            }
         }
     };
 
@@ -241,6 +275,7 @@ function injectReference(thisdoi, options) {
 
         // Extract and process DOIs
         let dois = extractDOIs(reference_text);
+        console.log(dois);
         dois.forEach(doi => {
             if (doi !== thisdoi) {
                 injectReferenceByDOI([element, reference_element], doi, options);

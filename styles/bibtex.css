@@ -108,6 +108,7 @@
 .tw-icon-tooltip {
   position: relative;
   display: inline-block;
+  text-indent: 0;
 }
 
 .tw-tooltip-text {
