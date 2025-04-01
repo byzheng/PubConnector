@@ -78,10 +78,18 @@ function addTiddlyWikiIconsDOIinText(divs, tiddler, host) {
     const divList = Array.isArray(divs) ? divs : [divs];
     let tw_class = "tw-svg-inline";
     divList.forEach(div => {
-        tw_svgs = div.querySelectorAll("." + tw_class);
-        if (tw_svgs.length > 0) {
+
+        const nextElement = div.nextElementSibling;
+        const hasTwSvgNext = nextElement &&
+            nextElement.tagName === 'A' &&
+            nextElement.classList.contains("tw-icon");
+        if (hasTwSvgNext) {
             return;
         }
+        //tw_svgs = div.querySelectorAll("." + tw_class);
+        // if (tw_svgs.length > 0) {
+        //     return;
+        // }
         let a_ele = tw_link(tiddler.title, tw_class, host, "images/TiddlywikiSmall.svg");
         //a_ele.setAttribute("title", title);
         a_ele.classList.add("icon-tooltip");
@@ -111,6 +119,7 @@ function addTiddlyWikiIconsDOIinText(divs, tiddler, host) {
 
 
         // a_ele.appendChild(ele_tooltip);
+        //div.appendChild(a_ele);
         div.parentElement.insertBefore(a_ele, div.nextSibling);
     })
 }
@@ -176,6 +185,8 @@ function injectReference(thisdoi, options) {
         css_reference = 'a[data-track-action="reference anchor"]';
     } else if (href.includes("www.mdpi.com")) {
         css_reference = 'a.html-bibr'
+    } else if (href.includes("nature.com")) {
+        css_reference = 'a[data-track-action="reference anchor"]'
     } else {
         return;
     }
@@ -198,6 +209,13 @@ function injectReference(thisdoi, options) {
             let ref_href = element.getAttribute("href");
             ref_href = ref_href.replace("#", "");
             ref_selector = `ol > li[id=${ref_href}]`;
+        } else if (href.includes("nature.com")) {
+            let ref_href = element.getAttribute("href");
+            if (!ref_href.includes("#")) {
+                return;
+            }
+            ref_href = ref_href.split("#")[1];
+            ref_selector = `li:has(> p[id=${ref_href}])`;
         } else {
             return;
         }
