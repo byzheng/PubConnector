@@ -183,7 +183,7 @@ function injectReference(thisdoi, options) {
         css_reference = 'a.anchor.anchor-primary[data-xocs-content-type="reference"]';
     } else if (href.includes("link.springer.com")) {
         css_reference = 'a[data-track-action="reference anchor"]';
-    } else if (href.includes("www.mdpi.com")) {
+    } else if (href.includes("mdpi.com")) {
         css_reference = 'a.html-bibr'
     } else if (href.includes("nature.com")) {
         css_reference = 'a[data-track-action="reference anchor"]'
@@ -207,7 +207,7 @@ function injectReference(thisdoi, options) {
         } else if (href.includes("link.springer.com")) {
             reference_element = element;
             reference_text = element.title;
-        } else if (href.includes("www.mdpi.com")) {
+        } else if (href.includes("mdpi.com")) {
             let ref_href = element.getAttribute("href");
             ref_href = ref_href.replace("#", "");
             ref_selector = `ol > li[id=${ref_href}]`;
