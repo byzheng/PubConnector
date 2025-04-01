@@ -105,12 +105,12 @@
 
 
 
-.icon-tooltip {
+.tw-icon-tooltip {
   position: relative;
   display: inline-block;
 }
 
-.tooltip-text {
+.tw-tooltip-text {
   visibility: hidden;
   background-color: #fdfdfd;
   color: #3a3a3a;
@@ -136,7 +136,7 @@
 
 
 
-.icon-tooltip:hover .tooltip-text {
+.tw-icon-tooltip:hover .tw-tooltip-text {
   visibility: visible;
   opacity: 1;
 }

@@ -92,12 +92,12 @@ function addTiddlyWikiIconsDOIinText(divs, tiddler, host) {
         // }
         let a_ele = tw_link(tiddler.title, tw_class, host, "images/TiddlywikiSmall.svg");
         //a_ele.setAttribute("title", title);
-        a_ele.classList.add("icon-tooltip");
+        a_ele.classList.add("tw-icon-tooltip");
         // var ele_tooltip = document.createElement("span");
-        // ele_tooltip.classList.add("tooltip-text");
+        // ele_tooltip.classList.add("tw-tooltip-text");
         // ele_tooltip.textContent = generateShortReference(tiddler);
         // ele_tooltip.addEventListener('mouseenter', function () {
-        //     const tooltipText = item.querySelector('.tooltip-text');
+        //     const tooltipText = item.querySelector('.tw-tooltip-text');
         //     const tooltipRect = tooltipText.getBoundingClientRect();
         //     const windowWidth = window.innerWidth;
 
@@ -112,7 +112,7 @@ function addTiddlyWikiIconsDOIinText(divs, tiddler, host) {
         // });
 
         // ele_tooltip.addEventListener('mouseleave', function () {
-        //     const tooltipText = item.querySelector('.tooltip-text');
+        //     const tooltipText = item.querySelector('.tw-tooltip-text');
         //     tooltipText.style.left = '50%'; // Reset position
         //     tooltipText.style.right = 'auto';
         // });
@@ -175,87 +175,77 @@ function addDefaultIconsDOI(div, id) {
 
 function injectReference(thisdoi, options) {
     let href = window.location.href;
-    if (href == undefined) {
-        return;
-    }
-    let css_reference;
-    if (href.includes("sciencedirect.com")) {
-        css_reference = 'a.anchor.anchor-primary[data-xocs-content-type="reference"]';
-    } else if (href.includes("link.springer.com")) {
-        css_reference = 'a[data-track-action="reference anchor"]';
-    } else if (href.includes("mdpi.com")) {
-        css_reference = 'a.html-bibr'
-    } else if (href.includes("nature.com")) {
-        css_reference = 'a[data-track-action="reference anchor"]'
-    } else if (href.includes("cell.com")) {
-        css_reference = 'span.reference-citations > a[role="doc-biblioref"]'
-    } else {
-        return;
-    }
-    if (css_reference === undefined) {
-        return;
-    }
+    if (!href) return;
+
+    // Mapping of site-specific settings
+    const siteConfig = {
+        "sciencedirect.com": {
+            css_reference: 'a.anchor.anchor-primary[data-xocs-content-type="reference"]',
+            getRefSelector: element => `li:has(span > a.anchor.anchor-primary[href="#${element.getAttribute("name")}"])`,
+            extractEID: extractScopusEID
+        },
+        "link.springer.com": {
+            css_reference: 'a[data-track-action="reference anchor"]',
+            getReferenceText: element => element.title
+        },
+        "mdpi.com": {
+            css_reference: 'a.html-bibr',
+            getRefSelector: element => `ol > li[id=${element.getAttribute("href").replace("#", "")}]`
+        },
+        "nature.com": {
+            css_reference: 'a[data-track-action="reference anchor"]',
+            getRefSelector: element => {
+                let ref_href = element.getAttribute("href");
+                if (!ref_href.includes("#")) return null;
+                return `li:has(> p[id=${ref_href.split("#")[1]}])`;
+            }
+        },
+        "cell.com": {
+            css_reference: 'span.reference-citations > a[role="doc-biblioref"]',
+            getRefSelector: element => `div.citations:has(a[href="#${element.getAttribute("id")}"])`
+        }
+    };
+
+    // Find matching site configuration
+    let siteKey = Object.keys(siteConfig).find(site => href.includes(site));
+    if (!siteKey) return;
+    let { css_reference, getRefSelector, getReferenceText, extractEID } = siteConfig[siteKey];
+
+    // Query reference elements
     const elements = document.querySelectorAll(css_reference);
     elements.forEach(element => {
-
-        let reference_text;
         let reference_element;
-        let ref_selector;
-        if (href.includes("sciencedirect.com")) {
-            let ref_href = element.getAttribute("name");
-            ref_selector = 'li:has(span > a.anchor.anchor-primary[href="#' + ref_href + '"])';
-        } else if (href.includes("link.springer.com")) {
+        let reference_text;
+
+        if (getReferenceText) {
+            reference_text = getReferenceText(element);
             reference_element = element;
-            reference_text = element.title;
-        } else if (href.includes("mdpi.com")) {
-            let ref_href = element.getAttribute("href");
-            ref_href = ref_href.replace("#", "");
-            ref_selector = `ol > li[id=${ref_href}]`;
-        } else if (href.includes("nature.com")) {
-            let ref_href = element.getAttribute("href");
-            if (!ref_href.includes("#")) {
-                return;
-            }
-            ref_href = ref_href.split("#")[1];
-            ref_selector = `li:has(> p[id=${ref_href}])`;
-        } else if (href.includes("cell.com")) {
-            let ref_href = element.getAttribute("id");
-            ref_href = "#" + ref_href;
-            ref_selector = `div.citations:has(a[href="${ref_href}"])`;
-        } else {
-            return;
-        }
-
-
-        if (reference_element === undefined) {
+        } else if (getRefSelector) {
+            let ref_selector = getRefSelector(element);
+            if (!ref_selector) return;
             reference_element = document.querySelector(ref_selector);
-            if (reference_element === undefined || reference_element === null) {
-                return;
-            }
-            // Check scopus eid first, if find skip it. 
+            if (!reference_element) return;
             reference_text = reference_element.outerHTML;
         }
-        if (reference_text === undefined || reference_element === undefined) {
-            return;
-        }
 
-        // for sciencedirect.com only to find eid
-        if (href.includes("sciencedirect.com")) {
-            let eid = extractScopusEID(reference_text);
+        if (!reference_text || !reference_element) return;
+
+        // Special handling for Scopus EID on ScienceDirect
+        if (extractEID) {
+            let eid = extractEID(reference_text);
             if (eid !== null) {
                 injectReferenceByEID([element, reference_element], eid, options);
                 return;
             }
         }
 
-        // Then check doi
+        // Extract and process DOIs
         let dois = extractDOIs(reference_text);
         dois.forEach(doi => {
-            if (doi === thisdoi) {
-                return;
+            if (doi !== thisdoi) {
+                injectReferenceByDOI([element, reference_element], doi, options);
             }
-            injectReferenceByDOI([element, reference_element], doi, options);
-        })
+        });
     });
 }
 
