@@ -178,6 +178,13 @@ function injectReference(thisdoi, options) {
     let href = window.location.href;
     if (!href) return;
 
+    function get_href_id(element) {
+        let ref_href = element.getAttribute("href");
+        if (!ref_href.includes("#")) return null;
+        ref_href = ref_href.split("#")[1];
+        return ref_href;
+    } 
+
     // Mapping of site-specific settings
     const siteConfig = {
         "sciencedirect.com": {
@@ -187,7 +194,10 @@ function injectReference(thisdoi, options) {
         },
         "link.springer.com": {
             css_reference: 'a[data-track-action="reference anchor"]',
-            getReferenceText: element => element.title
+            getRefSelector: element => {
+                let ref_href = get_href_id(element);
+                return `li.c-article-references__item:has(p[id="${ref_href}"])`;
+            }
         },
         "mdpi.com": {
             css_reference: 'a.html-bibr',
@@ -196,9 +206,8 @@ function injectReference(thisdoi, options) {
         "nature.com": {
             css_reference: 'a[data-track-action="reference anchor"]',
             getRefSelector: element => {
-                let ref_href = element.getAttribute("href");
-                if (!ref_href.includes("#")) return null;
-                return `li:has(> p[id=${ref_href.split("#")[1]}])`;
+                let ref_href = get_href_id(element);
+                return `li:has(> p[id=${ref_href}])`;
             }
         },
         "cell.com": {
@@ -208,18 +217,14 @@ function injectReference(thisdoi, options) {
         "wiley.com": {
             css_reference: 'span > a.bibLink',
             getRefSelector: element => {
-                let ref_href = element.getAttribute("href");
-                if (!ref_href.includes("#")) return null;
-                ref_href = ref_href.split("#")[1];
+                let ref_href = get_href_id(element);
                 return `li[data-bib-id="${ref_href}"]`;
             }
         },
         "biomedcentral.com": {
             css_reference: 'a[data-track-action="reference anchor"]',
             getRefSelector: element => {
-                let ref_href = element.getAttribute("href");
-                if (!ref_href.includes("#")) return null;
-                ref_href = ref_href.split("#")[1];
+                let ref_href = get_href_id(element);
                 return `li:has(p[id="${ref_href}"])`;
             }
         },
@@ -233,18 +238,14 @@ function injectReference(thisdoi, options) {
         "publish.csiro.au": {
             css_reference: 'a.reftools',
             getRefSelector: element => {
-                let ref_href = element.getAttribute("href");
-                if (!ref_href.includes("#")) return null;
-                ref_href = ref_href.split("#")[1];
+                let ref_href = get_href_id(element);
                 return `div#${ref_href} ~ a.reftools`;
             }
         },
         "frontiersin.org": {
             css_reference: 'a[href^="#B"]',
             getRefSelector: element => {
-                let ref_href = element.getAttribute("href");
-                if (!ref_href.includes("#")) return null;
-                ref_href = ref_href.split("#")[1];
+                let ref_href = get_href_id(element);
                 return `div.References:has(a[id="${ref_href}"])`;
             }
         }
@@ -253,7 +254,7 @@ function injectReference(thisdoi, options) {
     // Find matching site configuration
     let siteKey = Object.keys(siteConfig).find(site => href.includes(site));
     if (!siteKey) return;
-    let { css_reference, getRefSelector, getReferenceText, extractEID } = siteConfig[siteKey];
+    let { css_reference, getRefSelector, extractEID } = siteConfig[siteKey];
 
     // Query reference elements
     const elements = document.querySelectorAll(css_reference);
@@ -261,10 +262,7 @@ function injectReference(thisdoi, options) {
         let reference_element;
         let reference_text;
 
-        if (getReferenceText) {
-            reference_text = getReferenceText(element);
-            reference_element = element;
-        } else if (getRefSelector) {
+        if (getRefSelector) {
             let ref_selector = getRefSelector(element);
             if (!ref_selector) return;
             reference_element = document.querySelector(ref_selector);
