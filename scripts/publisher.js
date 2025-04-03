@@ -39,9 +39,9 @@ async function publisher(options) {
 
 // Helper function to add TiddlyWiki icons and links to the banner
 function addTiddlyWikiIconsDOI(div, tiddler, doi, host) {
-    
-    div.appendChild(tw_copy_citation(tiddler.title)); 
-    div.appendChild(tw_link(tiddler.title, "tw-svg", host, "images/Tiddlywiki.svg")); 
+
+    div.appendChild(tw_copy_citation(tiddler.title));
+    div.appendChild(tw_link(tiddler.title, "tw-svg", host, "images/Tiddlywiki.svg"));
     div.appendChild(scholara(doi)); // Add Scholar link through searching DOI
 
     if (tiddler["scopus-eid"]) {
@@ -183,8 +183,9 @@ function injectReference(thisdoi, options) {
         if (!ref_href.includes("#")) return null;
         ref_href = ref_href.split("#")[1];
         return ref_href;
-    } 
+    }
 
+    // Mapping of site-specific settings
     // Mapping of site-specific settings
     const siteConfig = {
         "sciencedirect.com": {
@@ -194,21 +195,15 @@ function injectReference(thisdoi, options) {
         },
         "link.springer.com": {
             css_reference: 'a[data-track-action="reference anchor"]',
-            getRefSelector: element => {
-                let ref_href = get_href_id(element);
-                return `li.c-article-references__item:has(p[id="${ref_href}"])`;
-            }
+            getRefSelector: element => `li.c-article-references__item:has(p[id="${get_href_id(element)}"])`
         },
         "mdpi.com": {
             css_reference: 'a.html-bibr',
-            getRefSelector: element => `ol > li[id=${element.getAttribute("href").replace("#", "")}]`
+            getRefSelector: element => `ol > li[id=${get_href_id(element).replace("#", "")}]`
         },
         "nature.com": {
             css_reference: 'a[data-track-action="reference anchor"]',
-            getRefSelector: element => {
-                let ref_href = get_href_id(element);
-                return `li:has(> p[id=${ref_href}])`;
-            }
+            getRefSelector: element => `li:has(> p[id=${get_href_id(element)}])`
         },
         "cell.com": {
             css_reference: 'span.reference-citations > a[role="doc-biblioref"]',
@@ -216,38 +211,23 @@ function injectReference(thisdoi, options) {
         },
         "wiley.com": {
             css_reference: 'span > a.bibLink',
-            getRefSelector: element => {
-                let ref_href = get_href_id(element);
-                return `li[data-bib-id="${ref_href}"]`;
-            }
+            getRefSelector: element => `li[data-bib-id="${get_href_id(element)}"]`
         },
         "biomedcentral.com": {
             css_reference: 'a[data-track-action="reference anchor"]',
-            getRefSelector: element => {
-                let ref_href = get_href_id(element);
-                return `li:has(p[id="${ref_href}"])`;
-            }
+            getRefSelector: element => `li:has(p[id="${get_href_id(element)}"])`
         },
         "academic.oup.com": {
             css_reference: 'a.link.link-ref',
-            getRefSelector: element => {
-                let ref_href = element.getAttribute("reveal-id");
-                return `div[content-id="${ref_href}"]`;
-            }
+            getRefSelector: element => `div[content-id="${element.getAttribute("reveal-id")}"]`
         },
         "publish.csiro.au": {
             css_reference: 'a.reftools',
-            getRefSelector: element => {
-                let ref_href = get_href_id(element);
-                return `div#${ref_href} ~ a.reftools`;
-            }
+            getRefSelector: element => `div#${get_href_id(element)} ~ a.reftools`
         },
         "frontiersin.org": {
             css_reference: 'a[href^="#B"]',
-            getRefSelector: element => {
-                let ref_href = get_href_id(element);
-                return `div.References:has(a[id="${ref_href}"])`;
-            }
+            getRefSelector: element => `div.References:has(a[id="${get_href_id(element)}"])`
         }
     };
 
