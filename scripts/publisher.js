@@ -14,8 +14,6 @@ async function publisher(options) {
     if (tiddlers.length > 0) {
         // Add TiddlyWiki-related icons or actions
         addTiddlyWikiIconsDOI(banner, tiddlers[0], doi, options.tiddlywikihost);
-        // Insert colleague and domain info
-        // insertColleagueAndDomainInfo(tiddlers[0], options.tiddlywikihost);
     } else {
         addDefaultIconsDOI(banner, doi);
     }
@@ -41,7 +39,9 @@ async function publisher(options) {
 
 // Helper function to add TiddlyWiki icons and links to the banner
 function addTiddlyWikiIconsDOI(div, tiddler, doi, host) {
-    div.appendChild(tw_link(tiddler.title, "tw-svg", host, "images/Tiddlywiki.svg")); // Add link back to TiddlyWiki 
+    
+    div.appendChild(tw_copy_citation(tiddler.title)); 
+    div.appendChild(tw_link(tiddler.title, "tw-svg", host, "images/Tiddlywiki.svg")); 
     div.appendChild(scholara(doi)); // Add Scholar link through searching DOI
 
     if (tiddler["scopus-eid"]) {
@@ -54,6 +54,7 @@ function addTiddlyWikiIconsDOI(div, tiddler, doi, host) {
         div.appendChild(reading_span());
     }
 }
+
 
 
 function generateShortReference(tiddler) {

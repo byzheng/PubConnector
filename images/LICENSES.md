@@ -46,3 +46,8 @@ This file contains licensing information for the third-party icons used in this 
    - **Icon Set**: Ant Design Icons
    - **Author**: HeskeyBaozi
    - **License**: [MIT](https://opensource.org/licenses/MIT)
+
+10. **Copy.svg**
+   - **Icon Set**: Akar Icons
+   - **Author**: Arturo Wibawa
+   - **License**: [MIT](https://opensource.org/licenses/MIT)

@@ -30,7 +30,8 @@
         "images/ReadOutlined.svg",
         "images/Save.svg",
         "images/ZoteroSquare.svg",
-        "images/FilePdfFilled.svg"
+        "images/FilePdfFilled.svg",
+        "images/Copy.svg"
       ],
       "matches": [
         "*://*/*"

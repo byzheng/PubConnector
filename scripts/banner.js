@@ -1,5 +1,12 @@
 
+function notication_box() {
+    const notification = document.createElement("div");
+    notification.id = "tw-notification"; 
+    notification.classList.add("tw-notification");
 
+    document.body.appendChild(notification);
+    return notification;
+}
 // Function to create and append the banner to the document
 function createBanner() {
     var div = document.createElement("div");
@@ -81,6 +88,46 @@ function tw_link(title, cls, host, icon = "images/Tiddlywiki.svg", hidden = fals
         });
     });
 
+    return sa;
+}
+
+
+
+// Helper function to create an icon link to tiddlywiki by title
+function tw_copy_citation(title) {
+    
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/Copy.svg");
+    img.classList.add("tw-svg");
+    var sa = document.createElement("a");
+    sa.appendChild(img);
+    sa.setAttribute("href", "#");
+
+    sa.addEventListener("click", function(event) {
+        event.preventDefault();
+        const textToCopy = "<<ref2 " + title + ">>"
+        if (!document.hasFocus()) {
+            console.warn("Document is not focused. Clipboard copy may fail.");
+            return;
+        }
+        navigator.clipboard.writeText(textToCopy).then(() => {
+
+            let notification = document.getElementById("tw-notification");
+            if (!notification) {
+                notification = notication_box();
+            }
+            notification.textContent = `Copied: ${textToCopy}`;
+            notification.style.display = "block";
+
+            // Hide after 1 second
+            setTimeout(() => {
+                notification.style.display = "none";
+            }, 1500);
+        }).catch(err => {
+            console.error("Failed to copy text: ", err);
+        });
+    });
+    sa.classList.add("tw-icon");
     return sa;
 }
 

@@ -5,7 +5,7 @@
     right: 2em;
     min-width: 100px;
     height: 55px;
-    z-index: 9999999999;
+    z-index: 99999;
     border: 1px solid #ccc;
     border-radius: 1.5em;
     vertical-align: middle;
@@ -140,4 +140,19 @@
 .tw-icon-tooltip:hover .tw-tooltip-text {
   visibility: visible;
   opacity: 1;
+}
+
+
+.tw-notification {
+  display: none;
+  position: fixed;
+  top: 10px;
+  left: 50%;  /* Center it horizontally */
+  transform: translateX(-50%);  /* Shift it back by half its width */
+  background: rgb(192, 192, 139);
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  z-index: 99999999;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
 }
