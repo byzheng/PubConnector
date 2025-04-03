@@ -230,13 +230,22 @@ function injectReference(thisdoi, options) {
                 return `div[content-id="${ref_href}"]`;
             }
         },
-        "publish.csiro.au/": {
+        "publish.csiro.au": {
             css_reference: 'a.reftools',
             getRefSelector: element => {
                 let ref_href = element.getAttribute("href");
                 if (!ref_href.includes("#")) return null;
                 ref_href = ref_href.split("#")[1];
                 return `div#${ref_href} ~ a.reftools`;
+            }
+        },
+        "frontiersin.org": {
+            css_reference: 'a[href^="#B"]',
+            getRefSelector: element => {
+                let ref_href = element.getAttribute("href");
+                if (!ref_href.includes("#")) return null;
+                ref_href = ref_href.split("#")[1];
+                return `div.References:has(a[id="${ref_href}"])`;
             }
         }
     };
