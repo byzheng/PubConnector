@@ -199,7 +199,7 @@ function injectReference(thisdoi, options) {
         },
         "mdpi.com": {
             css_reference: 'a.html-bibr',
-            getRefSelector: element => `ol > li[id=${get_href_id(element).replace("#", "")}]`
+            getRefSelector: element => `ol > li[id=${get_href_id(element)}]`
         },
         "nature.com": {
             css_reference: 'a[data-track-action="reference anchor"]',
