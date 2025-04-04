@@ -191,6 +191,12 @@ async function injectReference(thisdoi, options) {
         ref_href = ref_href.split("#")[1];
         return ref_href;
     }
+    function get_href_id_mdpi(element) {
+        let str = get_href_id(element);
+        const match = str.match(/^B(\d+)-/);
+        return match ? `ref_${match[1]}` : null;
+    }
+
     // Mapping of site-specific settings
     // Mapping of site-specific settings
     const siteConfig = {
@@ -207,7 +213,8 @@ async function injectReference(thisdoi, options) {
         },
         "mdpi.com": {
             css_reference: 'a.html-bibr',
-            getRefSelector: element => `ol > li[id=${get_href_id(element)}]`
+            getRefSelector: element => `ol > li[id=${get_href_id(element)}]`,
+            getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(get_href_id_mdpi(element)))
         },
         "nature.com": {
             css_reference: 'a[data-track-action="reference anchor"]',
@@ -216,7 +223,8 @@ async function injectReference(thisdoi, options) {
         },
         "cell.com": {
             css_reference: 'span.reference-citations > a[role="doc-biblioref"]',
-            getRefSelector: element => `div.citations:has(a[href="#${element.getAttribute("id")}"])`
+            getRefSelector: element => `div.citations:has(a[href="#${element.getAttribute("id")}"])`,
+            getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(element.getAttribute("data-xml-rid")))
         },
         "wiley.com": {
             css_reference: 'span > a.bibLink',
