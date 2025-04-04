@@ -64,6 +64,7 @@
         "scripts/tags.js",
         "scripts/api/tiddlywiki-api.js",
         "scripts/api/zotero-api.js",
+        "scripts/api/crossref.js",
         "scripts/tiddlywiki.js"
       ],
       "css": [

@@ -174,7 +174,14 @@ function addDefaultIconsDOI(div, id) {
     div.style.backgroundColor = "#8f928f"; // Set background color to indicate no TiddlyWiki data
 }
 
-function injectReference(thisdoi, options) {
+async function injectReference(thisdoi, options) {
+
+    const crossref_work = await crossrefWorks(thisdoi); // Get works from crossref
+    let crossref_reference;
+    if (crossref_work.message && crossref_work.message.reference) {
+        crossref_reference = crossref_work.message.reference;
+    }
+
     let href = window.location.href;
     if (!href) return;
 
@@ -184,18 +191,19 @@ function injectReference(thisdoi, options) {
         ref_href = ref_href.split("#")[1];
         return ref_href;
     }
-
     // Mapping of site-specific settings
     // Mapping of site-specific settings
     const siteConfig = {
         "sciencedirect.com": {
             css_reference: 'a.anchor.anchor-primary[data-xocs-content-type="reference"]',
             getRefSelector: element => `li:has(span > a.anchor.anchor-primary[href="#${element.getAttribute("name")}"])`,
+            getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(get_href_id(element))),
             extractEID: extractScopusEID
         },
         "link.springer.com": {
             css_reference: 'a[data-track-action="reference anchor"]',
-            getRefSelector: element => `li.c-article-references__item:has(p[id="${get_href_id(element)}"])`
+            getRefSelector: element => `li.c-article-references__item:has(p[id="${get_href_id(element)}"])`,
+            getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(get_href_id(element).replace('ref-', '')))
         },
         "mdpi.com": {
             css_reference: 'a.html-bibr',
@@ -203,7 +211,8 @@ function injectReference(thisdoi, options) {
         },
         "nature.com": {
             css_reference: 'a[data-track-action="reference anchor"]',
-            getRefSelector: element => `li:has(> p[id=${get_href_id(element)}])`
+            getRefSelector: element => `li:has(> p[id=${get_href_id(element)}])`,
+            getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(get_href_id(element).replace('ref-', '')))
         },
         "cell.com": {
             css_reference: 'span.reference-citations > a[role="doc-biblioref"]',
@@ -215,30 +224,37 @@ function injectReference(thisdoi, options) {
         },
         "biomedcentral.com": {
             css_reference: 'a[data-track-action="reference anchor"]',
-            getRefSelector: element => `li:has(p[id="${get_href_id(element)}"])`
+            getRefSelector: element => `li:has(p[id="${get_href_id(element)}"])`,
+            getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(get_href_id(element).replace('ref-', '')))
         },
         "academic.oup.com": {
             css_reference: 'a.link.link-ref',
-            getRefSelector: element => `div[content-id="${element.getAttribute("reveal-id")}"]`
+            getRefSelector: element => `div[content-id="${element.getAttribute("reveal-id")}"]`,
+            getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(element.getAttribute("reveal-id")))
         },
         "publish.csiro.au": {
             css_reference: 'a.reftools',
-            getRefSelector: element => `div#${get_href_id(element)} ~ a.reftools`
+            getRefSelector: element => `div#${get_href_id(element)} ~ a.reftools`,
+            getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(get_href_id(element)))
         },
         "frontiersin.org": {
             css_reference: 'a[href^="#B"]',
-            getRefSelector: element => `div.References:has(a[id="${get_href_id(element)}"])`
+            getRefSelector: element => `div.References:has(a[id="${get_href_id(element)}"])`,
+            getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(get_href_id(element)))
         }
     };
 
     // Find matching site configuration
     let siteKey = Object.keys(siteConfig).find(site => href.includes(site));
     if (!siteKey) return;
-    let { css_reference, getRefSelector, extractEID } = siteConfig[siteKey];
+    let { css_reference, getRefSelector, getCrossRefKey, extractEID } = siteConfig[siteKey];
 
     // Query reference elements
     const elements = document.querySelectorAll(css_reference);
     elements.forEach(element => {
+        let dois_reference = [];
+        let dois_crossref = [];
+        // get DOI from reference elements
         let reference_element;
         let reference_text;
 
@@ -262,8 +278,15 @@ function injectReference(thisdoi, options) {
         }
 
         // Extract and process DOIs
-        let dois = extractDOIs(reference_text);
-        //console.log(dois);
+        dois_reference = extractDOIs(reference_text);
+        // get doi from from crossres
+        if (getCrossRefKey) {
+            let items_crossref = getCrossRefKey(element, crossref_reference);
+            if (items_crossref && items_crossref.DOI) dois_crossref = [items_crossref.DOI];
+        }
+        let dois =  [...new Set([...dois_reference, ...dois_crossref])];
+        //dois = dois_crossref;
+        //console.log(get_href_id(element), ": ", dois);
         dois.forEach(doi => {
             if (doi !== thisdoi) {
                 injectReferenceByDOI([element, reference_element], doi, options);

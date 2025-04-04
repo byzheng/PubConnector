@@ -31,6 +31,19 @@ chrome.runtime.onMessage.addListener(
             // Return true to indicate asynchronous response
             return true;
         }
+
+        if (request.from === "fetchCorssRefWorks") {
+            performZoteroRequest(request)
+                .then(response => {
+                    sendResponse(response);
+                })
+                .catch(error => {
+                    sendResponse({ success: false, error: error.message }); 
+                });
+
+            // Return true to indicate asynchronous response
+            return true;
+        }
     });
 
 
