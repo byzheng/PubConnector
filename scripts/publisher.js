@@ -126,6 +126,18 @@ function addTiddlyWikiIconsDOIinText(divs, tiddler, host) {
 }
 
 
+function addPublisherLinkByDOI(element, doi) {
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/LinkOut.svg");
+    img.classList.add("tw-svg-inline");
+    var sa = document.createElement("a");
+    sa.appendChild(img);
+    sa.setAttribute("href", "https://doi.org/" + doi);
+    sa.setAttribute("target", "_blank");
+    sa.classList.add("tw-icon-tiny");
+
+    element.parentElement.insertBefore(sa, element.nextSibling);
+}
 
 
 
@@ -308,9 +320,10 @@ async function injectReferenceByDOI(element, doi, options) {
     var filter = `[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[${doi}]]`;
     const tiddlers = await tiddlywikiGetTiddlers(filter, options.tiddlywikihost);
     if (tiddlers.length !== 1) {
-        return;
+        addPublisherLinkByDOI(element[0], doi);
+    } else {
+        addTiddlyWikiIconsDOIinText(element, tiddlers[0], options.tiddlywikihost);
     }
-    addTiddlyWikiIconsDOIinText(element, tiddlers[0], options.tiddlywikihost);
 }
 
 

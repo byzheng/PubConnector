@@ -77,7 +77,7 @@ function tw_link(title, cls, host, icon = "images/Tiddlywiki.svg", hidden = fals
     var url = new URL("#" + title, host);
     sa.setAttribute("href", url);
     sa.setAttribute("target", "_blank");
-    sa.classList.add("tw-icon");
+    sa.classList.add("tw-icon-tiny");
     sa.addEventListener("click", function (event) {
         event.preventDefault();
         chrome.runtime.sendMessage({

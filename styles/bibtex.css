@@ -35,6 +35,13 @@
     vertical-align: middle;
 }
 
+.tw-icon-tiny {
+  color:#7096b3;
+  margin: 0em 0em;
+  padding: 0em 0em;
+  vertical-align: middle;
+}
+
 .tw-svg {
     width: 40px;
     height: 50px;
@@ -47,10 +54,15 @@
 
 
 .tw-svg-inline {
-  height: 1em;  
+  height: 1em !important;  
   width: auto;  
   vertical-align: middle; 
+  margin: 0 !important;     /* Remove any margin */
+  padding: 0 !important;    /* Remove any padding */
+  border: none !important;
 }
+
+
 
 
 .tw-tag {
