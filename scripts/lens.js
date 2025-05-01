@@ -27,7 +27,7 @@ function lens_searchlist(options) {
 
             // Only re-run if p or n changed
             if (currentPage !== lastPage || currentCount !== lastCount) {
-                console.log(`🔁 Detected change (p=${currentPage}, n=${currentCount}), reinjecting...`);
+                //console.log(`🔁 Detected change (p=${currentPage}, n=${currentCount}), reinjecting...`);
                 lens_searchlist_period_check(options);
 
                 lastPage = currentPage;
@@ -42,7 +42,7 @@ async function lens_searchlist_period_check(options) {
     const selector = "main.lf-main-panel.internal-results-container";
     const contentSelector = "div.div-table-results-row.ng-scope h1.listing-title"; // <-- Adjust this to match the final content
     
-    const maxAttempts = 20;      // e.g., try for 20 seconds
+    const maxAttempts = 30;      // e.g., try for 20 seconds
     const interval = 1000;       // in milliseconds
     let attempts = 0;
 
@@ -54,18 +54,18 @@ async function lens_searchlist_period_check(options) {
 
         if (container && items.length > 0) {
             // Found the actual results, apply your processing
-            console.log(`✅ Found ${items.length} result items`);
+            //console.log(`✅ Found ${items.length} result items`);
             lens_items(container, options);
             break;
         }
 
-        console.log(`⏳ Waiting for content... Attempt ${attempts + 1}`);
+        //console.log(`⏳ Waiting for content... Attempt ${attempts + 1}`);
         await sleep(interval);
         attempts++;
     }
 
     if (attempts === maxAttempts) {
-        console.warn("❌ Timeout: content not found");
+        //console.warn("❌ Timeout: content not found");
     }
 }
 
@@ -107,14 +107,14 @@ function lens_items(element, options) {
 
     // Process for each item
     for (let i = 0; i < items.length; i++) {
-        if (items[i].querySelector("a.tw-icon-tiny") !== null) {
+        if (items[i].querySelector("span.tw-lens-icon") !== null) {
             continue;
         }
         let dois = extractDOIs(items[i].outerHTML);
         if (dois === undefined || dois === null || dois.length !== 1) {
             continue;
         }
-        console.log(dois);
+        //console.log(dois);
         inject_lens_doi(items[i], dois, options)
         //addIconTW(eid, items[i], options.tiddlywikihost, page_type);
         //console.log(eid);
@@ -123,14 +123,24 @@ function lens_items(element, options) {
 
 
 async function inject_lens_doi(element, doi, options) {
+
+    var span = document.createElement("span");
+    span.classList.add("tw-lens-icon");
+    
     // Make the request to TiddlyWiki
     var filter = `[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[${doi}]]`;
     const tiddlers = await tiddlywikiGetTiddlers(filter, options.tiddlywikihost);
-    if (tiddlers.length !== 1) {
+    if (tiddlers.length === 1) {
+        span.appendChild(tw_link(tiddlers[0].title, "tw-svg-small", options.tiddlywikihost));
+    }
+    span.appendChild(publisher_doi(doi, a_class="tw-icon-tiny", img_class="tw-svg-small"));
+
+    var qry = "h1.listing-title";
+    const h1 = element.querySelector(qry);
+    if (h1 === undefined) {
         return;
     }
-    var span = tw_link(tiddlers[0].title, "tw-svg-small", options.tiddlywikihost);
-    var qry = "h1.listing-title";
-    element.querySelector(qry).appendChild(span);
+    h1.classList.add("listing-title-flex");
+    h1.appendChild(span);
     //setItemStyle(element);
 }

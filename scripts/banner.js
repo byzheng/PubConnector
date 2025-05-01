@@ -52,15 +52,15 @@ function scholara(doi) {
 }
 
 // Helper function to create an icon link to publisher by DOI
-function publisher_doi(doi) {
+function publisher_doi(doi, a_class="tw-icon", img_class="tw-svg") {
     var img = document.createElement("img");
     img.src = chrome.runtime.getURL("images/LinkOut.svg");
-    img.classList.add("tw-svg");
+    img.classList.add(img_class);
     var sa = document.createElement("a");
     sa.appendChild(img);
     sa.setAttribute("href", "https://doi.org/" + doi);
     sa.setAttribute("target", "_blank");
-    sa.classList.add("tw-icon");
+    sa.classList.add(a_class);
 
 
     return sa;
