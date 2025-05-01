@@ -142,5 +142,8 @@ async function inject_lens_doi(element, doi, options) {
     }
     h1.classList.add("listing-title-flex");
     h1.appendChild(span);
+    if (tiddlers.length === 1) {
+        setItemStyle(h1);
+    }
     //setItemStyle(element);
 }
