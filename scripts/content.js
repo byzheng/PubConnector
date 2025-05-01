@@ -23,7 +23,12 @@ chrome.storage.sync.get({
                 }, 2000)
             }, false);
         }  else if (href.includes("lens.org")) {
-            lens(options);
+            window.addEventListener('load', function load(e) {
+                window.removeEventListener('load', load, false);
+                this.setTimeout(() => {
+                    run_lens(options);
+                }, 2000)
+            }, false);
         } else {
             publisher(options);
         }
