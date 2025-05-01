@@ -83,7 +83,7 @@ function addTiddlyWikiIconsDOIinText(divs, tiddler, host) {
         const nextElement = div.nextElementSibling;
         const hasTwSvgNext = nextElement &&
             nextElement.tagName === 'A' &&
-            nextElement.classList.contains("tw-icon");
+            nextElement.classList.contains("tw-icon-tiny");
         if (hasTwSvgNext) {
             return;
         }

@@ -22,6 +22,8 @@ chrome.storage.sync.get({
                     run_scopus(options)
                 }, 2000)
             }, false);
+        }  else if (href.includes("lens.org")) {
+            lens(options);
         } else {
             publisher(options);
         }
