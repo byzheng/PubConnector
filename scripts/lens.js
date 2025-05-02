@@ -8,10 +8,6 @@ async function run_lens(options) {
 
 function lens_searchlist(options) {
     let lastUrl = location.href;
-    let lastParams = new URLSearchParams(window.location.search);
-    let lastPage = lastParams.get("p");
-    let lastCount = lastParams.get("n");
-
     // Run once initially
     lens_searchlist_period_check(options);
 
@@ -20,28 +16,21 @@ function lens_searchlist(options) {
         const currentUrl = location.href;
         if (currentUrl !== lastUrl) {
             lastUrl = currentUrl;
-
-            const params = new URLSearchParams(window.location.search);
-            const currentPage = params.get("p");
-            const currentCount = params.get("n");
-
-            // Only re-run if p or n changed
-            if (currentPage !== lastPage || currentCount !== lastCount) {
-                //console.log(`🔁 Detected change (p=${currentPage}, n=${currentCount}), reinjecting...`);
-                lens_searchlist_period_check(options);
-
-                lastPage = currentPage;
-                lastCount = currentCount;
-            }
+            lens_searchlist_period_check(options);
         }
-    }, 500); // check every 0.5s
+    }, 1000); // check every 0.5s
 }
 
 
 async function lens_searchlist_period_check(options) {
-    const selector = "main.lf-main-panel.internal-results-container";
-    const contentSelector = "div.div-table-results-row.ng-scope h1.listing-title"; // <-- Adjust this to match the final content
-    
+    const selector = [
+        "main.lf-main-panel.internal-results-container", // for search list
+        "div.div-table-results-body" // for article page
+    ].join(", ");
+    const contentSelector = [
+        "div.div-table-results-row.ng-scope h1.listing-title", // for search list
+        "div.div-table-results-row.ng-scope h3.listing-result-title" // for article page
+    ].join(", ");
     const maxAttempts = 30;      // e.g., try for 20 seconds
     const interval = 1000;       // in milliseconds
     let attempts = 0;
@@ -92,19 +81,11 @@ function lens_items(element, options) {
     
     var selector_lens = [
         "div.div-table-results-row.ng-scope" // for search list
-    ];
-    var items;
-    for (let i = 0; i < selector_lens.length; i++) {
-        items = element.querySelectorAll(selector_lens[i]);
-        if (items.length > 0) {
-            break;
-        }
-    }
-    if (items === undefined) {
+    ].join(", ");
+    var items = element.querySelectorAll(selector_lens);
+    if (items === undefined || items.length === 0) {
         return;
     }
-
-
     // Process for each item
     for (let i = 0; i < items.length; i++) {
         if (items[i].querySelector("span.tw-lens-icon") !== null) {
@@ -135,7 +116,7 @@ async function inject_lens_doi(element, doi, options) {
     }
     span.appendChild(publisher_doi(doi, a_class="tw-icon-tiny", img_class="tw-svg-small"));
 
-    var qry = "h1.listing-title";
+    var qry = "h1.listing-title,h3.listing-result-title";
     const h1 = element.querySelector(qry);
     if (h1 === undefined) {
         return;
