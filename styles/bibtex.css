@@ -170,8 +170,26 @@
 }
 
 
+/* Existing flex class */
 .listing-title-flex {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start; /* allow title to wrap naturally */
+  flex-wrap: nowrap;       /* prevent the right icons from wrapping down */
+  gap: 1em;
+}
+
+/* Ensure the icon container doesn't shrink or wrap */
+.tw-lens-icon {
+  display: flex;
+  flex-shrink: 0;
   align-items: center;
+  gap: 0.3em;
+  white-space: nowrap; /* keeps both icons in one line */
+}
+
+/* Optional: control the max width of the title if needed */
+.listing-title-flex > a.ng-binding {
+  flex: 1 1 auto;
+  min-width: 0;  /* allow flex item to shrink properly */
 }

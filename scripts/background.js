@@ -5,7 +5,7 @@ chrome.runtime.onMessage.addListener(
         if (request.from == "webpage") {
             linkTiddlywiki(request);
         }
-        
+
         if (request.from === "fetchTiddlyWikiData") {
             performTiddlyWikiRequest(request)
                 .then(response => {
@@ -38,7 +38,7 @@ chrome.runtime.onMessage.addListener(
                     sendResponse(response);
                 })
                 .catch(error => {
-                    sendResponse({ success: false, error: error.message }); 
+                    sendResponse({ success: false, error: error.message });
                 });
 
             // Return true to indicate asynchronous response
@@ -109,7 +109,7 @@ function linkTiddlywiki(request) {
         // Ensure window and tab are focused
         await chrome.windows.update(tab.windowId, { focused: true });
         await chrome.tabs.update(tab.id, { active: true });
-        
+
         // Check tab status before waiting
         let tabInfo = await new Promise((resolve) => chrome.tabs.get(tab.id, resolve));
 
@@ -163,22 +163,35 @@ async function performZoteroRequest(request) {
 
 
 
-// Perform a tiddlywiki api request
+// Perform a TiddlyWiki API request (supports GET and PUT)
 async function performTiddlyWikiRequest(request) {
-    const url = request.url;
-    try {
-        const response = await fetch(url, {
-            method: "GET"
-        });
+    const { url, method = "GET", data = null } = request;
 
-        if (!response.ok) {
-            throw new Error(`Failed to fetch TiddlyWiki data: ${response.status}`);
+    try {
+        const options = {
+            method,
+            headers: {
+                "Content-Type": "application/json",
+                "x-requested-with": "TiddlyWiki"
+            }
+        };
+
+        // Only include body for methods that allow it
+        if (method === "PUT" || method === "POST") {
+            options.body = JSON.stringify(data);
         }
 
-        const data = await response.json();
-        return { success: true, data };  // Return the data as a resolved result
+        const response = await fetch(url, options);
+
+        if (!response.ok) {
+            throw new Error(`Failed TiddlyWiki ${method} request: ${response.status}`);
+        }
+
+        // const result = await response.status === 204 ? null : response.json();
+        const result = await response.json();
+        return { success: true, data: result };
     } catch (error) {
-        //console.error("Error in background fetch:", error);
-        return { success: false, error: error.message };  // Return error as a result
+        return { success: false, error: error.message };
     }
 }
+

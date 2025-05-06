@@ -78,7 +78,7 @@ function lens_item(element, options) {
 function lens_items(element, options) {
     // Whole page to add a bar with EID
     var url = new URL(window.location.href);
-    
+
     var selector_lens = [
         "div.div-table-results-row.ng-scope" // for search list
     ].join(", ");
@@ -96,7 +96,7 @@ function lens_items(element, options) {
             continue;
         }
         //console.log(dois);
-        inject_lens_doi(items[i], dois, options)
+        inject_lens_doi(items[i], dois, options);
         //addIconTW(eid, items[i], options.tiddlywikihost, page_type);
         //console.log(eid);
     }
@@ -107,14 +107,14 @@ async function inject_lens_doi(element, doi, options) {
 
     var span = document.createElement("span");
     span.classList.add("tw-lens-icon");
-    
+
     // Make the request to TiddlyWiki
     var filter = `[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[${doi}]]`;
     const tiddlers = await tiddlywikiGetTiddlers(filter, options.tiddlywikihost);
     if (tiddlers.length === 1) {
         span.appendChild(tw_link(tiddlers[0].title, "tw-svg-small", options.tiddlywikihost));
     }
-    span.appendChild(publisher_doi(doi, a_class="tw-icon-tiny", img_class="tw-svg-small"));
+    span.appendChild(publisher_doi(doi, a_class = "tw-icon-tiny", img_class = "tw-svg-small"));
 
     var qry = "h1.listing-title,h3.listing-result-title";
     const h1 = element.querySelector(qry);
@@ -126,5 +126,28 @@ async function inject_lens_doi(element, doi, options) {
     if (tiddlers.length === 1) {
         setItemStyle(h1);
     }
+    const lens_id = getLensID(element);
+    console.log(lens_id);
+    if (tiddlers.length === 1 && tiddlers[0].lens === undefined) {
+        await tiddlywikiPutTiddler(title = tiddlers[0].title, 
+            tags = [], 
+            fields = {lens: lens_id}, host = options.tiddlywikihost);
+    }
     //setItemStyle(element);
+}
+
+
+function getLensID(element) {
+
+    // Get the id attribute
+    if (element == null) {
+        return;
+        
+    } 
+    const articleId = element.id;
+    const pattern = /^article-(\d{3}-){4}\d{3}$/;
+    if (!pattern.test(articleId)) {
+        return;
+    }
+    return articleId;
 }
