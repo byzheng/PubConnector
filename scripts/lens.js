@@ -2,27 +2,80 @@
 
 // Main functions for scopus
 async function run_lens(options) {
-    lens_searchlist(options);
+   // for list of articles
+    lens_article_list(options);
+
+    // article page
+    lens_banner(options);
+
 }
 
+async function lens_banner(options) {
+    var url = window.location.href;
+    const articleID = extractLensArticleID(url);
 
-function lens_searchlist(options) {
+    if (!articleID) {
+        return;
+    }
+
+    const doi_ele = document.querySelector("a.linkouts-website.ng-scope");
+    if (!doi_ele) {
+        return;
+    }
+
+    let doi = extractDOIs(doi_ele.outerHTML);
+
+    if (doi === undefined || doi === null || doi.length !== 1) {
+        return;
+    }
+
+    doi = doi[0];
+
+    var banner = createBanner();
+    // Make the request to TiddlyWiki
+    var filter = `[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[${doi}]]`;
+    const tiddlers = await tiddlywikiGetTiddlers(filter, options.tiddlywikihost);
+
+
+    if (tiddlers.length > 0) {
+        // Add TiddlyWiki-related icons or actions
+        addTiddlyWikiIconsDOI(banner, tiddlers[0], doi, options.tiddlywikihost);
+    } else {
+        addDefaultIconsDOI(banner, doi);
+    }
+    // Add Zotero related icons
+    await addZoteroIconsDOI(banner, doi, options.zoterohost);
+    // Set finally width of banner
+    bannerSetWidth(banner);
+
+    // Add other information into pages
+
+    // Wait to load page as some website will render the whole page later
+    await waitForLoading();
+
+    // Insert author and domain information
+    if (tiddlers.length > 0) {
+        insertColleagueAndDomainInfo(tiddlers[0], options.tiddlywikihost);
+    }
+}
+
+function lens_article_list(options) {
     let lastUrl = location.href;
     // Run once initially
-    lens_searchlist_period_check(options);
+    lens_articlelist_period_check(options);
 
     // Poll for URL changes (e.g., p or n)
     setInterval(() => {
         const currentUrl = location.href;
         if (currentUrl !== lastUrl) {
             lastUrl = currentUrl;
-            lens_searchlist_period_check(options);
+            lens_articlelist_period_check(options);
         }
     }, 1000); // check every 0.5s
 }
 
 
-async function lens_searchlist_period_check(options) {
+async function lens_articlelist_period_check(options) {
     const selector = [
         "main.lf-main-panel.internal-results-container", // for search list
         "div.div-table-results-body" // for article page
@@ -77,7 +130,6 @@ function lens_item(element, options) {
 // Helper functions to create banner in other pages, e.g. search list, citation list
 function lens_items(element, options) {
     // Whole page to add a bar with EID
-    var url = new URL(window.location.href);
 
     var selector_lens = [
         "div.div-table-results-row.ng-scope" // for search list
@@ -128,26 +180,34 @@ async function inject_lens_doi(element, doi, options) {
     }
     const lens_id = getLensID(element);
     console.log(lens_id);
+
     if (tiddlers.length === 1 && tiddlers[0].lens === undefined) {
-        await tiddlywikiPutTiddler(title = tiddlers[0].title, 
-            tags = [], 
-            fields = {lens: lens_id}, host = options.tiddlywikihost);
-    }
+        if (lens_id.length === 1) {
+            await tiddlywikiPutTiddler(title = tiddlers[0].title, 
+                tags = [], 
+                fields = {lens: lens_id[0]}, host = options.tiddlywikihost);
+        }
+    } 
     //setItemStyle(element);
 }
 
 
 function getLensID(element) {
-
-    // Get the id attribute
-    if (element == null) {
-        return;
-        
-    } 
-    const articleId = element.id;
-    const pattern = /^article-(\d{3}-){4}\d{3}$/;
-    if (!pattern.test(articleId)) {
-        return;
-    }
-    return articleId;
+    const pattern = /\b(article[\/-]\d{3}-\d{3}-\d{3}-\d{3}-\d{2,3}[A-Z]?)\b/g;
+    const matches = [...element.outerHTML.matchAll(pattern)];
+    const normalized = matches.map(match =>
+        match[1].replace(/^article-/, 'article/')
+    );
+    return [...new Set(normalized)];
 }
+
+function extractLensArticleID(url) {
+    const match = url.match(/article\/(\d{3}-\d{3}-\d{3}-\d{3}-\d{3}[A-Z]?)/);
+    return match ? `article/${match[1]}` : null;
+}
+
+// function getLensID(element) {
+//     const pattern = /\b\d{3}-\d{3}-\d{3}-\d{3}-\d{3}\b/;
+//     const match = element.outerHTML.match(pattern);
+//     return match ? match[0] : null;
+// }
