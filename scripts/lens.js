@@ -29,6 +29,8 @@ async function run_lens(options) {
 }
 
 async function lens_banner(options) {
+
+    removeTwBanner();
     var url = window.location.href;
     const articleID = extractLensArticleID(url);
 

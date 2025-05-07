@@ -187,7 +187,10 @@ async function performTiddlyWikiRequest(request) {
             throw new Error(`Failed TiddlyWiki ${method} request: ${response.status}`);
         }
 
-        // const result = await response.status === 204 ? null : response.json();
+        if (response.status === 204) {
+            return { success: true, data: null } 
+        }
+        //const result = await response.status === 204 ? null : response.json();
         const result = await response.json();
         return { success: true, data: result };
     } catch (error) {
