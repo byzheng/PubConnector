@@ -31,7 +31,8 @@
         "images/Save.svg",
         "images/ZoteroSquare.svg",
         "images/FilePdfFilled.svg",
-        "images/Copy.svg"
+        "images/Copy.svg",
+        "images/Googlelens.svg"
       ],
       "matches": [
         "*://*/*"

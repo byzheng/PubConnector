@@ -19,6 +19,13 @@ function createBanner() {
 }
 
 
+function removeTwBanner() {
+    const banner = document.getElementById('tw-banner');
+    if (banner) {
+      banner.remove(); // Removes the element from the DOM
+    }
+}
+
 // Helper function to set width of banner
 function bannerSetWidth(div) {
     let totalWidth = 0;
@@ -50,6 +57,36 @@ function scholara(doi) {
     sa.classList.add("tw-icon");
     return sa;
 }
+
+
+// Helper function to create a icon to scholar.google.com
+function lens_icon_id(id) {
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/Googlelens.svg");
+    img.classList.add("tw-svg");
+    var sa = document.createElement("a");
+    sa.appendChild(img);
+    sa.setAttribute("href", "https://www.lens.org/lens/scholar/" + id + "/main");
+    sa.setAttribute("target", "_blank");
+    sa.classList.add("tw-icon");
+    return sa;
+}
+
+// Helper function to create a icon to scholar.google.com
+function lens_icon_doi(doi) {
+    const encodedDOI = encodeURIComponent(doi);
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/Googlelens.svg");
+    img.classList.add("tw-svg");
+    var sa = document.createElement("a");
+    sa.appendChild(img);
+    sa.setAttribute("href", `https://www.lens.org/lens/search/scholar/list?q=${encodedDOI}`);
+    sa.setAttribute("target", "_blank");
+    sa.classList.add("tw-icon");
+    return sa;
+}
+
+
 
 // Helper function to create an icon link to publisher by DOI
 function publisher_doi(doi, a_class="tw-icon", img_class="tw-svg") {

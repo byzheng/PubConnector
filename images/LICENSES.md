@@ -51,3 +51,9 @@ This file contains licensing information for the third-party icons used in this 
    - **Icon Set**: Akar Icons
    - **Author**: Arturo Wibawa
    - **License**: [MIT](https://opensource.org/licenses/MIT)
+
+
+11. **Googlelens.svg**
+   - **Icon Set**: Simple Icons
+   - **Author**: Simple Icons Collaborators
+   - **License**: [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)

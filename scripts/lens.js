@@ -2,12 +2,30 @@
 
 // Main functions for scopus
 async function run_lens(options) {
-   // for list of articles
-    lens_article_list(options);
-
+    
+    let lastUrl = location.href;
     // article page
     lens_banner(options);
 
+    // Run once initially
+    if (!shouldSkipUrl(lastUrl)) {
+        lens_articlelist_period_check(options);
+    }
+
+    // Poll for URL changes (e.g., p or n)
+    setInterval(() => {
+        const currentUrl = location.href;
+        if (currentUrl !== lastUrl) {
+            lastUrl = currentUrl;
+            if (!shouldSkipUrl(currentUrl)) {
+                lens_articlelist_period_check(options);
+            }
+            // article page
+            lens_banner(options);
+
+        }
+    }, 1000); // check every 0.5s
+    
 }
 
 async function lens_banner(options) {
@@ -15,10 +33,12 @@ async function lens_banner(options) {
     const articleID = extractLensArticleID(url);
 
     if (!articleID) {
+        // delete banner
+        removeTwBanner();
         return;
     }
 
-    const doi_ele = document.querySelector("a.linkouts-website.ng-scope");
+    const doi_ele = document.querySelector("a.linkouts-website.ng-scope, header[lens-article-item-meta]");
     if (!doi_ele) {
         return;
     }
@@ -38,10 +58,27 @@ async function lens_banner(options) {
 
 
     if (tiddlers.length > 0) {
-        // Add TiddlyWiki-related icons or actions
-        addTiddlyWikiIconsDOI(banner, tiddlers[0], doi, options.tiddlywikihost);
+        const tiddler = tiddlers[0];
+        banner.appendChild(tw_copy_citation(tiddler.title));
+        banner.appendChild(tw_link(tiddler.title, "tw-svg", options.tiddlywikihost, "images/Tiddlywiki.svg"));
+        banner.appendChild(scholara(doi)); // Add Scholar link through searching DOI
+        banner.appendChild(publisher_doi(doi)); // add link to publisher
+        if (tiddler["scopus-eid"]) {
+            banner.appendChild(scopusa(tiddler["scopus-eid"])); // Add Scopus link if scopus-eid is found
+        } else {
+            banner.appendChild(scopus_search_doi(doi)); // Add link to search Scopus by DOI
+        }
+    
+        // Add Reading tag icon if applicable
+        if (tiddler.tags.includes("Reading")) {
+            banner.appendChild(reading_span());
+        }
+
     } else {
-        addDefaultIconsDOI(banner, doi);
+        banner.appendChild(scholara(doi)); // Add Scholar search link for DOI
+        banner.appendChild(scopus_search_doi(doi)); // Add Scopus search button by DOI
+        banner.appendChild(publisher_doi(doi)); // Add Publisher link for DOI
+        banner.style.backgroundColor = "#8f928f"; // Set background color to indicate no TiddlyWiki data
     }
     // Add Zotero related icons
     await addZoteroIconsDOI(banner, doi, options.zoterohost);
@@ -59,21 +96,11 @@ async function lens_banner(options) {
     }
 }
 
-function lens_article_list(options) {
-    let lastUrl = location.href;
-    // Run once initially
-    lens_articlelist_period_check(options);
 
-    // Poll for URL changes (e.g., p or n)
-    setInterval(() => {
-        const currentUrl = location.href;
-        if (currentUrl !== lastUrl) {
-            lastUrl = currentUrl;
-            lens_articlelist_period_check(options);
-        }
-    }, 1000); // check every 0.5s
+function shouldSkipUrl(url) {
+    const skipSuffixes = ['/main', '/collections']; // Add more suffixes as needed
+    return skipSuffixes.some(suffix => url.endsWith(suffix));
 }
-
 
 async function lens_articlelist_period_check(options) {
     const selector = [
@@ -122,7 +149,7 @@ function lens_item(element, options) {
     if (dois === undefined || dois === null || dois.length !== 1) {
         return;
     }
-    console.log(dois);
+    //console.log(dois);
     inject_lens_doi(element, dois, options)
 }
 
@@ -179,7 +206,7 @@ async function inject_lens_doi(element, doi, options) {
         setItemStyle(h1);
     }
     const lens_id = getLensID(element);
-    console.log(lens_id);
+    //console.log(lens_id);
 
     if (tiddlers.length === 1 && tiddlers[0].lens === undefined) {
         if (lens_id.length === 1) {

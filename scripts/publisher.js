@@ -49,6 +49,12 @@ function addTiddlyWikiIconsDOI(div, tiddler, doi, host) {
     } else {
         div.appendChild(scopus_search_doi(doi)); // Add link to search Scopus by DOI
     }
+
+    if (tiddler.lens) {
+        div.appendChild(lens_icon_id(tiddler.lens));
+    } else {
+        div.appendChild(lens_icon_doi(doi));
+    }
     // Add Reading tag icon if applicable
     if (tiddler.tags.includes("Reading")) {
         div.appendChild(reading_span());
@@ -183,6 +189,7 @@ function addDefaultIconsDOI(div, id) {
     div.appendChild(scholara(id)); // Add Scholar search link for DOI
     div.appendChild(scopus_search_doi(id)); // Add Scopus search button by DOI
     div.appendChild(publisher_doi(id)); // Add Publisher link for DOI
+    div.appendChild(lens_icon_doi(id));
     div.style.backgroundColor = "#8f928f"; // Set background color to indicate no TiddlyWiki data
 }
 
