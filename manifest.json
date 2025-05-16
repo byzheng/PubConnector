@@ -67,7 +67,8 @@
         "scripts/api/zotero-api.js",
         "scripts/api/crossref.js",
         "scripts/tiddlywiki.js",
-        "scripts/lens.js"
+        "scripts/lens.js",
+        "scripts/zotero.js"
       ],
       "css": [
         "styles/bibtex.css"

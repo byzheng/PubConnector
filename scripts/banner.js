@@ -1,7 +1,7 @@
 
 function notication_box() {
     const notification = document.createElement("div");
-    notification.id = "tw-notification"; 
+    notification.id = "tw-notification";
     notification.classList.add("tw-notification");
 
     document.body.appendChild(notification);
@@ -22,7 +22,7 @@ function createBanner() {
 function removeTwBanner() {
     const banner = document.getElementById('tw-banner');
     if (banner) {
-      banner.remove(); // Removes the element from the DOM
+        banner.remove(); // Removes the element from the DOM
     }
 }
 
@@ -89,7 +89,7 @@ function lens_icon_doi(doi) {
 
 
 // Helper function to create an icon link to publisher by DOI
-function publisher_doi(doi, a_class="tw-icon", img_class="tw-svg") {
+function publisher_doi(doi, a_class = "tw-icon", img_class = "tw-svg") {
     var img = document.createElement("img");
     img.src = chrome.runtime.getURL("images/LinkOut.svg");
     img.classList.add(img_class);
@@ -129,10 +129,30 @@ function tw_link(title, cls, host, icon = "images/Tiddlywiki.svg", hidden = fals
 }
 
 
+function tw_save(doi, options) {
+    var img = document.createElement("img");
+    img.src = chrome.runtime.getURL("images/Save.svg");
+    img.classList.add("tw-svg");
+
+    var sa = document.createElement("a");
+    sa.appendChild(img);
+    sa.setAttribute("href", "#");
+    sa.setAttribute("target", "_blank");
+    sa.classList.add("tw-icon");
+
+
+    sa.addEventListener("click", function (event) {
+        event.preventDefault();
+        importBibtexToTiddlyWikiByDOI(doi, options);
+    });
+
+    return sa;
+}
+
 
 // Helper function to create an icon link to tiddlywiki by title
 function tw_copy_citation(title) {
-    
+
     var img = document.createElement("img");
     img.src = chrome.runtime.getURL("images/Copy.svg");
     img.classList.add("tw-svg");
@@ -140,7 +160,7 @@ function tw_copy_citation(title) {
     sa.appendChild(img);
     sa.setAttribute("href", "#");
 
-    sa.addEventListener("click", function(event) {
+    sa.addEventListener("click", function (event) {
         event.preventDefault();
         const textToCopy = "<<ref2 " + title + ">>"
         if (!document.hasFocus()) {

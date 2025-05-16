@@ -23,7 +23,7 @@ function zoteroRequest(url) {
                 from: "fetchZoteroData",  // Identifier to tell background script the type of request
                 url: url                  // The URL to be passed to Zotero API
             },
-            function(response) {
+            function (response) {
                 if (response.success) {
                     //console.log("Zotero data fetched successfully:", response.data);
                     resolve(response.data); // Resolve with the data
@@ -73,4 +73,80 @@ function getZoteroItemKey(item) {
         return null;
     }
     return item.data.key;
+}
+
+
+
+
+// Fectch site key from better-bibtex
+
+// Perform a request to zotero
+function bibtexRpcRequest(zoteroRPC, method, params, id = 1) {
+    if (typeof method !== "string") {
+        throw new Error("method must be a single character");
+    }
+    if (!zoteroRPC.endsWith("better-bibtex/json-rpc")) {
+        throw new Error("zoteroRPC must end with 'better-bibtex/json-rpc'");
+    }
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(
+            {
+                from: "fetchBibtexData",
+                zoteroRPC: zoteroRPC,
+                method: method,
+                params: params,
+                id: id
+            },
+            function (response) {
+                if (response.success) {
+                    resolve(response.data);
+                } else {
+                    resolve(null);
+                }
+            }
+        );
+    });
+}
+
+
+
+async function getBibtexCiteKey(zoteroRPC, items) {
+    if (!Array.isArray(items)) {
+        if (items == null) return null;
+        items = [items];
+    }
+    if (items.length === 0) return null;
+    // Call the RPC method "item.citationkey" with the correct params
+    const response = await bibtexRpcRequest(
+        zoteroRPC,
+        "item.citationkey",
+        { item_keys: items }
+    );
+
+    if (response && typeof response === "object" && response.result) {
+        return response.result;
+    }
+    return null;
+}
+
+async function getBibtexByCiteKey(zoteroRPC, citekey) {
+    if (!Array.isArray(citekey)) {
+        if (citekey == null) return null;
+        citekey = [citekey];
+    }
+    if (citekey.length === 0) return null;
+    // Call the RPC method "item.citationkey" with the correct params
+    const response = await bibtexRpcRequest(
+        zoteroRPC,
+        "item.export",
+        { 
+            "translator": "Better BibLaTeX",
+            "citekeys": citekey 
+        }
+    );
+
+    if (response && typeof response === "object" && response.result) {
+        return response.result;
+    }
+    return null;
 }

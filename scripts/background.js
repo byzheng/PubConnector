@@ -32,6 +32,19 @@ chrome.runtime.onMessage.addListener(
             return true;
         }
 
+        if (request.from === "fetchBibtexData") {
+            performBibtexRequest(request)
+                .then(response => {
+                    sendResponse(response);  // Send the result back to the sender
+                })
+                .catch(error => {
+                    sendResponse({ success: false, error: error.message });  // Handle any errors
+                });
+
+            // Return true to indicate asynchronous response
+            return true;
+        }
+
         if (request.from === "fetchCorssRefWorks") {
             performZoteroRequest(request)
                 .then(response => {
@@ -163,6 +176,40 @@ async function performZoteroRequest(request) {
 
 
 
+// Perform a zotero better bibtex api request
+async function performBibtexRequest(request) {
+    if (typeof request.method !== "string") {
+        throw new Error("method must be a single character");
+    }
+    if (!request.zoteroRPC.endsWith("better-bibtex/json-rpc")) {
+        throw new Error("zoteroRPC must end with 'better-bibtex/json-rpc'");
+    }
+    try {
+        const response = await fetch(request.zoteroRPC, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                "jsonrpc": "2.0",
+                "method": request.method,
+                "params": request.params,
+                "id": request.id
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch RPC: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return { success: true, data };
+    } catch (error) {
+        //console.error("Error in background fetch:", error);
+        return { success: false, error: error.message };  // Return error as a result
+    }
+}
+
+
+
 // Perform a TiddlyWiki API request (supports GET and PUT)
 async function performTiddlyWikiRequest(request) {
     const { url, method = "GET", data = null } = request;
@@ -188,7 +235,7 @@ async function performTiddlyWikiRequest(request) {
         }
 
         if (response.status === 204) {
-            return { success: true, data: null } 
+            return { success: true, data: null }
         }
         //const result = await response.status === 204 ? null : response.json();
         const result = await response.json();

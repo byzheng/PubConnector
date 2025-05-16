@@ -15,7 +15,7 @@ async function publisher(options) {
         // Add TiddlyWiki-related icons or actions
         addTiddlyWikiIconsDOI(banner, tiddlers[0], doi, options.tiddlywikihost);
     } else {
-        addDefaultIconsDOI(banner, doi);
+        addDefaultIconsDOI(banner, doi, options);
     }
     // Add Zotero related icons
     await addZoteroIconsDOI(banner, doi, options.zoterohost);
@@ -185,12 +185,13 @@ async function addZoteroIconsDOI(div, doi, host) {
 
 
 // Helper function to add default icons when no TiddlyWiki tiddler is found
-function addDefaultIconsDOI(div, id) {
-    div.appendChild(scholara(id)); // Add Scholar search link for DOI
-    div.appendChild(scopus_search_doi(id)); // Add Scopus search button by DOI
-    div.appendChild(publisher_doi(id)); // Add Publisher link for DOI
+function addDefaultIconsDOI(div, id, options) {
+    div.appendChild(scholara(id)); 
+    div.appendChild(scopus_search_doi(id)); 
+    div.appendChild(publisher_doi(id)); 
     div.appendChild(lens_icon_doi(id));
-    div.style.backgroundColor = "#8f928f"; // Set background color to indicate no TiddlyWiki data
+    div.appendChild(tw_save(id, options));
+    div.style.backgroundColor = "#8f928f"; 
 }
 
 async function injectReference(thisdoi, options) {
@@ -295,14 +296,14 @@ async function injectReference(thisdoi, options) {
 
         if (!reference_text || !reference_element) return;
 
-        // Special handling for Scopus EID on ScienceDirect
-        if (extractEID) {
-            let eid = extractEID(reference_text);
-            if (eid !== null) {
-                injectReferenceByEID([element, reference_element], eid, options);
-                return;
-            }
-        }
+        // // Special handling for Scopus EID on ScienceDirect
+        // if (extractEID) {
+        //     let eid = extractEID(reference_text);
+        //     if (eid !== null) {
+        //         injectReferenceByEID([element, reference_element], eid, options);
+        //         return;
+        //     }
+        // }
 
         // Extract and process DOIs
         dois_reference = extractDOIs(reference_text);
