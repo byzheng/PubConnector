@@ -2,7 +2,8 @@
 // Main function for chrome extension
 chrome.storage.sync.get({
     tiddlywikihost: 'http://localhost:8080',
-    zoterohost: 'http://localhost:23119/api/'
+    zoterohost: 'http://localhost:23119/api/',
+    singlefileid: ''
 },
     (options) => {
         var href = window.location.href;

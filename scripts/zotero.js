@@ -21,7 +21,7 @@ async function importBibtexToTiddlyWikiByDOI(doi, options) {
     //console.log("pdf_key", pdf_key);
 
     const zotero_bibtex_host = options.zoterohost.replace(/api\//, 'better-bibtex/json-rpc');
-    const cite_key = await getBibtexCiteKey(zotero_bibtex_host, item_key); 
+    const cite_key = await getBibtexCiteKey(zotero_bibtex_host, item_key);
 
     if (cite_key === null) {
         return;
@@ -36,6 +36,12 @@ async function importBibtexToTiddlyWikiByDOI(doi, options) {
         return;
     }
     //console.log("bibtex", bibtex);
+    // trigger single file save
+    const singlefileid = options.singlefileid;
+    if (singlefileid) {
+        chrome.runtime.sendMessage(singlefileid, "save-page");
+    }
+    
     // send bibtex entry to tiddlywiki
     chrome.runtime.sendMessage({
         from: "webpage",
@@ -46,4 +52,6 @@ async function importBibtexToTiddlyWikiByDOI(doi, options) {
         host: options.tiddlywikihost,
         pdf_key: pdf_key
     });
+    
+    
 }

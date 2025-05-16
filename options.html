@@ -1,24 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+  <meta charset="UTF-8" />
   <title>Utility for TiddlyWiki</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 40px;
+      min-width: 500px;
+      min-height: 500px;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #007700;
+    }
+
+    .button-group {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    button#reset {
+      background-color: #6c757d;
+    }
+
+    button#reset:hover {
+      background-color: #545b62;
+    }
+  </style>
 </head>
 
-<body style="min-width:500px;min-height:500px;">
-  <div style="width:100%">
-    <div>
-      <label for="tiddlywikihost">TiddlyWIKI Host</label>
-      <input type="text" id="tiddlywikihost" name="tiddlywikihost" value="http://localhost:8080"> </input>
+<body>
+  <div class="container">
+    <h1>Utility for TiddlyWiki</h1>
+    <div class="form-group">
+      <label for="tiddlywikihost">TiddlyWiki Host</label>
+      <input type="text" id="tiddlywikihost" name="tiddlywikihost" value="http://localhost:8080" />
     </div>
-    <div>
+    <div class="form-group">
       <label for="zoterohost">Zotero Host</label>
-      <input type="text" id="zoterohost" name="zoterohost" value="http://localhost:23119/api/"> </input>
+      <input type="text" id="zoterohost" name="zoterohost" value="http://localhost:23119/api/" />
+    </div>
+    <div class="form-group">
+      <label for="singlefileid">Extension ID for SingleFile</label>
+      <input type="text" id="singlefileid" name="singlefileid" value="" />
     </div>
     <div id="status"></div>
-    <button id="save">Save</button>
-    <button id="reset">Reset</button>
+    <div class="button-group">
+      <button id="save">Save</button>
+      <button id="reset">Reset</button>
+    </div>
   </div>
+
   <script src="scripts/options.js"></script>
 </body>
 

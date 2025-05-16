@@ -1,16 +1,19 @@
 // Saves options to chrome.storage
 const defaultConfig = { 
   tiddlywikihost: 'http://localhost:8080',
-  zoterohost: 'http://localhost:23119/api/'
+  zoterohost: 'http://localhost:23119/api/',
+  singlefileid: ''
 };
 const saveOptions = () => {
   const tiddlywikihost = document.getElementById('tiddlywikihost').value;
   const zoterohost = document.getElementById('zoterohost').value;
+  const singlefileid = document.getElementById('singlefileid').value;
 
   chrome.storage.sync.set(
     { 
       tiddlywikihost: tiddlywikihost,
-      zoterohost: zoterohost
+      zoterohost: zoterohost,
+      singlefileid: singlefileid
     },
     () => {
       // Update status to let user know options were saved.
@@ -31,6 +34,7 @@ const restoreOptions = () => {
     (items) => {
       document.getElementById('tiddlywikihost').value = items.tiddlywikihost;
       document.getElementById('zoterohost').value = items.zoterohost;
+      document.getElementById('singlefileid').value = items.singlefileid;
     }
   );
 };
@@ -38,6 +42,7 @@ const restoreOptions = () => {
 const resetOptions = () => {
   document.getElementById('tiddlywikihost').value = defaultConfig.tiddlywikihost;
   document.getElementById('zoterohost').value = defaultConfig.zoterohost;
+  document.getElementById('singlefileid').value = defaultConfig.singlefileid;
   saveOptions();
 };
 
