@@ -11,6 +11,15 @@ async function importBibtexToTiddlyWikiByDOI(doi, options) {
     if (item_key === null) {
         return;
     }
+    // get the pdf attachement key
+    const attachmentHref = items[0]?.links?.attachment?.href;
+    let pdf_key = null;
+    if (attachmentHref) {
+        const parts = attachmentHref.split('/');
+        pdf_key = parts[parts.length - 1];
+    }
+    //console.log("pdf_key", pdf_key);
+
     const zotero_bibtex_host = options.zoterohost.replace(/api\//, 'better-bibtex/json-rpc');
     const cite_key = await getBibtexCiteKey(zotero_bibtex_host, item_key); 
 
@@ -34,6 +43,7 @@ async function importBibtexToTiddlyWikiByDOI(doi, options) {
         method: "new_bibtex_entry",
         bibtex: bibtex,
         title: foundCiteKey,
-        host: options.tiddlywikihost
+        host: options.tiddlywikihost,
+        pdf_key: pdf_key
     });
 }
