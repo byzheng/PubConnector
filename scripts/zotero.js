@@ -6,13 +6,23 @@ async function importBibtexToTiddlyWikiByDOI(doi, options) {
         return;
     }
 
+    const item = items.find(item =>
+        item.data.itemType !== 'attachment' &&
+        typeof item.data.DOI === 'string' &&
+        item.data.DOI.toLowerCase() === doi.toLowerCase()
+    );
+
+    if (!item) {
+        console.log('No item found with matching DOI');
+        return;
+    }
     // get item key
-    var item_key = getZoteroItemKey(items[0]);
+    var item_key = getZoteroItemKey(item);
     if (item_key === null) {
         return;
     }
     // get the pdf attachement key
-    const attachmentHref = items[0]?.links?.attachment?.href;
+    const attachmentHref = item?.links?.attachment?.href;
     let pdf_key = null;
     if (attachmentHref) {
         const parts = attachmentHref.split('/');
@@ -41,7 +51,7 @@ async function importBibtexToTiddlyWikiByDOI(doi, options) {
     if (singlefileid) {
         chrome.runtime.sendMessage(singlefileid, "save-page");
     }
-    
+
     // send bibtex entry to tiddlywiki
     chrome.runtime.sendMessage({
         from: "webpage",
@@ -52,6 +62,6 @@ async function importBibtexToTiddlyWikiByDOI(doi, options) {
         host: options.tiddlywikihost,
         pdf_key: pdf_key
     });
-    
-    
+
+
 }
