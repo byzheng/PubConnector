@@ -37,7 +37,7 @@ function zoteroRequest(url) {
 }
 
 // Fetch metadata from Zotero API by item key or identifier
-function zoteroSearchItemsByDOI(doi, host) {
+async function zoteroSearchItemsByDOI(doi, host) {
     const path = "/users/0/items";
     const query = {
         q: doi,
@@ -46,7 +46,20 @@ function zoteroSearchItemsByDOI(doi, host) {
 
     const url = buildZoteroApiUrl(host, path, query);
 
-    return zoteroRequest(url);
+    const items = await zoteroRequest(url);
+
+    if (!Array.isArray(items) || items.length === 0) {
+        return null;
+    }
+
+    const item = items.find(item =>
+        item.data.itemType !== 'attachment' &&
+        typeof item.data.DOI === 'string' &&
+        item.data.DOI.toLowerCase() === doi.toLowerCase()
+    );
+
+    return item
+
 }
 
 
@@ -139,9 +152,9 @@ async function getBibtexByCiteKey(zoteroRPC, citekey) {
     const response = await bibtexRpcRequest(
         zoteroRPC,
         "item.export",
-        { 
+        {
             "translator": "Better BibLaTeX",
-            "citekeys": citekey 
+            "citekeys": citekey
         }
     );
 

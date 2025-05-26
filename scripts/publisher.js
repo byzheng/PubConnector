@@ -16,9 +16,17 @@ async function publisher(options) {
         addTiddlyWikiIconsDOI(banner, tiddlers[0], doi, options.tiddlywikihost);
     } else {
         addDefaultIconsDOI(banner, doi, options);
+        // Add save to tiddlywiki button
+        // The best place will be add it if the item in the zotero
+        banner.appendChild(tw_save(doi, options));
+        
     }
+    
+    
     // Add Zotero related icons
     await addZoteroIconsDOI(banner, doi, options.zoterohost);
+
+
     // Set finally width of banner
     bannerSetWidth(banner);
 
@@ -56,9 +64,9 @@ function addTiddlyWikiIconsDOI(div, tiddler, doi, host) {
         div.appendChild(lens_icon_doi(doi));
     }
     // Add Reading tag icon if applicable
-    if (tiddler.tags.includes("Reading")) {
-        div.appendChild(reading_span());
-    }
+    // if (tiddler.tags.includes("Reading")) {
+    //     div.appendChild(reading_span());
+    // }
 }
 
 
@@ -150,12 +158,14 @@ function addPublisherLinkByDOI(element, doi) {
 // Helper function to add TiddlyWiki icons and links to the banner
 async function addZoteroIconsDOI(div, doi, host) {
 
-    const items = await zoteroSearchItemsByDOI(doi, host);
-    if (!Array.isArray(items) || items.length === 0) {
+    
+    const item = await zoteroSearchItemsByDOI(doi, host);
+    if (!item) {
+        console.log('No item found with matching DOI');
         return;
     }
 
-    var item_key = getZoteroItemKey(items[0]);
+    var item_key = getZoteroItemKey(item);
     if (item_key === null) {
         return;
     }
@@ -177,8 +187,8 @@ async function addZoteroIconsDOI(div, doi, host) {
             }
             div.appendChild(addZeteroPDFSpan(pdf_key));
         }
+        
     }
-
 }
 
 
@@ -190,7 +200,7 @@ function addDefaultIconsDOI(div, id, options) {
     div.appendChild(scopus_search_doi(id)); 
     div.appendChild(publisher_doi(id)); 
     div.appendChild(lens_icon_doi(id));
-    div.appendChild(tw_save(id, options));
+    
     div.style.backgroundColor = "#8f928f"; 
 }
 

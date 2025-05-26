@@ -1,16 +1,7 @@
 async function importBibtexToTiddlyWikiByDOI(doi, options) {
 
     // Get Zotero items
-    const items = await zoteroSearchItemsByDOI(doi, options.zoterohost);
-    if (!Array.isArray(items) || items.length === 0) {
-        return;
-    }
-
-    const item = items.find(item =>
-        item.data.itemType !== 'attachment' &&
-        typeof item.data.DOI === 'string' &&
-        item.data.DOI.toLowerCase() === doi.toLowerCase()
-    );
+    const item = await zoteroSearchItemsByDOI(doi, options.zoterohost);
 
     if (!item) {
         console.log('No item found with matching DOI');
