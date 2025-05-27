@@ -40,7 +40,8 @@ function isValidGoogleScholarID(url) {
 
 function getURL() {
     var urlSelt = [
-        "meta[name='prism.url' i]"
+        "meta[name='prism.url' i]",
+		"meta[property='og:url' i]"
     ]
     var url;
     for (let i = 0; i < urlSelt.length; i++) {

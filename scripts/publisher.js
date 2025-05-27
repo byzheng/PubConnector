@@ -222,7 +222,11 @@ async function injectReference(thisdoi, options) {
     if (crossref_work.message && crossref_work.message.reference) {
         crossref_reference = crossref_work.message.reference;
     }
-
+    if (!crossref_reference) {
+        console.warn("No crossref reference found for DOI: " + thisdoi);
+        return;
+    }
+    
     let href = window.location.href;
     if (!href) return;
 

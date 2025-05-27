@@ -37,11 +37,6 @@ async function importBibtexToTiddlyWikiByDOI(doi, options) {
         return;
     }
     //console.log("bibtex", bibtex);
-    // trigger single file save
-    const singlefileid = options.singlefileid;
-    if (singlefileid) {
-        chrome.runtime.sendMessage(singlefileid, "save-page");
-    }
 
     // send bibtex entry to tiddlywiki
     chrome.runtime.sendMessage({
@@ -53,6 +48,12 @@ async function importBibtexToTiddlyWikiByDOI(doi, options) {
         host: options.tiddlywikihost,
         pdf_key: pdf_key
     });
+
+    // trigger single file save
+    const singlefileid = options.singlefileid;
+    if (singlefileid) {
+        chrome.runtime.sendMessage(singlefileid, "save-page");
+    }
 
 
 }
