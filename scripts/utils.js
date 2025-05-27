@@ -38,6 +38,28 @@ function isValidGoogleScholarID(url) {
     return scholarPattern.test(url);
 }
 
+function getURL() {
+    var urlSelt = [
+        "meta[name='prism.url' i]"
+    ]
+    var url;
+    for (let i = 0; i < urlSelt.length; i++) {
+
+        var ele = document.querySelector(urlSelt[i]);
+        if (ele === undefined || ele === null) {
+            continue;
+        }
+        var attributes = ["content", "href"];
+        for (let j = 0; j < attributes.length; j++) {
+            url = ele.getAttribute(attributes[j]);
+            if (url) {
+                break;
+            }
+        }
+        break;
+    }
+    return url;
+}
 
 function getDOI() {
     var doi_sel = [

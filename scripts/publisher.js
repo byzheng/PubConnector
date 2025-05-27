@@ -1,6 +1,17 @@
 // Functions for publisher pages except scholar.google.com and scopus.com
 
 async function publisher(options) {
+
+    // remove old banner if exists
+
+    const selector = "#tw-banner, .tw-icon-tiny, .tw-tag";
+    const oldElement = document.querySelectorAll(selector);
+    if (oldElement.length > 0) {
+        oldElement.forEach(element => {
+            element.remove();
+        });
+    }
+
     var doi = getDOI();
     if (doi === undefined) {
         return;
@@ -19,10 +30,10 @@ async function publisher(options) {
         // Add save to tiddlywiki button
         // The best place will be add it if the item in the zotero
         banner.appendChild(tw_save(doi, options));
-        
+
     }
-    
-    
+
+
     // Add Zotero related icons
     await addZoteroIconsDOI(banner, doi, options.zoterohost);
 
@@ -158,7 +169,7 @@ function addPublisherLinkByDOI(element, doi) {
 // Helper function to add TiddlyWiki icons and links to the banner
 async function addZoteroIconsDOI(div, doi, host) {
 
-    
+
     const item = await zoteroSearchItemsByDOI(doi, host);
     if (!item) {
         console.log('No item found with matching DOI');
@@ -187,7 +198,7 @@ async function addZoteroIconsDOI(div, doi, host) {
             }
             div.appendChild(addZeteroPDFSpan(pdf_key));
         }
-        
+
     }
 }
 
@@ -196,12 +207,12 @@ async function addZoteroIconsDOI(div, doi, host) {
 
 // Helper function to add default icons when no TiddlyWiki tiddler is found
 function addDefaultIconsDOI(div, id, options) {
-    div.appendChild(scholara(id)); 
-    div.appendChild(scopus_search_doi(id)); 
-    div.appendChild(publisher_doi(id)); 
+    div.appendChild(scholara(id));
+    div.appendChild(scopus_search_doi(id));
+    div.appendChild(publisher_doi(id));
     div.appendChild(lens_icon_doi(id));
-    
-    div.style.backgroundColor = "#8f928f"; 
+
+    div.style.backgroundColor = "#8f928f";
 }
 
 async function injectReference(thisdoi, options) {
@@ -214,6 +225,13 @@ async function injectReference(thisdoi, options) {
 
     let href = window.location.href;
     if (!href) return;
+
+    let url = new URL(href);
+    let twHost = new URL(options.tiddlywikihost);
+
+    if (url.hostname === twHost.hostname) {
+        href = getURL();
+    }
 
     function get_href_id(element) {
         let ref_href = element.getAttribute("href");
@@ -322,7 +340,7 @@ async function injectReference(thisdoi, options) {
             let items_crossref = getCrossRefKey(element, crossref_reference);
             if (items_crossref && items_crossref.DOI) dois_crossref = [items_crossref.DOI];
         }
-        let dois =  [...new Set([...dois_reference, ...dois_crossref])];
+        let dois = [...new Set([...dois_reference, ...dois_crossref])];
         //dois = dois_crossref;
         //console.log(get_href_id(element), ": ", dois);
         dois.forEach(doi => {
