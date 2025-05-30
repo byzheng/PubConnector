@@ -105,7 +105,7 @@ async function getTiddlerForScholarItem(item, host) {
         cidNotSet = true; // if tiddler not found, we will set cid later
     }
     const cites = getScholarCites(item, cid);
-    console.log(cites);
+    //console.log(cites);
     // get tiddler by matching url
     if (!tiddler) {
         const elementHref = item.querySelector(`a[id="${cid}"]`);
@@ -127,7 +127,7 @@ async function getTiddlerForScholarItem(item, host) {
     }
     // inject scholar CID if a tiddler is found and cid is not set
     if ((cidNotSet && tiddler) ||
-        (tiddler || !tiddler.fields["scholar-cid"] || tiddler.fields["scholar-cid"] === "")) {
+        (tiddler && (!tiddler["scholar-cid"] || tiddler["scholar-cid"] === ""))) {
         await tiddlywikiPutTiddler(tiddler.title, [], { "scholar-cid": cid, "scholar-cites" : cites }, host);
     }
     return tiddler;
