@@ -60,11 +60,12 @@ async function tiddlywikiPutTiddler(title, tags = [], fields = {}, host) {
     if (existingTiddler) {
         const existingTags = normalizeTags(existingTiddler.tags);
         const mergedTags = [...new Set([...existingTags, ...tags])];
-
+        const existingFields = existingTiddler.fields || {};
+        const mergedFields = { ...existingFields, ...fields };
         const updatedTiddler = {
             ...existingTiddler,
-            tags: mergedTags,
-            ...fields // merge/override additional fields
+            fields: mergedFields,
+            tags: mergedTags // ensure tags is always the mergedTags array
         };
 
         return tiddlywikiRequest(url, "PUT", updatedTiddler);

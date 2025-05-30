@@ -19,7 +19,9 @@ let colleague_fields = [
 function extractDOIs(text) {
     const doiPattern = /10\.\d{4,9}\/[-._;()/:A-Z0-9]+/gi;
     const matches = text.match(doiPattern) || [];
-    return [...new Set(matches)];
+    // Remove trailing .pdf if present
+    const cleaned = matches.map(doi => doi.replace(/\.pdf$/i, ''));
+    return [...new Set(cleaned)];
 }
 
 function extractScopusEID(text) {
