@@ -52,7 +52,7 @@ async function scholar_items(host) {
         if (page_type === "scholar") {
             qry = "div.gs_fl, h3.gs_ora_tt";
         } else if (page_type === "citation") {
-            qry = "td.gsc_a_y";
+            qry = "td.gsc_a_x";
         }
         if (qry === undefined) {
             return;
