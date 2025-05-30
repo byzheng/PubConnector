@@ -127,7 +127,7 @@ async function getTiddlerForScholarItem(item, host) {
     }
     // inject scholar CID if a tiddler is found and cid is not set
     if ((cidNotSet && tiddler) ||
-        (tiddler && (!tiddler["scholar-cid"] || tiddler["scholar-cid"] === ""))) {
+        (tiddler && (!tiddler["scholar-cites"] || tiddler["scholar-cites"] === ""))) {
         await tiddlywikiPutTiddler(tiddler.title, [], { "scholar-cid": cid, "scholar-cites" : cites }, host);
     }
     return tiddler;
