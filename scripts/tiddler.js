@@ -33,6 +33,16 @@ async function getTiddlerByScholarCID(cid, host) {
     return getTiddlerByFilter(filter, host);
 }
 
+
+async function getTiddlerByScholarCites(cites, host) {
+    if (!cites || cites.trim() === "") {
+        return;
+    }
+    const filter = "[tag[bibtex-entry]field:scholar-cites[" + cites + "]]";
+    return getTiddlerByFilter(filter, host);
+}
+
+
 async function getTiddlerByURL(url, host) {
     if (!url || url.trim() === "") {
         //console.error("URL is undefined or empty");

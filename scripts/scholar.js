@@ -10,8 +10,8 @@ async function run_scholar(host) {
     if (sid !== undefined && sid !== null) {
         getColleague(sid, "scholar", host);
     }
-    scholar_items(host);
-    //await scholar_await(host);
+    await scholar_items(host);
+    await scholar_await(host);
 
 }
 
@@ -29,40 +29,21 @@ async function scholar_items(host) {
     var items = document.querySelectorAll("div.gs_r.gs_or.gs_scl, div.gs_ora, tr.gsc_a_tr");
     for (let i = 0; i < items.length; i++) {
         // skip if already added
-        if (items[i].querySelector("span.tw-icon") !== null) {
+        if (items[i].querySelector("span.tw-icon")) {
             continue;
         }
-        const tiddler = await getTiddlerForScholarItem(items[i], host);
-        // var id;
-        // if (page_type === "scholar") {
-        //     var cid = items[i].dataset.cid;
-        //     if (cid === undefined) {
-        //         cid = items[i].dataset.did;
-        //         if (cid === undefined) {
-        //             continue;
-        //         }
-        //     }
-        //     id = cid;
-        // } else if (page_type === "citation") {
-        //     var href_cites = items[i].querySelector("td.gsc_a_c > a").getAttribute("href");
-        //     if (href_cites === undefined) {
-        //         continue;
-        //     }
-        //     var href_parse = URL.parse(href_cites);
-        //     if (href_parse === null) {
-        //         continue;
-        //     }
-        //     var cites = href_parse.searchParams.get("cites");
-        //     if (cites === undefined) {
-        //         continue;
-        //     }
-        //     id = cites;
-        // }
-        
         var spanHide = twspan("tw-svg-small", true);
         items[i].appendChild(spanHide);
 
-        if (!tiddler){
+
+        let tiddler;
+        if (page_type === "scholar") {
+            tiddler = await getTiddlerForScholarItem(items[i], host);
+        } else if (page_type === "citation") {
+            tiddler = await getTiddlerForCitationItem(items[i], host);
+        }
+        
+        if (!tiddler) {
             continue;
         }
 
@@ -78,10 +59,31 @@ async function scholar_items(host) {
         }
         items[i].querySelector(qry).appendChild(span);
         setItemStyle(items[i]);
-        //gettiddlerCID(id, items[i], page_type, host);
-        //console.log(cid);
     }
 
+}
+
+
+
+async function getTiddlerForCitationItem(item, host) {
+    var href_cites = item.querySelector("td.gsc_a_c > a").getAttribute("href");
+    if (!href_cites) {
+        return;
+    }
+    var href_parse = URL.parse(href_cites);
+    if (!href_parse) {
+        return;
+    }
+    var cites = href_parse.searchParams.get("cites");
+    if (!cites) {
+        return;
+    }
+    
+    let tiddler = await getTiddlerByScholarCites(cites, host);
+    if (!tiddler) {
+        return;
+    }
+    return tiddler;
 }
 
 
@@ -91,14 +93,19 @@ async function getTiddlerForScholarItem(item, host) {
     if (!cid) {
         cid = item.dataset.did;
     }
+
+    if (!cid) {
+        return;
+    }
     let tiddler;
     let cidNotSet = false;
-    if (cid) {
-        tiddler = await getTiddlerByScholarCID(cid, host);
-        if (!tiddler) {
-            cidNotSet = true; // if tiddler not found, we will set cid later
-        }
+
+    tiddler = await getTiddlerByScholarCID(cid, host);
+    if (!tiddler) {
+        cidNotSet = true; // if tiddler not found, we will set cid later
     }
+    const cites = getScholarCites(item, cid);
+    console.log(cites);
     // get tiddler by matching url
     if (!tiddler) {
         const elementHref = item.querySelector(`a[id="${cid}"]`);
@@ -112,66 +119,49 @@ async function getTiddlerForScholarItem(item, host) {
         const href = window.location.href;
         // Merge item.outerHTML and href for DOI extraction
         const mergedText = item.outerHTML + " " + href;
-        const dois = extractDOIs(mergedText);  
+        const dois = extractDOIs(mergedText);
         console.log(dois);
         if (dois.length === 1) {
             tiddler = await getTiddlerByDOI(dois[0], host);
         }
     }
     // inject scholar CID if a tiddler is found and cid is not set
-    if (cidNotSet && tiddler) {
-        await tiddlywikiPutTiddler(tiddler.title, [], { "scholar-cid": cid }, host);
+    if ((cidNotSet && tiddler) ||
+        (tiddler || !tiddler.fields["scholar-cid"] || tiddler.fields["scholar-cid"] === "")) {
+        await tiddlywikiPutTiddler(tiddler.title, [], { "scholar-cid": cid, "scholar-cites" : cites }, host);
     }
     return tiddler;
 }
 
-
-
-async function gettiddlerCID(id, item, page_type, host) {
-    var filter;
-    if (page_type === "scholar") {
-        filter = "[tag[bibtex-entry]field:scholar-cid[" + id + "]]";
-    } else if (page_type === "citation") {
-        filter = "[tag[bibtex-entry]field:scholar-cites[" + id + "]]";
+function getScholarCites(item, cid) {
+    let cites = "";
+    const elementHref = item.querySelector(`a[id="${cid}"]`);
+    if (elementHref && elementHref.hasAttribute("data-clk")) {
+        const dataClk = elementHref.getAttribute("data-clk");
+        const match = dataClk.match(/[?&]d=([^&]+)/);
+        if (match) {
+            cites = match[1];
+        }
     }
-    if (filter === undefined) {
-        return;
-    }
-    const tiddlers = await tiddlywikiGetTiddlers(filter, host);
-    if (tiddlers.length === 0) {
-        return
-    }
-    var span = tw_link(tiddlers[0].title, "tw-svg-small", host);
-    var qry;
-    if (page_type === "scholar") {
-        qry = "div.gs_fl, h3.gs_ora_tt";
-    } else if (page_type === "citation") {
-        qry = "td.gsc_a_y";
-    }
-    if (qry === undefined) {
-        return;
-    }
-    item.querySelector(qry).appendChild(span);
-    setItemStyle(item);
+    return cites;
 }
 
-// async function scholar_await(host) {
+async function scholar_await(host) {
 
-//     scholar_items(host);
-//     // let element = document.querySelector("div#documents-panel");
-//     // scopus_authorpage(element, host, page_type);
-//     const observer = new MutationObserver(mutationList =>
-//         mutationList.filter(m => m.type === 'childList').forEach(m => {
-//             m.addedNodes.forEach(function (element) {
-//                 scholar_items(host);
-//             });
-//         }));
-//     const targetElements = document.querySelectorAll("tbody#gsc_a_b,div#gs_ra_b");
-//     targetElements.forEach((i) => {
-//         observer.observe(i, {
-//             childList: true,
-//             subtree: true
-//         })
-//     })
-//     return;
-// }
+    scholar_items(host);
+    const observer = new MutationObserver(mutationList =>
+        mutationList.filter(m => m.type === 'childList').forEach(m => {
+            m.addedNodes.forEach(function (element) {
+                scholar_items(host);
+            });
+        }));
+    //const targetElements = document.querySelectorAll("tbody#gsc_a_b,div#gs_ra_b");
+    const targetElements = document.querySelectorAll("tbody#gsc_a_b");
+    targetElements.forEach((i) => {
+        observer.observe(i, {
+            childList: true,
+            subtree: true
+        })
+    })
+    return;
+}
