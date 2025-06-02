@@ -13,7 +13,7 @@ chrome.storage.sync.get({
                 window.removeEventListener('load', load, false);
                 this.setTimeout(() => {
                     run_scholar(options.tiddlywikihost)
-                }, 500)
+                }, 1000)
             }, false);
 
         } else if (href.includes("scopus.com")) {
