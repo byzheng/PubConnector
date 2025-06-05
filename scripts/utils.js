@@ -20,7 +20,7 @@ function extractDOIs(text) {
     const doiPattern = /10\.\d{4,9}\/[-._;()/:A-Z0-9]+/gi;
     const matches = text.match(doiPattern) || [];
     // Remove trailing .pdf if present
-    const cleaned = matches.map(doi => doi.replace(/(\.pdf|\/pdf|\/full)$/i, ''));
+    const cleaned = matches.map(doi => doi.replace(/(\.pdf|\/pdf|\/full|\.)$/i, ''));
     return [...new Set(cleaned)];
 }
 
@@ -43,7 +43,8 @@ function isValidGoogleScholarID(url) {
 function getURL() {
     var urlSelt = [
         "meta[name='prism.url' i]",
-		"meta[property='og:url' i]"
+		"meta[property='og:url' i]",
+        "link[rel='canonical' i]"
     ]
     var url;
     for (let i = 0; i < urlSelt.length; i++) {
