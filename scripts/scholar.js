@@ -98,7 +98,8 @@ function Scholar(options) {
             }
 
             var span = tw_link(tiddler.title, "tw-svg-small", tiddlywikiHost);
-            var qry = "td.gsc_a_x";
+            var qry = "td.gsc_a_y";
+            
             let target = items[i].querySelector(qry);
             if (!target) {
                 continue;
