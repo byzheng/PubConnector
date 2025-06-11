@@ -24,23 +24,6 @@ async function getTiddlerByFilter(filter, host) {
     return tiddlers[0];
 }
 
-async function getTiddlerByScholarCID(cid, host) {
-    if (!cid || cid.trim() === "") {
-        // console.error("Scholar CID is undefined or empty");
-        return;
-    }
-    const filter = "[tag[bibtex-entry]field:scholar-cid[" + cid + "]]";
-    return getTiddlerByFilter(filter, host);
-}
-
-
-async function getTiddlerByScholarCites(cites, host) {
-    if (!cites || cites.trim() === "") {
-        return;
-    }
-    const filter = "[tag[bibtex-entry]field:scholar-cites[" + cites + "]]";
-    return getTiddlerByFilter(filter, host);
-}
 
 
 async function getTiddlerByURL(url, host) {

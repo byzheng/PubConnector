@@ -14,18 +14,18 @@ function Scholar(options) {
         if (sid !== undefined && sid !== null) {
             tiddlerColleague = await getColleague(sid, "scholar", tiddlywikiHost);
         }
-        await scholarItems(tiddlywikiHost);
-        await scholarAwait(tiddlywikiHost);
+        await scholarItems();
+        await scholarAwait();
 
     }
 
-    async function scholarAwait(host) {
+    async function scholarAwait() {
 
-        scholarItems(host);
+        scholarItems();
         const observer = new MutationObserver(mutationList =>
             mutationList.filter(m => m.type === 'childList').forEach(m => {
                 m.addedNodes.forEach(function (element) {
-                    scholarItems(host);
+                    scholarItems();
                 });
             }));
         //const targetElements = document.querySelectorAll("tbody#gsc_a_b,div#gs_ra_b");
@@ -41,7 +41,7 @@ function Scholar(options) {
 
 
     // Helper function to add tiddlywiki icon to exist items
-    async function scholarItems(host) {
+    async function scholarItems() {
         // get page type
         var href = window.location.href;
         var page_type = "scholar"; // search page
@@ -49,8 +49,16 @@ function Scholar(options) {
         if (sid !== undefined && sid !== null) {
             page_type = "citation"; // for user home page
         }
-        //get all items
+        // get all items
         var items = document.querySelectorAll("div.gs_r.gs_or.gs_scl, div.gs_ora, tr.gsc_a_tr");
+        if (page_type === "scholar") {
+            await processScholarItems(items, tiddlywikiHost);
+        } else if (page_type === "citation") {
+            await processCitationItems(items, tiddlywikiHost);
+        }
+    }
+
+    async function processScholarItems(items) {
         for (let i = 0; i < items.length; i++) {
             // skip if already added
             if (items[i].querySelector("span.tw-icon")) {
@@ -59,37 +67,50 @@ function Scholar(options) {
             var spanHide = twspan("tw-svg-small", true);
             items[i].appendChild(spanHide);
 
-
-            let tiddler;
-            if (page_type === "scholar") {
-                tiddler = await getTiddlerForScholarItem(items[i], host);
-            } else if (page_type === "citation") {
-                tiddler = await getTiddlerForCitationItem(items[i], host);
-            }
-
+            let tiddler = await getTiddlerForScholarItem(items[i], tiddlywikiHost);
             if (!tiddler) {
                 continue;
             }
 
-            var span = tw_link(tiddler.title, "tw-svg-small", host);
-            var qry;
-            if (page_type === "scholar") {
-                qry = "div.gs_fl, h3.gs_ora_tt";
-            } else if (page_type === "citation") {
-                qry = "td.gsc_a_x";
+            var span = tw_link(tiddler.title, "tw-svg-small", tiddlywikiHost);
+            var qry = "div.gs_fl, h3.gs_ora_tt";
+            let target = items[i].querySelector(qry);
+            if (!target) {
+                continue;
             }
-            if (qry === undefined) {
-                return;
-            }
-            items[i].querySelector(qry).appendChild(span);
+            target.appendChild(span);
             setItemStyle(items[i]);
         }
+    }
 
+    async function processCitationItems(items) {
+        for (let i = 0; i < items.length; i++) {
+            // skip if already added
+            if (items[i].querySelector("span.tw-icon")) {
+                continue;
+            }
+            var spanHide = twspan("tw-svg-small", true);
+            items[i].appendChild(spanHide);
+
+            let tiddler = await getTiddlerForCitationItem(items[i]);
+            if (!tiddler) {
+                continue;
+            }
+
+            var span = tw_link(tiddler.title, "tw-svg-small", tiddlywikiHost);
+            var qry = "td.gsc_a_x";
+            let target = items[i].querySelector(qry);
+            if (!target) {
+                continue;
+            }
+            target.appendChild(span);
+            setItemStyle(items[i]);
+        }
     }
 
 
 
-    async function getTiddlerForCitationItem(item, host) {
+    async function getTiddlerForCitationItem(item) {
         var href_cites = item.querySelector("td.gsc_a_c > a").getAttribute("href");
         if (!href_cites) {
             return;
@@ -103,7 +124,7 @@ function Scholar(options) {
             return;
         }
 
-        let tiddler = await getTiddlerByScholarCites(cites, host);
+        let tiddler = await getTiddlerByScholarCites(cites);
         if (!tiddler) {
             return;
         }
@@ -111,7 +132,7 @@ function Scholar(options) {
     }
 
 
-    async function getTiddlerForScholarItem(item, host) {
+    async function getTiddlerForScholarItem(item) {
         // get tiddler by cid
         var cid = item.dataset.cid;
         if (!cid) {
@@ -124,7 +145,7 @@ function Scholar(options) {
         let tiddler;
         let cidNotSet = false;
 
-        tiddler = await getTiddlerByScholarCID(cid, host);
+        tiddler = await getTiddlerByScholarCID(cid);
         if (!tiddler) {
             cidNotSet = true; // if tiddler not found, we will set cid later
         }
@@ -169,6 +190,26 @@ function Scholar(options) {
         }
         return cites;
     }
+
+
+    async function getTiddlerByScholarCID(cid) {
+        if (!cid || cid.trim() === "") {
+            // console.error("Scholar CID is undefined or empty");
+            return;
+        }
+        const filter = "[tag[bibtex-entry]field:scholar-cid[" + cid + "]]";
+        return getTiddlerByFilter(filter, tiddlywikiHost);
+    }
+
+
+    async function getTiddlerByScholarCites(cites) {
+        if (!cites || cites.trim() === "") {
+            return;
+        }
+        const filter = "[tag[bibtex-entry]field:scholar-cites[" + cites + "]]";
+        return getTiddlerByFilter(filter, tiddlywikiHost);
+    }
+
 
     return {
         execute: execute
