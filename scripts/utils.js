@@ -1,4 +1,10 @@
 
+async function dynamicLoadScript(file) {
+    const src = chrome.runtime.getURL(file);
+    return await import(src);
+}
+
+
 
 let colleague_fields = [
     {

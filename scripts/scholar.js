@@ -1,12 +1,9 @@
 
-async function dynamicLoadScript() {
-    const src = chrome.runtime.getURL('scripts/helper.js');
-    return await import(src);
-}
+
 
 
 async function Scholar(options) {
-    const helper = await dynamicLoadScript();
+    const helper = await dynamicLoadScript('scripts/helper.js');
     const this_options = options;
     const tiddlywikiHost = this_options.tiddlywikihost;
     let tiddlerColleague;
