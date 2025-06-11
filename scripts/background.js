@@ -1,4 +1,6 @@
 
+import { ScheduleTask } from './task_schedule.js';
+
 // transfer message
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
@@ -95,6 +97,23 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
         })();
     }
+});
+
+function loadOptions() {
+    return new Promise((resolve) => {
+        chrome.storage.sync.get({
+            tiddlywikihost: 'http://localhost:8080',
+            zoterohost: 'http://localhost:23119/api/',
+            singlefileid: ''
+        }, resolve);
+    });
+}
+
+
+chrome.action.onClicked.addListener(async () => {
+    const options = await loadOptions();
+    const schedule = ScheduleTask(options);
+    schedule.scholarSearchDOI();
 });
 
 // Link to TiddlyWiki
@@ -244,4 +263,9 @@ async function performTiddlyWikiRequest(request) {
         return { success: false, error: error.message };
     }
 }
+
+
+
+
+
 
