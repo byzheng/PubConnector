@@ -155,7 +155,7 @@ function Scholar(options) {
         if (!tiddler) {
             const elementHref = item.querySelector(`a[id="${cid}"]`);
             if (elementHref) {
-                tiddler = await getTiddlerByURL(elementHref.getAttribute("href"), host);
+                tiddler = await getTiddlerByURL(elementHref.getAttribute("href"), tiddlywikiHost);
             }
         }
         // get tiddler by matching DOI
@@ -167,13 +167,13 @@ function Scholar(options) {
             const dois = extractDOIs(mergedText);
             console.log(dois);
             if (dois.length === 1) {
-                tiddler = await getTiddlerByDOI(dois[0], host);
+                tiddler = await getTiddlerByDOI(dois[0], tiddlywikiHost);
             }
         }
         // inject scholar CID if a tiddler is found and cid is not set
         if ((cidNotSet && tiddler) ||
             (tiddler && (!tiddler["scholar-cites"] || tiddler["scholar-cites"] === ""))) {
-            await tiddlywikiPutTiddler(tiddler.title, [], { "scholar-cid": cid, "scholar-cites": cites }, host);
+            await tiddlywikiPutTiddler(tiddler.title, [], { "scholar-cid": cid, "scholar-cites": cites }, tiddlywikiHost);
         }
         return tiddler;
     }
