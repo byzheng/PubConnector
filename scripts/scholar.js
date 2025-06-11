@@ -49,16 +49,15 @@ function Scholar(options) {
         if (sid !== undefined && sid !== null) {
             page_type = "citation"; // for user home page
         }
-        // get all items
-        var items = document.querySelectorAll("div.gs_r.gs_or.gs_scl, div.gs_ora, tr.gsc_a_tr");
         if (page_type === "scholar") {
-            await processScholarItems(items, tiddlywikiHost);
+            await processScholarItems();
         } else if (page_type === "citation") {
-            await processCitationItems(items, tiddlywikiHost);
+            await processCitationItems();
         }
     }
 
-    async function processScholarItems(items) {
+    async function processScholarItems() {
+        var items = document.querySelectorAll("div.gs_r.gs_or.gs_scl, div.gs_ora");
         for (let i = 0; i < items.length; i++) {
             // skip if already added
             if (items[i].querySelector("span.tw-icon")) {
@@ -83,7 +82,8 @@ function Scholar(options) {
         }
     }
 
-    async function processCitationItems(items) {
+    async function processCitationItems() {
+        var items = document.querySelectorAll("tr.gsc_a_tr");
         for (let i = 0; i < items.length; i++) {
             // skip if already added
             if (items[i].querySelector("span.tw-icon")) {
@@ -102,6 +102,13 @@ function Scholar(options) {
             let target = items[i].querySelector(qry);
             if (!target) {
                 continue;
+            }
+            // Authoring this item if there are missing colleague
+            if (!(tiddlerColleague && tiddler.tags && tiddler.tags.includes(tiddlerColleague.title))) {
+                const oldTags = parseStringArray(tiddler.tags);
+                const mergedTags = Array.from(new Set([...oldTags, tiddlerColleague.title]));
+                console.log(mergedTags);
+                await tiddlywikiPutTiddler(tiddler.title, tags = mergedTags, fields= [], tiddlywikiHost);   
             }
             target.appendChild(span);
             setItemStyle(items[i]);
