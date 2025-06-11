@@ -12,7 +12,7 @@ chrome.storage.sync.get({
             window.addEventListener('load', function load(e) {
                 window.removeEventListener('load', load, false);
                 this.setTimeout(() => {
-                    run_scholar(options.tiddlywikihost)
+                    Scholar(options).execute();
                 }, 1000)
             }, false);
 

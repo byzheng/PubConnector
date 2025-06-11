@@ -167,7 +167,7 @@ async function getColleague(id, type, host) {
             colleague_fields[i].icon);
         elements.forEach(element => banner.appendChild(element));
     }
-    return true;
+    return tiddlers[0];
 }
 
 
