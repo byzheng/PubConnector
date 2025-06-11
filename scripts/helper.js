@@ -3,7 +3,8 @@ export function extractDOIs(text) {
     const doiPattern = /10\.\d{4,9}\/[-._;()/:A-Z0-9]+/gi;
     const matches = text.match(doiPattern) || [];
     // Remove trailing .pdf if present
-    const cleaned = matches.map(doi => doi.replace(/(\.abstract|\.full|\.pdf|\/pdf|\/full|\.)$/i, ''));
+    console.log(matches)
+    const cleaned = matches.map(doi => doi.replace(/(\.?(full\.pdf|pdf|full|abstract))$/i, ''));
     return [...new Set(cleaned)];
 }
 

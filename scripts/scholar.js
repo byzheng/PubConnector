@@ -1,6 +1,12 @@
 
+async function dynamicLoadScript() {
+    const src = chrome.runtime.getURL('scripts/helper.js');
+    return await import(src);
+}
 
-function Scholar(options) {
+
+async function Scholar(options) {
+    const helper = await dynamicLoadScript();
     const this_options = options;
     const tiddlywikiHost = this_options.tiddlywikihost;
     let tiddlerColleague;
@@ -99,7 +105,7 @@ function Scholar(options) {
 
             var span = tw_link(tiddler.title, "tw-svg-small", tiddlywikiHost);
             var qry = "td.gsc_a_y";
-            
+
             let target = items[i].querySelector(qry);
             if (!target) {
                 continue;
@@ -109,7 +115,7 @@ function Scholar(options) {
                 const oldTags = parseStringArray(tiddler.tags);
                 const mergedTags = Array.from(new Set([...oldTags, tiddlerColleague.title]));
                 console.log(mergedTags);
-                await tiddlywikiPutTiddler(tiddler.title, tags = mergedTags, fields= [], tiddlywikiHost);   
+                await tiddlywikiPutTiddler(tiddler.title, tags = mergedTags, fields = [], tiddlywikiHost);
             }
             target.appendChild(span);
             setItemStyle(items[i]);
@@ -172,7 +178,7 @@ function Scholar(options) {
             const href = window.location.href;
             // Merge item.outerHTML and href for DOI extraction
             const mergedText = item.outerHTML + " " + href;
-            const dois = extractDOIs(mergedText);
+            const dois = helper.extractDOIs(mergedText);
             console.log(dois);
             if (dois.length === 1) {
                 tiddler = await getTiddlerByDOI(dois[0], tiddlywikiHost);

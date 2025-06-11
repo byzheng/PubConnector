@@ -1,5 +1,4 @@
 
-
 function loadOptions() {
     return new Promise((resolve) => {
         chrome.storage.sync.get({
@@ -19,7 +18,10 @@ async function main() {
         window.addEventListener('load', function load(e) {
             window.removeEventListener('load', load, false);
             this.setTimeout(() => {
-                Scholar(options).execute();
+                (async () => {
+                    const scholar = await Scholar(options);
+                    await scholar.execute();
+                })();
             }, 1000)
         }, false);
 
