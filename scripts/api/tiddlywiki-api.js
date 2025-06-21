@@ -113,3 +113,70 @@ function parseStringArray(value, allowDuplicate = false) {
         return null;
     }
 }
+
+
+
+function Tiddlywiki(host) {
+    const this_host = host || "http://localhost:8080";
+    function tiddlywikiRequest(path, query = {}, method = "GET", data = null) {
+        if (typeof path !== "string" || path.trim() === "") {
+            return Promise.reject(new Error("Invalid path: Path must be a non-empty string."));
+        }
+        let url = this_host + (path.startsWith("/") ? "" : "/") + path;
+        // Validate URL
+        try {
+            new URL(url);
+        } catch (e) {
+            return Promise.reject(new Error("Invalid URL: " + url));
+        }
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage(
+                {
+                    from: "fetchTiddlyWikiData",
+                    url: url,
+                    method: method,
+                    data: data
+                },
+                (response) => {
+                    if (chrome.runtime.lastError) {
+                        console.error("Message error:", chrome.runtime.lastError.message);
+                        reject(chrome.runtime.lastError);
+                        return;
+                    }
+
+                    if (response && response.success) {
+                        resolve(response.data); // ✅ Success
+                    } else {
+                        console.error("TiddlyWiki request failed:", response?.error);
+                        reject(response?.error || "Unknown error");
+                    }
+                }
+            );
+        });
+    }
+    /**
+     * Fetch tiddlers from TiddlyWiki based on a filter.
+     * @param {string} filter - The filter string for querying tiddlers.
+     * @param {string} host - The TiddlyWiki server host URL.
+     * @returns {Promise<Object[]>} - A promise resolving to an array of tiddler objects.
+     */
+    async function status() {
+        const url = `${this_host}/status`;
+        return tiddlywikiRequest(url);
+    }
+
+    saveScholarAuthorCites = async function (author, cites) {
+        const path = "authors/scholar/update";
+        return tiddlywikiRequest(path, {}, "POST", 
+            data = {
+                id: author,
+                works: cites
+            });
+    }
+    return {
+        status: status,
+        saveScholarAuthorCites: saveScholarAuthorCites
+    };
+}
+
+

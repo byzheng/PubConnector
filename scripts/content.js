@@ -9,39 +9,57 @@ function loadOptions() {
     });
 }
 
+function onPageLoad(callback, delay = 1000) {
+    const run = () => setTimeout(callback, delay);
+
+    if (document.readyState === "complete") {
+        run();
+    } else {
+        window.addEventListener("load", function loadHandler() {
+            window.removeEventListener("load", loadHandler, false);
+            run();
+        }, false);
+    }
+}
 
 async function main() {
+
     options = await loadOptions();
+    // const tw = Tiddlywiki(options.tiddlywikihost);
+    // try {
+    //     const status = await tw.status();
+    //     if (!status) {
+    //         console.error("TiddlyWiki is not running at the specified host.");
+    //         return;
+    //     }
+    // } catch (error) {
+    //     console.error("Tiddlywiki Server is not running");
+    //     return;
+    // }
     var href = window.location.href;
-    // For google scholar
+
+
+
     if (href.includes("scholar.google")) {
-        window.addEventListener('load', function load(e) {
-            window.removeEventListener('load', load, false);
-            this.setTimeout(() => {
-                (async () => {
-                    const scholar = await Scholar(options);
-                    await scholar.execute();
-                })();
-            }, 1000)
-        }, false);
+        onPageLoad(async () => {
+            const scholar = await Scholar(options);
+            await scholar.execute();
+        });
 
     } else if (href.includes("scopus.com")) {
-        window.addEventListener('load', function load(e) {
-            window.removeEventListener('load', load, false);
-            this.setTimeout(() => {
-                run_scopus(options)
-            }, 1000)
-        }, false);
+        onPageLoad(() => {
+            run_scopus(options);
+        });
+
     } else if (href.includes("lens.org")) {
-        window.addEventListener('load', function load(e) {
-            window.removeEventListener('load', load, false);
-            this.setTimeout(() => {
-                run_lens(options);
-            }, 1000)
-        }, false);
+        onPageLoad(() => {
+            run_lens(options);
+        });
+
     } else {
         publisher(options);
     }
+
     colleague(options.tiddlywikihost);
     context_menu(options);
 

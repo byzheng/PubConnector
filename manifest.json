@@ -6,7 +6,8 @@
   "permissions": [
     "storage",
     "tabs",
-    "contextMenus"
+    "contextMenus",
+    "scripting"
   ],
   "options_ui": {
     "page": "options.html",

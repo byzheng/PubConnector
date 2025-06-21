@@ -1,13 +1,9 @@
-
-
-
-
 async function Scholar(options) {
     const helper = await dynamicLoadScript('scripts/helper.js');
     const this_options = options;
     const tiddlywikiHost = this_options.tiddlywikihost;
     let tiddlerColleague;
-
+    const tw = Tiddlywiki(tiddlywikiHost);
     // Main function for Google Scholar
     async function execute() {
         var href = window.location.href;
@@ -15,20 +11,54 @@ async function Scholar(options) {
         // Add colleague banner for google scholar
         let sid = URL.parse(href).searchParams.get("user");
         if (sid !== undefined && sid !== null) {
-            tiddlerColleague = await getColleague(sid, "scholar", tiddlywikiHost);
+            authorPage(sid);
+        } else {
+            await processScholarItems();
         }
-        await scholarItems();
-        await scholarAwait();
+        
 
     }
+    async function authorPage(sid) {
+        // Add colleague banner for google scholar
+        tiddlerColleague = await getColleague(sid, "scholar", tiddlywikiHost);
+        // For items in the author page
+        await authorPageItemsAwait(); 
+        await saveAuthorCites(sid);
+    }
+    async function saveAuthorCites(sid) {
+        // Click show clickShowMore
+        await new Promise(resolve => {
+            (function clickShowMore() {
+                const button = document.querySelector("button#gsc_bpf_more:not([disabled])");
+                if (button) {
+                    button.click();
+                    setTimeout(clickShowMore, 1000); // Adjust the delay as needed
+                } else {
+                    console.log("All publications loaded.");
+                    resolve();
+                }
+            })();
+        });
+        const items = document.querySelectorAll("tr.gsc_a_tr");
+        const allCites = [];
+        for (let item of items) {
+            const cites = getCitesFromAuthorPage(item);
+            if (!cites) {
+                continue;
+            }
+            
+            allCites.push(...cites);
+        }
+        await tw.saveScholarAuthorCites(sid, allCites);
+        console.log("Collected citations:", allCites);
+    }
+    async function authorPageItemsAwait() {
 
-    async function scholarAwait() {
-
-        scholarItems();
+        processCitationItems();
         const observer = new MutationObserver(mutationList =>
             mutationList.filter(m => m.type === 'childList').forEach(m => {
                 m.addedNodes.forEach(function (element) {
-                    scholarItems();
+                    processCitationItems();
                 });
             }));
         //const targetElements = document.querySelectorAll("tbody#gsc_a_b,div#gs_ra_b");
@@ -40,23 +70,6 @@ async function Scholar(options) {
             })
         })
         return;
-    }
-
-
-    // Helper function to add tiddlywiki icon to exist items
-    async function scholarItems() {
-        // get page type
-        var href = window.location.href;
-        var page_type = "scholar"; // search page
-        let sid = URL.parse(href).searchParams.get("user");
-        if (sid !== undefined && sid !== null) {
-            page_type = "citation"; // for user home page
-        }
-        if (page_type === "scholar") {
-            await processScholarItems();
-        } else if (page_type === "citation") {
-            await processCitationItems();
-        }
     }
 
     async function processScholarItems() {
@@ -120,8 +133,7 @@ async function Scholar(options) {
     }
 
 
-
-    async function getTiddlerForCitationItem(item) {
+    function getCitesFromAuthorPage(item) {
         var href_cites = item.querySelector("td.gsc_a_c > a").getAttribute("href");
         if (!href_cites) {
             return;
@@ -134,12 +146,35 @@ async function Scholar(options) {
         if (!cites) {
             return;
         }
-
-        let tiddler = await getTiddlerByScholarCites(cites);
-        if (!tiddler) {
+        if (cites.includes(",")) {
+            return cites.split(",").map(s => s.trim());
+        }
+        return [cites];
+    }
+    async function getTiddlerForCitationItem(item) {
+        const cites = getCitesFromAuthorPage(item);
+        if (!cites) {
             return;
         }
-        return tiddler;
+        // if cites is an array, we will get the first one
+        if (!Array.isArray(cites)) {
+            return;
+        }
+        if (cites.length === 0) {
+            return;
+        }
+        for (let cite of cites) {
+            if (!cite || cite.trim() === "") {  
+                continue;
+            }
+            //console.log("getTiddlerForCitationItem", cite);
+            // get tiddler by matching cites
+            let tiddler = await getTiddlerByScholarCites(cite);
+            if (tiddler) {
+                return tiddler;
+            }
+        }
+        return;
     }
 
 
