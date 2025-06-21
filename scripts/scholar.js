@@ -50,7 +50,6 @@ async function Scholar(options) {
             allCites.push(...cites);
         }
         await tw.saveScholarAuthorCites(sid, allCites);
-        console.log("Collected citations:", allCites);
     }
     async function authorPageItemsAwait() {
 
@@ -82,7 +81,7 @@ async function Scholar(options) {
             var spanHide = twspan("tw-svg-small", true);
             items[i].appendChild(spanHide);
 
-            let tiddler = await getTiddlerForScholarItem(items[i], tiddlywikiHost);
+            let tiddler = await getTiddlerForScholarItem(items[i]);
             if (!tiddler) {
                 continue;
             }
@@ -124,8 +123,7 @@ async function Scholar(options) {
             if (!(tiddlerColleague && tiddler.tags && tiddler.tags.includes(tiddlerColleague.title))) {
                 const oldTags = parseStringArray(tiddler.tags);
                 const mergedTags = Array.from(new Set([...oldTags, tiddlerColleague.title]));
-                console.log(mergedTags);
-                await tiddlywikiPutTiddler(tiddler.title, tags = mergedTags, fields = [], tiddlywikiHost);
+                await tw.putTiddler(tiddler.title, tags = mergedTags, fields = []);
             }
             target.appendChild(span);
             setItemStyle(items[i]);
@@ -213,13 +211,13 @@ async function Scholar(options) {
             const dois = helper.extractDOIs(mergedText);
             console.log(dois);
             if (dois.length === 1) {
-                tiddler = await getTiddlerByDOI(dois[0], tiddlywikiHost);
+                tiddler = await tw.getTiddlerByDOI(dois[0]);
             }
         }
         // inject scholar CID if a tiddler is found and cid is not set
         if ((cidNotSet && tiddler) ||
             (tiddler && (!tiddler["scholar-cites"] || tiddler["scholar-cites"] === ""))) {
-            await tiddlywikiPutTiddler(tiddler.title, [], { "scholar-cid": cid, "scholar-cites": cites }, tiddlywikiHost);
+            await tw.putTiddler(tiddler.title, [], { "scholar-cid": cid, "scholar-cites": cites });
         }
         return tiddler;
     }
@@ -244,7 +242,7 @@ async function Scholar(options) {
             return;
         }
         const filter = "[tag[bibtex-entry]field:scholar-cid[" + cid + "]]";
-        return getTiddlerByFilter(filter, tiddlywikiHost);
+        return tw.getTiddler(filter);
     }
 
 
@@ -253,7 +251,7 @@ async function Scholar(options) {
             return;
         }
         const filter = "[tag[bibtex-entry]field:scholar-cites[" + cites + "]]";
-        return getTiddlerByFilter(filter, tiddlywikiHost);
+        return tw.getTiddler(filter);
     }
 
 

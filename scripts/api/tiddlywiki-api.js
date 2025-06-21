@@ -118,7 +118,7 @@ function parseStringArray(value, allowDuplicate = false) {
 
 function Tiddlywiki(host) {
     const this_host = host || "http://localhost:8080";
-    function tiddlywikiRequest(path, query = {}, method = "GET", data = null) {
+    function request(path, method = "GET", data = null) {
         if (typeof path !== "string" || path.trim() === "") {
             return Promise.reject(new Error("Invalid path: Path must be a non-empty string."));
         }
@@ -154,27 +154,89 @@ function Tiddlywiki(host) {
             );
         });
     }
-    /**
-     * Fetch tiddlers from TiddlyWiki based on a filter.
-     * @param {string} filter - The filter string for querying tiddlers.
-     * @param {string} host - The TiddlyWiki server host URL.
-     * @returns {Promise<Object[]>} - A promise resolving to an array of tiddler objects.
-     */
     async function status() {
         const url = `${this_host}/status`;
-        return tiddlywikiRequest(url);
+        return request(url);
     }
+
+    async function getTiddlers(filter) {
+        if (!filter || typeof filter !== "string" || filter.trim() === "") {
+            return Promise.reject(new Error("Invalid filter: Filter must be a non-empty string."));
+        }
+        const path = `/recipes/default/tiddlers.json?filter=${encodeURIComponent(filter)}`;
+        return request(path);
+    }
+
+
+    async function getTiddler(filter) {
+        const tiddlers = await getTiddlers(filter);
+        if (tiddlers.length === 0) {
+            return;
+        }
+        if (tiddlers.length > 1) {
+            return;
+        }
+        return tiddlers[0];
+    }
+
+
+    async function putTiddler(title, tags = [], fields = {}) {
+        const path = `/recipes/default/tiddlers/${encodeURIComponent(title)}`;
+
+        // Check if the tiddler exists
+        const existingTiddler = await request(path);
+
+        // Use TiddlyWiki's built-in tag parser
+        const normalizeTags = (input) => parseStringArray(input || []);
+
+        if (existingTiddler) {
+            const existingTags = normalizeTags(existingTiddler.tags);
+            const mergedTags = [...new Set([...existingTags, ...tags])];
+            const existingFields = existingTiddler.fields || {};
+            const mergedFields = { ...existingFields, ...fields };
+            const updatedTiddler = {
+                ...existingTiddler,
+                fields: mergedFields,
+                tags: mergedTags // ensure tags is always the mergedTags array
+            };
+
+            return request(path, "PUT", updatedTiddler);
+        } else {
+            const newTiddler = {
+                title,
+                tags: Array.isArray(tags) ? tags : normalizeTags(tags),
+                ...fields
+            };
+
+            return request(path, "PUT", newTiddler);
+        }
+    }
+
 
     saveScholarAuthorCites = async function (author, cites) {
         const path = "authors/scholar/update";
-        return tiddlywikiRequest(path, {}, "POST", 
+        return request(path, "POST",
             data = {
                 id: author,
                 works: cites
             });
     }
+
+
+    async function getTiddlerByDOI(doi) {
+        if (!doi || doi.trim() === "") {
+            // console.error("DOI is undefined or empty");
+            return;
+        }
+        const filter = "[tag[bibtex-entry]field:bibtex-doi[" + doi + "]]";
+        return getTiddler(filter);
+    }
     return {
         status: status,
+        getTiddlers: getTiddlers,
+        getTiddler: getTiddler,
+        getTiddlerByDOI: getTiddlerByDOI,
+        putTiddler: putTiddler,
         saveScholarAuthorCites: saveScholarAuthorCites
     };
 }
