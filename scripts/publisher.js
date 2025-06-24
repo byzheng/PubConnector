@@ -1,58 +1,41 @@
 // Functions for publisher pages except scholar.google.com and scopus.com
 
-async function publisher(options) {
+async function Publisher(options) {
+    const helper = await dynamicLoadScript('scripts/helper.js');
+    const this_options = options;
+    const tiddlywikiHost = this_options.tiddlywikihost;
+    const tw = Tiddlywiki(tiddlywikiHost);
+    const this_href = window.location.href;
+    async function execute() {
+        var doi = helper.getDOI();
+        if (doi === undefined) {
+            return;
+        }
+        const banner = await Banner(this_options);
+        // remove old banner if exists
+        banner.remove();
+        // Add publisher banner
+        await banner.publisher(doi);
+        // Add Zotero related icons
+        await addZoteroIconsDOI(banner.container(), doi, this_options.zoterohost);
 
-    // remove old banner if exists
+        // Add other information into pages
 
-    const selector = "#tw-banner, .tw-icon-tiny, .tw-tag";
-    const oldElement = document.querySelectorAll(selector);
-    if (oldElement.length > 0) {
-        oldElement.forEach(element => {
-            element.remove();
-        });
+        // Wait to load page as some website will render the whole page later
+        await waitForLoading();
+
+        // Insert author and domain information
+        if (banner.tiddler()) {
+            insertColleagueAndDomainInfo(banner.tiddler(), this_options.tiddlywikihost);
+        }
+        banner.setWidth();
+        // inject reference
+        injectReference(doi, this_options);
+
     }
-
-    var doi = getDOI();
-    if (doi === undefined) {
-        return;
-    }
-    var banner = createBanner();
-    // Make the request to TiddlyWiki
-    var filter = `[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[${doi}]]`;
-    const tiddlers = await tiddlywikiGetTiddlers(filter, options.tiddlywikihost);
-
-
-    if (tiddlers.length > 0) {
-        // Add TiddlyWiki-related icons or actions
-        addTiddlyWikiIconsDOI(banner, tiddlers[0], doi, options.tiddlywikihost);
-    } else {
-        addDefaultIconsDOI(banner, doi, options);
-        // Add save to tiddlywiki button
-        // The best place will be add it if the item in the zotero
-        banner.appendChild(tw_save(doi, options));
-
-    }
-
-
-    // Add Zotero related icons
-    await addZoteroIconsDOI(banner, doi, options.zoterohost);
-
-
-    // Set finally width of banner
-    bannerSetWidth(banner);
-
-    // Add other information into pages
-
-    // Wait to load page as some website will render the whole page later
-    await waitForLoading();
-
-    // Insert author and domain information
-    if (tiddlers.length > 0) {
-        insertColleagueAndDomainInfo(tiddlers[0], options.tiddlywikihost);
-    }
-
-    // inject reference
-    injectReference(doi, options);
+    return {
+        execute: execute
+    };
 }
 
 
@@ -226,7 +209,7 @@ async function injectReference(thisdoi, options) {
         console.warn("No crossref reference found for DOI: " + thisdoi);
         return;
     }
-    
+
     let href = window.location.href;
     if (!href) return;
 

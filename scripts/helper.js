@@ -11,3 +11,80 @@ export function extractDOIs(text) {
 export async function delay(ms) {
     await new Promise(resolve => setTimeout(resolve, ms));
 }
+
+export function domainType(href) {
+    if (!href) {
+        return "unknown";
+    }
+    if (href.contains("scopus.com")) {
+        return "scopus";
+    } else if (href.contains("scholar.google")) {
+        return "google-scholar";
+    }
+    return "publisher"
+}
+
+
+
+// Helper function to create icon to different platforms
+export function iconURL(url, icon) {
+    let links = url.split(" ");
+    let sas = [];
+    for (let i = 0; i < links.length; i++) {
+        var img = document.createElement("img");
+        img.src = chrome.runtime.getURL(icon);
+        img.classList.add("tw-svg");
+        var sa = document.createElement("a");
+        sa.appendChild(img);
+        sa.setAttribute("href", links[i]);
+        sa.setAttribute("target", "_blank");
+        sa.classList.add("tw-icon");
+        sas.push(sa);
+    }
+
+    return sas;
+}
+
+
+
+
+export function getDOI() {
+    var doi_sel = [
+        "meta[name='dc.Identifier' i][scheme='doi' i]",
+        "meta[name='dc.Identifier' i]",
+        "meta[name='citation_doi' i]",
+        "meta[property='citation_doi' i]",
+        'ul.nova-legacy-e-list li +li a.nova-legacy-e-link[href*="doi.org"]', // for researchgate
+        'div strong +a[href*="doi.org"]', // for IEEE
+        'li[data-test-id="paper-doi"] .doi__link' // for sematic
+    ];
+
+    var doi;
+    for (let i = 0; i < doi_sel.length; i++) {
+
+        var ele = document.querySelector(doi_sel[i]);
+        if (ele === undefined || ele === null) {
+            continue;
+        }
+        var attributes = ["content", "href"];
+        for (let j = 0; j < attributes.length; j++) {
+            doi = ele.getAttribute(attributes[j]);
+            if (doi !== undefined && doi !== null) {
+                break;
+            }
+        }
+
+        doi = doi.replace('doi:', '');
+        doi = doi.replace(/^(https?:\/\/.*?doi\.org\/)?/, '');
+        break;
+    }
+    function isValidDOI(doi) {
+        const doiRegex = /^10.\d{4,9}\/[-._;()/:a-zA-Z0-9]+$/;
+        return doiRegex.test(doi);
+    }
+
+    if (!isValidDOI(doi)) {
+        return;
+    }
+    return doi;
+}

@@ -57,7 +57,8 @@ async function main() {
         });
 
     } else {
-        publisher(options);
+        const publisher = await Publisher(options);
+        await publisher.execute();
     }
 
     colleague(options.tiddlywikihost);

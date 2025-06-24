@@ -1,3 +1,264 @@
+async function Banner(options) {
+    const this_helper = await dynamicLoadScript('scripts/helper.js');
+
+    const this_options = options || {};
+    const this_tw = Tiddlywiki(options.tiddlywikihost);
+    const this_href = window.location.href;
+    let this_container, this_tiddler;
+
+    // Function to create and append the banner to the document
+    function initContainer() {
+        this_container = document.createElement("div");
+        this_container.id = "tw-banner";
+        document.body.appendChild(this_container);
+        // Enable dragging functionality for the banner
+        dragElement(this_container);
+
+    }
+    async function getTiddlerByID(id, field) {
+        var filter = `[tag[Colleague]search:${field}[${id}]]`;
+        this_tiddler = await this_tw.getTiddler(filter);
+        if (!this_tiddler) {
+            console.error("No tiddler found for filter: " + filter);
+            return;
+        }
+    }
+    async function colleague(id, field) {
+        if (!id) {
+            console.error("Banner requires an id");
+            return;
+        }
+        if (!field) {
+            console.error("Banner requires a field");
+            return;
+        }
+        await getTiddlerByID(id, field);
+        if (!this_tiddler) {
+            console.error("No tiddler found for id: " + id);
+            return;
+        }
+        initContainer(); // Initialize the container
+        iconTiddlywiki(); // create an icon to link back to Tiddlywiki
+        iconScholarAuthor(this_tiddler["google-scholar"]); // create an icon to link to google scholar author page
+        iconORCIDAuthor(this_tiddler["orcid"]); // create an icon to link to ORCID author page
+        iconScopusAuthor(this_tiddler["scopus"]); // create an icon to link to Scopus author page
+        setWidth(); // Set the width of the banner
+    }
+
+    async function publisher(doi) {
+        if (!doi) {
+            console.error("Banner requires a DOI");
+            return;
+        }
+        this_tiddler = await this_tw.getTiddlerByDOI(doi);
+
+        initContainer();
+        if (this_tiddler) {
+            twCopyCitation();
+            iconTiddlywiki();
+            iconScholarSearchDOI(doi);
+            iconScopusItem(doi);
+            iconLensItem(doi);
+        } else {
+            // If no tiddler found, create default links
+            iconScholarSearchDOI(doi);
+            iconScopusItem(doi);
+            iconPublisherByDOI(doi);
+            iconLensItem(doi);
+            iconTWSave(doi);
+            this_container.style.backgroundColor = "#8f928f";
+        }
+
+        setWidth(); // Set the width of the banner
+        return;
+    }
+
+    // remove
+    function remove() {
+        const banner = this_container || document.getElementById('tw-banner');
+        if (banner) {
+            banner.remove(); // Removes the element from the DOM
+        }
+    }
+
+
+    // Helper function to create an icon link to tiddlywiki by title
+    function iconTiddlywiki() {
+        var img = document.createElement("img");
+        img.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
+        img.classList.add("tw-svg");
+        var sa = document.createElement("a");
+        sa.appendChild(img);
+        var url = new URL("#" + this_tiddler.title, this_options.tiddlywikihost);
+        sa.setAttribute("href", url);
+        sa.setAttribute("target", "_blank");
+        sa.classList.add("tw-icon-tiny");
+        sa.addEventListener("click", function (event) {
+            event.preventDefault();
+            chrome.runtime.sendMessage({
+                from: "webpage",
+                tiddler: this_tiddler.title,
+                method: "open_tiddler",
+                host: this_options.tiddlywikihost
+            });
+        });
+        this_container.appendChild(sa);
+    }
+
+    function iconScholarAuthor(url) {
+        if (!url) {
+            return;
+        }
+        if (this_href.includes("scholar.google")) {
+            return;
+        }
+        const elements = this_helper.iconURL(url, "images/GoogleScholarSquare.svg")
+        elements.forEach(element => this_container.appendChild(element));
+    }
+
+    function iconORCIDAuthor(url) {
+        if (!url) {
+            return;
+        }
+        if (this_href.includes("orcid.org")) {
+            return;
+        }
+        const elements = this_helper.iconURL(url, "images/Orcid.svg")
+        elements.forEach(element => this_container.appendChild(element));
+    }
+
+    function iconScopusAuthor(url) {
+        if (!url) {
+            return;
+        }
+        if (this_href.includes("scopus.com")) {
+            return;
+        }
+        const elements = this_helper.iconURL(url, "images/Scopus.svg")
+        elements.forEach(element => this_container.appendChild(element));
+    }
+
+
+    // Helper function to create an icon link to publisher by DOI
+    function iconPublisherByDOI(doi) {
+        if (!doi) {
+            return;
+        }
+        const url = `https://doi.org/${encodeURIComponent(doi)}`;
+
+        const elements = this_helper.iconURL(url, "images/LinkOut.svg");
+        elements.forEach(element => this_container.appendChild(element));
+    }
+
+    function iconScholarSearchDOI(doi) {
+        if (!doi) {
+            return;
+        }
+        const url = `https://scholar.google.com/scholar?q=${encodeURIComponent(doi)}`;
+        const elements = this_helper.iconURL(url, "images/GoogleScholarSquare.svg")
+        elements.forEach(element => this_container.appendChild(element));
+    }
+
+    function iconScopusItem(doi) {
+        let url;
+        if (this_tiddler && this_tiddler["scopus-eid"]) {
+            const eid = this_tiddler["scopus-eid"];
+            url = `https://www.scopus.com/record/display.uri?eid=${eid}&origin=resultslist`;
+        } else {
+            url = `https://www.scopus.com/results/results.uri?s=DOI(${encodeURIComponent(doi)})`;
+        }
+        const elements = this_helper.iconURL(url, "images/Scopus.svg")
+        elements.forEach(element => this_container.appendChild(element));
+    }
+
+
+    // Helper function to create a icon to scholar.google.com
+    function iconLensItem(doi) {
+        let url;
+        if (this_tiddler && this_tiddler["lens"]) {
+            const id = this_tiddler["lens"];
+            url = `https://www.lens.org/lens/scholar/${id}/main`;
+        } else {
+            url = `https://www.lens.org/lens/search/scholar/list?q=${encodeURIComponent(doi)}`;
+        }
+        const elements = this_helper.iconURL(url, "images/Googlelens.svg")
+        elements.forEach(element => this_container.appendChild(element));
+    }
+
+
+
+    function iconTWSave(doi) {
+        const elements = this_helper.iconURL("#", "images/Save.svg")
+        elements.forEach(element => this_container.appendChild(element));
+        elements[0].addEventListener("click", function (event) {
+            event.preventDefault();
+            importBibtexToTiddlyWikiByDOI(doi, options);
+        });
+    }
+
+    // Helper function to set width of banner
+    function setWidth() {
+        let totalWidth = 0;
+        for (const child of this_container.children) {
+            totalWidth += child.offsetWidth;
+        }
+
+        // Optionally add padding or margins
+        const padding = 100; // Example padding
+        this_container.style.width = `${totalWidth + padding}px`;
+    }
+
+
+    // Helper function to create an icon link to tiddlywiki by title
+    function twCopyCitation() {
+        if (!this_tiddler || !this_tiddler.title) {
+            //console.error("No tiddler found to copy citation.");
+            return;
+        }
+        const title = this_tiddler.title; // Replace spaces with underscores for TiddlyWiki format
+        const elements = this_helper.iconURL("#", "images/Copy.svg")
+        elements.forEach(element => this_container.appendChild(element));
+        elements[0].addEventListener("click", function (event) {
+            event.preventDefault();
+            const textToCopy = "<<ref2 " + title + ">>"
+            if (!document.hasFocus()) {
+                console.warn("Document is not focused. Clipboard copy may fail.");
+                return;
+            }
+            navigator.clipboard.writeText(textToCopy).then(() => {
+
+                let notification = document.getElementById("tw-notification");
+                if (!notification) {
+                    notification = notication_box();
+                }
+                notification.textContent = `Copied: ${textToCopy}`;
+                notification.style.display = "block";
+
+                // Hide after 1 second
+                setTimeout(() => {
+                    notification.style.display = "none";
+                }, 1500);
+            }).catch(err => {
+                console.error("Failed to copy text: ", err);
+            });
+        });
+    }
+
+
+
+
+
+    return {
+        colleague: colleague,
+        publisher: publisher,
+        remove: remove,
+        tiddler: () => this_tiddler,
+        container: () => this_container,
+        setWidth: setWidth
+    }
+}
+
+
 
 function notication_box() {
     const notification = document.createElement("div");

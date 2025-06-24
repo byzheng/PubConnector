@@ -20,7 +20,10 @@ async function Scholar(options) {
     }
     async function authorPage(sid) {
         // Add colleague banner for google scholar
-        tiddlerColleague = await getColleague(sid, "scholar", tiddlywikiHost);
+        const banner = await Banner(this_options);
+        await banner.colleague(sid, "google-scholar");
+        tiddlerColleague = banner.tiddler()
+        //tiddlerColleague = await getColleague(sid, "scholar", tiddlywikiHost);
         // For items in the author page
         await authorPageItemsAwait(); 
         await saveAuthorCites(sid);
