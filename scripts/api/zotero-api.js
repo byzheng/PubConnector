@@ -1,3 +1,93 @@
+
+
+function Zotero(host) {
+    const this_host = host || "http://localhost:23119"; // Default Zotero host
+    // Perform a request to zotero
+    async function request(path, query = {}) {
+        // Ensure the host does not have a trailing slash
+        const normalizedHost = this_host.replace(/\/+$/, "");
+
+        // Ensure the path starts with a single slash
+        const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+        // Convert query object to URL search parameters
+        const queryString = new URLSearchParams(query).toString();
+
+        // Construct the full URL
+        const url = `${normalizedHost}${normalizedPath}${queryString ? `?${queryString}` : ""}`;
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage(
+                {
+                    from: "fetchZoteroData",  // Identifier to tell background script the type of request
+                    url: url                  // The URL to be passed to Zotero API
+                },
+                function (response) {
+                    if (response.success) {
+                        //console.log("Zotero data fetched successfully:", response.data);
+                        resolve(response.data); // Resolve with the data
+                    } else {
+                        //console.error("Failed to fetch Zotero data:", response.error);
+                        resolve(null);
+                    }
+                }
+            );
+        });
+    }
+
+
+    // Fetch metadata from Zotero API by item key or identifier
+    async function searchItemsByDOI(doi) {
+        const path = "/users/0/items";
+        const query = {
+            q: doi,
+            qmode: "everything",
+        };
+        const items = await request(path, query);
+
+        if (!Array.isArray(items) || items.length === 0) {
+            return null;
+        }
+
+        const item = items.find(item =>
+            item.data.itemType !== 'attachment' &&
+            typeof item.data.DOI === 'string' &&
+            item.data.DOI.toLowerCase() === doi.toLowerCase()
+        );
+
+        return item
+
+    }
+
+    // Fetch first PDF attachment for an item
+    async function children(key) {
+        const path = "/users/0/items/" + key + "/children";
+        const query = {};
+
+        const items = await request(path, query);
+        return items;
+    }
+    // get zotero item key
+    function getItemKey(item) {
+        if (item === undefined || item === null) {
+            return null;
+        }
+        if (item.data === undefined || item.data === null) {
+            return null;
+        }
+        if (item.data.key === undefined || item.data.key === null) {
+            return null;
+        }
+        return item.data.key;
+    }
+
+    return {
+        searchItemsByDOI: searchItemsByDOI,
+        children: children,
+        getItemKey: getItemKey
+    }
+}
+
+
 // Helper function to build a url
 function buildZoteroApiUrl(host, path, query = {}) {
     // Ensure the host does not have a trailing slash

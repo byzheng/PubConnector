@@ -17,7 +17,7 @@ async function Publisher(options) {
         // Add publisher banner
         await banner.publisher(doi);
         // Add Zotero related icons
-        await addZoteroIconsDOI(banner.container(), doi, this_options.zoterohost);
+        // await addZoteroIconsDOI(banner.container(), doi, this_options.zoterohost);
 
         // Add other information into pages
 
@@ -28,10 +28,26 @@ async function Publisher(options) {
         if (banner.tiddler()) {
             insertColleagueAndDomainInfo(banner.tiddler(), this_options.tiddlywikihost);
         }
-        banner.setWidth();
+        // banner.setWidth();
         // inject reference
         injectReference(doi, this_options);
 
+    }
+
+
+    function waitForLoading() {
+
+        let href = window.location.href;
+        if (href == undefined) {
+            return;
+        }
+        let timeout = 0;
+        if (href.includes("sciencedirect.com")) {
+            timeout = 1500;
+        } else {
+            return;
+        }
+        return new Promise(resolve => setTimeout(resolve, timeout));
     }
     return {
         execute: execute

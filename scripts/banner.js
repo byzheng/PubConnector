@@ -68,7 +68,7 @@ async function Banner(options) {
             iconTWSave(doi);
             this_container.style.backgroundColor = "#8f928f";
         }
-
+        await iconZotero(doi);
         setWidth(); // Set the width of the banner
         return;
     }
@@ -245,6 +245,61 @@ async function Banner(options) {
     }
 
 
+    // Helper function to add TiddlyWiki icons and links to the banner
+    async function iconZotero(doi) {
+
+        const zotero = Zotero(this_options.zoterohost);
+        const item = await zotero.searchItemsByDOI(doi);
+        if (!item) {
+            return;
+        }
+
+        var item_key = zotero.getItemKey(item);
+        if (item_key === null) {
+            return;
+        }
+        iconZeteroItem(item_key); // Add icon to zotero item
+
+        // Get children for pdfs
+        const items_children = await zotero.children(item_key);
+        if (!Array.isArray(items_children) || items_children.length === 0) {
+            return;
+        }
+        for (let i = 0; i < items_children.length; i++) {
+            const item = items_children[i];
+
+            // Check if the contentType is "application/pdf"
+            if (item.data && item.data.contentType === "application/pdf") {
+                var pdf_key = zotero.getItemKey(item);
+                if (pdf_key === null) {
+                    return;
+                }
+                iconZeteroPDF(pdf_key); 
+            }
+
+        }
+    }
+
+
+    // Helper function to create a icon to zotero item
+    function iconZeteroItem(key) {
+        if (!key) {
+            return;
+        }
+        const url = "zotero://select/library/items/" + key;
+        const elements = this_helper.iconURL(url, "images/ZoteroSquare.svg")
+        elements.forEach(element => this_container.appendChild(element));
+    }
+
+    // Helper function to create a icon to open zotero pdf
+    function iconZeteroPDF(key) {
+        if (!key) {
+            return; 
+        }
+        const url = "zotero://open-pdf/library/items/" + key;
+        const elements = this_helper.iconURL(url, "images/FilePdfFilled.svg")
+        elements.forEach(element => this_container.appendChild(element));
+    }
 
 
 
@@ -254,7 +309,8 @@ async function Banner(options) {
         remove: remove,
         tiddler: () => this_tiddler,
         container: () => this_container,
-        setWidth: setWidth
+        setWidth: setWidth,
+        iconZotero: iconZotero
     }
 }
 
