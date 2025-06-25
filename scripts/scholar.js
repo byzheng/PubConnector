@@ -77,12 +77,12 @@ async function Scholar(options) {
     async function processScholarItems() {
         var items = document.querySelectorAll("div.gs_r.gs_or.gs_scl, div.gs_ora");
         for (let i = 0; i < items.length; i++) {
+            const hidden = Hidden();
             // skip if already added
-            if (items[i].querySelector("span.tw-icon")) {
+            if (hidden.has(items[i])) {
                 continue;
             }
-            var spanHide = twspan("tw-svg-small", true);
-            items[i].appendChild(spanHide);
+            hidden.create(items[i]);
 
             let tiddler = await getTiddlerForScholarItem(items[i]);
             if (!tiddler) {
@@ -104,11 +104,11 @@ async function Scholar(options) {
         var items = document.querySelectorAll("tr.gsc_a_tr");
         for (let i = 0; i < items.length; i++) {
             // skip if already added
-            if (items[i].querySelector("span.tw-icon")) {
+            const hidden = Hidden();
+            if (hidden.has(items[i])) {
                 continue;
             }
-            var spanHide = twspan("tw-svg-small", true);
-            items[i].appendChild(spanHide);
+            hidden.create(items[i]);
 
             let tiddler = await getTiddlerForCitationItem(items[i]);
             if (!tiddler) {

@@ -6,6 +6,7 @@ async function dynamicLoadScript(file) {
 
 
 
+
 let colleague_fields = [
     {
         name: "scopus",
@@ -49,7 +50,7 @@ function isValidGoogleScholarID(url) {
 function getURL() {
     var urlSelt = [
         "meta[name='prism.url' i]",
-		"meta[property='og:url' i]",
+        "meta[property='og:url' i]",
         "link[rel='canonical' i]"
     ]
     var url;
@@ -189,7 +190,7 @@ async function convertImageToBase64(imageUrl) {
     try {
         // Fetch the image as a Blob
         const response = await fetch(imageUrl);
-        
+
         // Check if the response is OK (status code 200)
         if (!response.ok) {
             throw new Error('Failed to fetch image');

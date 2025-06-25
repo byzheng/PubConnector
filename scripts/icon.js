@@ -1,3 +1,24 @@
+function Hidden() {
+    const hidden_class = "tw-connector-hidden";
+    // Helper function to create a span to link back to Tiddlywiki
+    function create(element) {
+        var span = document.createElement("span");
+        span.classList.add(hidden_class);
+        span.hidden = true;
+        element.appendChild(span);
+        return span;
+    }
+    function has(element) {
+        return element.querySelector("span." + hidden_class) !== null;
+    }
+    return {
+        create,
+        has
+    };
+}
+
+
+
 function Icon(options, container) {
     const this_options = options || {};
     let this_container = container;
