@@ -39,10 +39,10 @@ async function Banner(options) {
             return;
         }
         initContainer(); // Initialize the container
-        iconTiddlywiki(); // create an icon to link back to Tiddlywiki
-        iconScholarAuthor(this_tiddler["google-scholar"]); // create an icon to link to google scholar author page
-        iconORCIDAuthor(this_tiddler["orcid"]); // create an icon to link to ORCID author page
-        iconScopusAuthor(this_tiddler["scopus"]); // create an icon to link to Scopus author page
+        this_icon.openTwItem(this_tiddler.title);
+        this_icon.scholarAuthor(this_tiddler["google-scholar"]); // create an icon to link to google scholar author page
+        this_icon.orcidAuthor(this_tiddler["orcid"]); // create an icon to link to ORCID author page
+        this_icon.scopusAuthor(this_tiddler["scopus"]); // create an icon to link to Scopus author page
         setWidth(); // Set the width of the banner
     }
 
@@ -80,41 +80,6 @@ async function Banner(options) {
         if (banner) {
             banner.remove(); // Removes the element from the DOM
         }
-    }
-
-
-    
-    function iconScholarAuthor(url) {
-        if (!url) {
-            return;
-        }
-        if (this_href.includes("scholar.google")) {
-            return;
-        }
-        const elements = this_helper.iconURL(url, "images/GoogleScholarSquare.svg")
-        elements.forEach(element => this_container.appendChild(element));
-    }
-
-    function iconORCIDAuthor(url) {
-        if (!url) {
-            return;
-        }
-        if (this_href.includes("orcid.org")) {
-            return;
-        }
-        const elements = this_helper.iconURL(url, "images/Orcid.svg")
-        elements.forEach(element => this_container.appendChild(element));
-    }
-
-    function iconScopusAuthor(url) {
-        if (!url) {
-            return;
-        }
-        if (this_href.includes("scopus.com")) {
-            return;
-        }
-        const elements = this_helper.iconURL(url, "images/Scopus.svg")
-        elements.forEach(element => this_container.appendChild(element));
     }
 
 

@@ -1,6 +1,7 @@
 function Icon(options, container) {
     const this_options = options || {};
     let this_container = container;
+    const this_href = window.location.href;
     function setContainer(container) {
         if (container) {
             this_container = container;
@@ -145,6 +146,38 @@ function Icon(options, container) {
     }
 
 
+    
+    function scholarAuthor(url, container) {
+        if (!url) {
+            return;
+        }
+        if (this_href.includes("scholar.google")) {
+            return;
+        }
+        const elements = createElementByURL(url, "images/GoogleScholarSquare.svg", container);
+    }
+
+    function orcidAuthor(url, container) {
+        if (!url) {
+            return;
+        }
+        if (this_href.includes("orcid.org")) {
+            return;
+        }
+        createElementByURL(url, "images/Orcid.svg", container);
+    }
+
+    function scopusAuthor(url, container) {
+        if (!url) {
+            return;
+        }
+        if (this_href.includes("scopus.com")) {
+            return;
+        }
+        createElementByURL(url, "images/Scopus.svg", container);
+    }
+
+
     return ({
         setContainer,
         copyTwCitation,
@@ -155,6 +188,9 @@ function Icon(options, container) {
         publisherByDOI,
         saveTwItem,
         zeteroItem,
-        zeteroPDF
+        zeteroPDF,
+        scholarAuthor,
+        orcidAuthor,
+        scopusAuthor
     })
 }
