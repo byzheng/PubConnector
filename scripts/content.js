@@ -51,11 +51,6 @@ async function main() {
             run_scopus(options);
         });
 
-    } else if (href.includes("lens.org")) {
-        onPageLoad(() => {
-            run_lens(options);
-        });
-
     } else {
         const publisher = await Publisher(options);
         await publisher.execute();

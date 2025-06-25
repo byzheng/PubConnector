@@ -188,9 +188,9 @@ async function addBannerScopusPublication(eid, options) {
     if (tiddlers.length > 0) {
         banner.appendChild(tw_link(tiddlers[0].title, "tw-svg", options.tiddlywikihost)); // Add link back to TiddlyWiki 
         // Add Reading tag icon if applicable
-        if (tiddlers[0].tags.includes("Reading")) {
-            banner.appendChild(reading_span());
-        }
+        // if (tiddlers[0].tags.includes("Reading")) {
+        //     banner.appendChild(reading_span());
+        // }
         // Insert colleague and domain info
         insertColleagueAndDomainInfo(tiddlers[0], options.tiddlywikihost);
     } else {

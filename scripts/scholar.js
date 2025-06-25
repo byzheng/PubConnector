@@ -88,8 +88,8 @@ async function Scholar(options) {
             if (!tiddler) {
                 continue;
             }
-
-            var span = tw_link(tiddler.title, "tw-svg-small", tiddlywikiHost);
+            var span = Icon(this_options).openTwItem(tiddler.title, undefined,
+                "tw-svg-small");
             var qry = "div.gs_fl, h3.gs_ora_tt";
             let target = items[i].querySelector(qry);
             if (!target) {
@@ -114,8 +114,9 @@ async function Scholar(options) {
             if (!tiddler) {
                 continue;
             }
-
-            var span = tw_link(tiddler.title, "tw-svg-small", tiddlywikiHost);
+            
+            var span = Icon(this_options).openTwItem(tiddler.title, undefined,
+                "tw-svg-small");
             var qry = "td.gsc_a_y";
 
             let target = items[i].querySelector(qry);

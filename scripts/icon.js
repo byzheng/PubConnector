@@ -28,7 +28,9 @@ function Icon(options, container) {
             this_container = container;
         }
     }
-    function createElementByURL(url, icon, container) {
+    function createElementByURL(url, icon, container, 
+        img_class = "tw-svg",
+        a_class = "tw-icon") {
         if (!container) {
             container = this_container;
         }
@@ -37,12 +39,12 @@ function Icon(options, container) {
         for (let i = 0; i < links.length; i++) {
             var img = document.createElement("img");
             img.src = chrome.runtime.getURL(icon);
-            img.classList.add("tw-svg");
+            img.classList.add(img_class);
             var sa = document.createElement("a");
             sa.appendChild(img);
             sa.setAttribute("href", links[i]);
             sa.setAttribute("target", "_blank");
-            sa.classList.add("tw-icon");
+            sa.classList.add(a_class);
             sas.push(sa);
         }
         if (container) {
@@ -50,7 +52,7 @@ function Icon(options, container) {
         }
         return sas;
     }
-    function notication_box() {
+    function noticationBox() {
         const notification = document.createElement("div");
         notification.id = "tw-notification";
         notification.classList.add("tw-notification");
@@ -76,7 +78,7 @@ function Icon(options, container) {
 
                 let notification = document.getElementById("tw-notification");
                 if (!notification) {
-                    notification = notication_box();
+                    notification = noticationBox();
                 }
                 notification.textContent = `Copied: ${textToCopy}`;
                 notification.style.display = "block";
@@ -91,9 +93,12 @@ function Icon(options, container) {
         });
     }
     // Helper function to create an icon link to tiddlywiki by title
-    function openTwItem(title, container) {
+    function openTwItem(title, container,
+        img_class = "tw-svg",
+        a_class = "tw-icon") {
         var url = new URL("#" + title, this_options.tiddlywikihost);
-        const elements = createElementByURL("#", "images/Tiddlywiki.svg", container)
+        const elements = createElementByURL("#", "images/Tiddlywiki.svg", 
+            container, img_class, a_class)
         elements[0].addEventListener("click", function (event) {
             event.preventDefault();
             chrome.runtime.sendMessage({
@@ -103,7 +108,9 @@ function Icon(options, container) {
                 host: this_options.tiddlywikihost
             });
         });
+        return elements[0]
     }
+
     function scholarSearchDOI(doi, container) {
         if (!doi) {
             return;

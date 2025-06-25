@@ -51,37 +51,10 @@ async function Publisher(options) {
             // if (tw_svgs.length > 0) {
             //     return;
             // }
-            let a_ele = tw_link(tiddler.title, tw_class, host, "images/TiddlywikiSmall.svg");
-            //a_ele.setAttribute("title", title);
-            a_ele.classList.add("tw-icon-tooltip");
-            // var ele_tooltip = document.createElement("span");
-            // ele_tooltip.classList.add("tw-tooltip-text");
-            // ele_tooltip.textContent = generateShortReference(tiddler);
-            // ele_tooltip.addEventListener('mouseenter', function () {
-            //     const tooltipText = item.querySelector('.tw-tooltip-text');
-            //     const tooltipRect = tooltipText.getBoundingClientRect();
-            //     const windowWidth = window.innerWidth;
-
-            //     // Check if the tooltip goes off the right side
-            //     if (tooltipRect.right > windowWidth) {
-            //         tooltipText.style.left = 'auto';
-            //         tooltipText.style.right = '0'; // Align to the right edge
-            //     } else {
-            //         tooltipText.style.left = '50%';
-            //         tooltipText.style.transform = 'translateX(-50%)';
-            //     }
-            // });
-
-            // ele_tooltip.addEventListener('mouseleave', function () {
-            //     const tooltipText = item.querySelector('.tw-tooltip-text');
-            //     tooltipText.style.left = '50%'; // Reset position
-            //     tooltipText.style.right = 'auto';
-            // });
-
-
-            // a_ele.appendChild(ele_tooltip);
-            //div.appendChild(a_ele);
-            div.parentElement.insertBefore(a_ele, div.nextSibling);
+            const icon = Icon(this_options).openTwItem(tiddler.title, undefined,
+                "tw-svg-inline");
+            //icon.classList.add(tw_class);
+            div.parentElement.insertBefore(icon, div.nextSibling);
         })
     }
 
