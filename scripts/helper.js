@@ -25,29 +25,6 @@ export function domainType(href) {
 }
 
 
-
-// Helper function to create icon to different platforms
-export function iconURL(url, icon) {
-    let links = url.split(" ");
-    let sas = [];
-    for (let i = 0; i < links.length; i++) {
-        var img = document.createElement("img");
-        img.src = chrome.runtime.getURL(icon);
-        img.classList.add("tw-svg");
-        var sa = document.createElement("a");
-        sa.appendChild(img);
-        sa.setAttribute("href", links[i]);
-        sa.setAttribute("target", "_blank");
-        sa.classList.add("tw-icon");
-        sas.push(sa);
-    }
-
-    return sas;
-}
-
-
-
-
 export function getDOI() {
     var doi_sel = [
         "meta[name='dc.Identifier' i][scheme='doi' i]",

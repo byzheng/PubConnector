@@ -71,7 +71,8 @@
         "scripts/tiddlywiki.js",
         "scripts/lens.js",
         "scripts/zotero.js",
-        "scripts/tiddler.js"
+        "scripts/tiddler.js",
+        "scripts/icon.js"
       ],
       "css": [
         "styles/bibtex.css"

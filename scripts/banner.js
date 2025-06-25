@@ -3,6 +3,7 @@ async function Banner(options) {
 
     const this_options = options || {};
     const this_tw = Tiddlywiki(options.tiddlywikihost);
+    const this_icon = Icon(options);
     const this_href = window.location.href;
     let this_container, this_tiddler;
 
@@ -13,7 +14,7 @@ async function Banner(options) {
         document.body.appendChild(this_container);
         // Enable dragging functionality for the banner
         dragElement(this_container);
-
+        this_icon.setContainer(this_container);
     }
     async function getTiddlerByID(id, field) {
         var filter = `[tag[Colleague]search:${field}[${id}]]`;
@@ -54,18 +55,18 @@ async function Banner(options) {
 
         initContainer();
         if (this_tiddler) {
-            twCopyCitation();
-            iconTiddlywiki();
-            iconScholarSearchDOI(doi);
-            iconScopusItem(doi);
-            iconLensItem(doi);
+            this_icon.copyTwCitation(this_tiddler.title);
+            this_icon.openTwItem(this_tiddler.title);
+            this_icon.scholarSearchDOI(doi);
+            this_icon.scopusItem(doi, this_tiddler["scopus-eid"]);
+            this_icon.lensItem(doi, this_tiddler["lens"]);
         } else {
             // If no tiddler found, create default links
-            iconScholarSearchDOI(doi);
-            iconScopusItem(doi);
-            iconPublisherByDOI(doi);
-            iconLensItem(doi);
-            iconTWSave(doi);
+            this_icon.scholarSearchDOI(doi);
+            this_icon.scopusItem(doi);
+            this_icon.publisherByDOI(doi);
+            this_icon.lensItem(doi);
+            this_icon.saveTwItem(doi);
             this_container.style.backgroundColor = "#8f928f";
         }
         await iconZotero(doi);
@@ -82,29 +83,7 @@ async function Banner(options) {
     }
 
 
-    // Helper function to create an icon link to tiddlywiki by title
-    function iconTiddlywiki() {
-        var img = document.createElement("img");
-        img.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
-        img.classList.add("tw-svg");
-        var sa = document.createElement("a");
-        sa.appendChild(img);
-        var url = new URL("#" + this_tiddler.title, this_options.tiddlywikihost);
-        sa.setAttribute("href", url);
-        sa.setAttribute("target", "_blank");
-        sa.classList.add("tw-icon-tiny");
-        sa.addEventListener("click", function (event) {
-            event.preventDefault();
-            chrome.runtime.sendMessage({
-                from: "webpage",
-                tiddler: this_tiddler.title,
-                method: "open_tiddler",
-                host: this_options.tiddlywikihost
-            });
-        });
-        this_container.appendChild(sa);
-    }
-
+    
     function iconScholarAuthor(url) {
         if (!url) {
             return;
@@ -139,63 +118,9 @@ async function Banner(options) {
     }
 
 
-    // Helper function to create an icon link to publisher by DOI
-    function iconPublisherByDOI(doi) {
-        if (!doi) {
-            return;
-        }
-        const url = `https://doi.org/${encodeURIComponent(doi)}`;
-
-        const elements = this_helper.iconURL(url, "images/LinkOut.svg");
-        elements.forEach(element => this_container.appendChild(element));
-    }
-
-    function iconScholarSearchDOI(doi) {
-        if (!doi) {
-            return;
-        }
-        const url = `https://scholar.google.com/scholar?q=${encodeURIComponent(doi)}`;
-        const elements = this_helper.iconURL(url, "images/GoogleScholarSquare.svg")
-        elements.forEach(element => this_container.appendChild(element));
-    }
-
-    function iconScopusItem(doi) {
-        let url;
-        if (this_tiddler && this_tiddler["scopus-eid"]) {
-            const eid = this_tiddler["scopus-eid"];
-            url = `https://www.scopus.com/record/display.uri?eid=${eid}&origin=resultslist`;
-        } else {
-            url = `https://www.scopus.com/results/results.uri?s=DOI(${encodeURIComponent(doi)})`;
-        }
-        const elements = this_helper.iconURL(url, "images/Scopus.svg")
-        elements.forEach(element => this_container.appendChild(element));
-    }
 
 
-    // Helper function to create a icon to scholar.google.com
-    function iconLensItem(doi) {
-        let url;
-        if (this_tiddler && this_tiddler["lens"]) {
-            const id = this_tiddler["lens"];
-            url = `https://www.lens.org/lens/scholar/${id}/main`;
-        } else {
-            url = `https://www.lens.org/lens/search/scholar/list?q=${encodeURIComponent(doi)}`;
-        }
-        const elements = this_helper.iconURL(url, "images/Googlelens.svg")
-        elements.forEach(element => this_container.appendChild(element));
-    }
-
-
-
-    function iconTWSave(doi) {
-        const elements = this_helper.iconURL("#", "images/Save.svg")
-        elements.forEach(element => this_container.appendChild(element));
-        elements[0].addEventListener("click", function (event) {
-            event.preventDefault();
-            importBibtexToTiddlyWikiByDOI(doi, options);
-        });
-    }
-
+    
     // Helper function to set width of banner
     function setWidth() {
         let totalWidth = 0;
@@ -208,42 +133,7 @@ async function Banner(options) {
         this_container.style.width = `${totalWidth + padding}px`;
     }
 
-
-    // Helper function to create an icon link to tiddlywiki by title
-    function twCopyCitation() {
-        if (!this_tiddler || !this_tiddler.title) {
-            //console.error("No tiddler found to copy citation.");
-            return;
-        }
-        const title = this_tiddler.title; // Replace spaces with underscores for TiddlyWiki format
-        const elements = this_helper.iconURL("#", "images/Copy.svg")
-        elements.forEach(element => this_container.appendChild(element));
-        elements[0].addEventListener("click", function (event) {
-            event.preventDefault();
-            const textToCopy = "<<ref2 " + title + ">>"
-            if (!document.hasFocus()) {
-                console.warn("Document is not focused. Clipboard copy may fail.");
-                return;
-            }
-            navigator.clipboard.writeText(textToCopy).then(() => {
-
-                let notification = document.getElementById("tw-notification");
-                if (!notification) {
-                    notification = notication_box();
-                }
-                notification.textContent = `Copied: ${textToCopy}`;
-                notification.style.display = "block";
-
-                // Hide after 1 second
-                setTimeout(() => {
-                    notification.style.display = "none";
-                }, 1500);
-            }).catch(err => {
-                console.error("Failed to copy text: ", err);
-            });
-        });
-    }
-
+    
 
     // Helper function to add TiddlyWiki icons and links to the banner
     async function iconZotero(doi) {
@@ -258,7 +148,7 @@ async function Banner(options) {
         if (item_key === null) {
             return;
         }
-        iconZeteroItem(item_key); // Add icon to zotero item
+        this_icon.zeteroItem(item_key); // Add icon to zotero item
 
         // Get children for pdfs
         const items_children = await zotero.children(item_key);
@@ -274,31 +164,10 @@ async function Banner(options) {
                 if (pdf_key === null) {
                     return;
                 }
-                iconZeteroPDF(pdf_key); 
+                this_icon.zeteroPDF(pdf_key); 
             }
 
         }
-    }
-
-
-    // Helper function to create a icon to zotero item
-    function iconZeteroItem(key) {
-        if (!key) {
-            return;
-        }
-        const url = "zotero://select/library/items/" + key;
-        const elements = this_helper.iconURL(url, "images/ZoteroSquare.svg")
-        elements.forEach(element => this_container.appendChild(element));
-    }
-
-    // Helper function to create a icon to open zotero pdf
-    function iconZeteroPDF(key) {
-        if (!key) {
-            return; 
-        }
-        const url = "zotero://open-pdf/library/items/" + key;
-        const elements = this_helper.iconURL(url, "images/FilePdfFilled.svg")
-        elements.forEach(element => this_container.appendChild(element));
     }
 
 
