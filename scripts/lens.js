@@ -90,7 +90,7 @@ async function lens_banner(options) {
     // Add other information into pages
 
     // Wait to load page as some website will render the whole page later
-    await waitForLoading();
+    //await waitForLoading();
 
     // Insert author and domain information
     if (tiddlers.length > 0) {
