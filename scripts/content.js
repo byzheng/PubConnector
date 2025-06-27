@@ -46,11 +46,6 @@ async function main() {
             await scholar.execute();
         });
 
-    } else if (href.includes("scopus.com")) {
-        onPageLoad(() => {
-            run_scopus(options);
-        });
-
     } else {
         const publisher = await Publisher(options);
         await publisher.execute();

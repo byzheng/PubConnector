@@ -45,7 +45,7 @@ async function Banner(options) {
         this_icon.openTwItem(this_tiddler.title);
         this_icon.scholarAuthor(this_tiddler["google-scholar"]); // create an icon to link to google scholar author page
         this_icon.orcidAuthor(this_tiddler["orcid"]); // create an icon to link to ORCID author page
-        this_icon.scopusAuthor(this_tiddler["scopus"]); // create an icon to link to Scopus author page
+        //this_icon.scopusAuthor(this_tiddler["scopus"]); // create an icon to link to Scopus author page
         setWidth(); // Set the width of the banner
     }
 
@@ -60,12 +60,12 @@ async function Banner(options) {
             this_icon.copyTwCitation(this_tiddler.title);
             this_icon.openTwItem(this_tiddler.title);
             this_icon.scholarSearchDOI(doi);
-            this_icon.scopusItem(doi, this_tiddler["scopus-eid"]);
+            //this_icon.scopusItem(doi, this_tiddler["scopus-eid"]);
             //this_icon.lensItem(doi, this_tiddler["lens"]);
         } else {
             // If no tiddler found, create default links
             this_icon.scholarSearchDOI(doi);
-            this_icon.scopusItem(doi);
+            //this_icon.scopusItem(doi);
             this_icon.publisherByDOI(doi);
             //this_icon.lensItem(doi);
             this_icon.saveTwItem(doi);
