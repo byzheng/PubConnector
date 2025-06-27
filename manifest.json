@@ -59,7 +59,6 @@
         "scripts/context_menu.js",
         "scripts/utils.js",
         "scripts/scholar.js",
-        "scripts/scopus.js",
         "scripts/content.js",
         "scripts/publisher.js",
         "scripts/banner.js",
