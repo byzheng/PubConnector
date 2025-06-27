@@ -228,7 +228,8 @@ function Tiddlywiki(host) {
             // console.error("DOI is undefined or empty");
             return;
         }
-        const filter = "[tag[bibtex-entry]field:bibtex-doi[" + doi + "]]";
+        const filter = `[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[${doi}]]`;
+        console.log("getTiddlerByDOI filter: " + filter);
         return getTiddler(filter);
     }
     return {

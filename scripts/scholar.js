@@ -15,7 +15,10 @@ async function Scholar(options) {
         } else {
             await processScholarItems();
         }
-        
+        // open all links in new tab
+        document.querySelectorAll('a').forEach(link => {
+            link.setAttribute('target', '_blank');
+        });
 
     }
     async function authorPage(sid) {
@@ -25,7 +28,7 @@ async function Scholar(options) {
         tiddlerColleague = banner.tiddler()
         //tiddlerColleague = await getColleague(sid, "scholar", tiddlywikiHost);
         // For items in the author page
-        await authorPageItemsAwait(); 
+        await authorPageItemsAwait();
         await saveAuthorCites(sid);
     }
     async function saveAuthorCites(sid) {
@@ -49,7 +52,7 @@ async function Scholar(options) {
             if (!cites) {
                 continue;
             }
-            
+
             allCites.push(...cites);
         }
         await tw.saveScholarAuthorCites(sid, allCites);
@@ -114,7 +117,7 @@ async function Scholar(options) {
             if (!tiddler) {
                 continue;
             }
-            
+
             var span = Icon(this_options).openTwItem(tiddler.title, undefined,
                 "tw-svg-small");
             var qry = "td.gsc_a_y";
@@ -166,7 +169,7 @@ async function Scholar(options) {
             return;
         }
         for (let cite of cites) {
-            if (!cite || cite.trim() === "") {  
+            if (!cite || cite.trim() === "") {
                 continue;
             }
             //console.log("getTiddlerForCitationItem", cite);
@@ -213,7 +216,6 @@ async function Scholar(options) {
             // Merge item.outerHTML and href for DOI extraction
             const mergedText = item.outerHTML + " " + href;
             const dois = helper.extractDOIs(mergedText);
-            console.log(dois);
             if (dois.length === 1) {
                 tiddler = await tw.getTiddlerByDOI(dois[0]);
             }

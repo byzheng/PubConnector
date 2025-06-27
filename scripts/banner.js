@@ -55,7 +55,6 @@ async function Banner(options) {
             return;
         }
         this_tiddler = await this_tw.getTiddlerByDOI(doi);
-
         initContainer();
         if (this_tiddler) {
             this_icon.copyTwCitation(this_tiddler.title);
