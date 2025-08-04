@@ -48,7 +48,7 @@ export async function UpdateScholar(options) {
         const pendingIds = await Pending();
         if (!pendingIds || pendingIds.length === 0) {
             console.log("No pending scholar IDs to process.");
-            return;
+            return limit;
         }
         const limitedPendingIds = pendingIds.slice(0, Math.min(limit, pendingIds.length));
         for (const scholarId of limitedPendingIds) {
@@ -117,33 +117,92 @@ export async function UpdateData(options) {
 }
 
 
-// export async function ScheduleTask(options) {
-//     const this_options = options;
-//     const this_tw = await Tiddlywiki(options.tiddlywikihost);
+export async function ScheduleTask(options) {
+    const this_options = options;
+    const this_tw = await Tiddlywiki(options.tiddlywikihost);
+    const this_update = await UpdateData(options);
 
-//     async function scholarSearchDOI() {
+    const ENABLE_TIDDLER = "$:/config/tw-connector/authoring/auto-update/enable";
+    const HOUR_TIDDLER = "$:/config/tw-connector/authoring/auto-update/hour";
+    const MINUTE_TIDDLER = "$:/config/tw-connector/authoring/auto-update/minute";
 
-//         const filter = "[tag[bibtex-entry]has[bibtex-doi]!has:field[scholar-cid]limit[2]]";
+    async function Enable() {
+        const enabledText = await this_tw.getTiddlerText(ENABLE_TIDDLER);
+        if (!enabledText || typeof enabledText !== "string") {
+            return false;
+        }
+        return enabledText.trim().toLowerCase() === "enable" ? true : false;
+    }
+    async function Hour() {
+        const hourText = await this_tw.getTiddlerText(HOUR_TIDDLER);
+        if (!hourText || typeof hourText !== "string") {
+            return "-1";
+        }
+        return hourText.trim();
+    }
 
-//         const tiddlers = await this_tw.getTiddlers(filter);
+    async function Minute() {
+        const minuteText = await this_tw.getTiddlerText(MINUTE_TIDDLER);
+        if (!minuteText || typeof minuteText !== "string") {
+            return "-1";
+        }
+        return minuteText.trim();
+    }
 
+    let lastRun = "";
 
-//         for (const tiddler of tiddlers) {
-//             const doi = helper.extractDOIs(tiddler["bibtex-doi"]);
-//             if (!doi || doi.length === 0) {
-//                 continue;
-//             }
-//             const url = `https://scholar.google.com/scholar?q=${encodeURIComponent(doi[0])}`;
-//             console.log(url);
-//             const tab = await chrome.tabs.create({ url, active: false });
-//             await waitForTabToLoad(tab.id);
-//             await helper.delay(2000);
-//             // chrome.tabs.remove(tab.id);
-//         }
-//     }
-//     return ({
-//         scholarSearchDOI: scholarSearchDOI,
-//         processPendingScholars: processPendingScholars
-//     });
+    function isValidHour(hour) {
+        return hour === -1 || (Number.isInteger(hour) && hour >= 0 && hour <= 23);
+    }
 
-// }
+    function isValidMinute(minute) {
+        return minute === -1 || (Number.isInteger(minute) && minute >= 0 && minute <= 59);
+    }
+
+    function shouldRunNow(now, hourStr, minuteStr) {
+        const hour = parseInt(hourStr);
+        const minute = parseInt(minuteStr);
+        const nowHour = now.getHours();
+        const nowMinute = now.getMinutes();
+        const key = `${now.toDateString()} ${nowHour}:${nowMinute}`;
+    
+        if (!isValidHour(hour) || !isValidMinute(minute)) {
+            console.warn(`⚠️ Invalid schedule time: hour=${hourStr}, minute=${minuteStr}`);
+            return false;
+        }
+
+        // Prevent repeated execution
+        if (lastRun === key) return false;
+
+        const matchHour = (hour === -1 || nowHour === hour);
+        const matchMinute = (minute === -1 || nowMinute === minute);
+        
+        if (matchHour && matchMinute) {
+            lastRun = key;
+            return true;
+        }
+        return false;
+    }
+    async function Update() {
+        console.log("⏰ Auto update scheduled to run daily at", await Hour(), ":", await Minute());
+        setInterval(async () => {
+            const enabled = await Enable();
+            if (!enabled) return;
+
+            const now = new Date();
+            const hour = await Hour();
+            const minute = await Minute();
+
+            if (shouldRunNow(now, hour, minute)) {
+                console.log("⏰ Auto update triggered at", now.toLocaleString());
+                await this_update.doUpdate();
+                console.log("✅ Auto update caches started successfully.");
+                return;
+            }
+
+       }, 60 * 1000); // Check every minute
+    }
+    return {
+        Update: Update
+    };  
+}

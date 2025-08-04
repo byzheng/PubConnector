@@ -1,5 +1,5 @@
 
-import { UpdateData } from './task_schedule.js';
+import { ScheduleTask, UpdateData } from './task_schedule.js';
 import { Tiddlywiki } from './api/tiddlywiki-api.js';
 
 const this_tw = Tiddlywiki();
@@ -116,9 +116,16 @@ chrome.action.onClicked.addListener(async () => {
     const options = await loadOptions();
     const updateDate = await UpdateData(options);
     await updateDate.doUpdate();
-    // const schedule = await ScheduleTask(options);
-    // schedule.scholarSearchDOI();
+    
 });
+
+async function runScheduleUpdate() {
+    const options = await loadOptions();
+    const schedule = await ScheduleTask(options);
+    schedule.Update();
+}
+
+runScheduleUpdate();
 
 // Link to TiddlyWiki
 function linkTiddlywiki(request) {
