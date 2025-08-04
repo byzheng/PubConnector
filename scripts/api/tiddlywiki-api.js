@@ -114,10 +114,68 @@ function parseStringArray(value, allowDuplicate = false) {
     }
 }
 
-
-
 export function Tiddlywiki(host) {
     const this_host = host || "http://localhost:8080";
+        
+    const CONTEXT = (() => {
+        // Service worker (background in MV3)
+        if (typeof self !== "undefined" && self.registration) {
+            return "background";
+        }
+
+        // Popup (check for extension protocol and window context)
+        if (typeof window !== "undefined" && window.location?.protocol === "chrome-extension:") {
+            return "popup";
+        }
+
+        // Content script (has access to document and window)
+        if (typeof window !== "undefined" && typeof document !== "undefined") {
+            return "content";
+        }
+
+        return "unknown";
+    })();
+
+
+
+        
+    // Perform a TiddlyWiki API request (supports GET and PUT)
+    async function do_request(request) {
+        const { url, method = "GET", data = null } = request;
+
+        try {
+            const options = {
+                method,
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-requested-with": "TiddlyWiki"
+                }
+            };
+
+            // Only include body for methods that allow it
+            if (method === "PUT" || method === "POST") {
+                options.body = JSON.stringify(data);
+            }
+
+            const response = await fetch(url, options);
+
+            if (!response.ok) {
+                throw new Error(`Failed TiddlyWiki ${method} request: ${response.status}`);
+            }
+
+            if (response.status === 204) {
+                return { success: true, data: null }
+            }
+            //const result = await response.status === 204 ? null : response.json();
+            const result = await response.json();
+            return { success: true, data: result };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+
+
     function request(path, method = "GET", data = null) {
         if (typeof path !== "string" || path.trim() === "") {
             return Promise.reject(new Error("Invalid path: Path must be a non-empty string."));
@@ -129,30 +187,48 @@ export function Tiddlywiki(host) {
         } catch (e) {
             return Promise.reject(new Error("Invalid URL: " + url));
         }
-        return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage(
-                {
-                    from: "fetchTiddlyWikiData",
-                    url: url,
-                    method: method,
-                    data: data
-                },
-                (response) => {
-                    if (chrome.runtime.lastError) {
-                        console.error("Message error:", chrome.runtime.lastError.message);
-                        reject(chrome.runtime.lastError);
-                        return;
-                    }
+        if (CONTEXT == "content" || CONTEXT == "popup") {
+            return new Promise((resolve, reject) => {
+                chrome.runtime.sendMessage(
+                    {
+                        from: "fetchTiddlyWikiData",
+                        url: url,
+                        method: method,
+                        data: data
+                    },
+                    (response) => {
+                        if (chrome.runtime.lastError) {
+                            console.error("Message error:", chrome.runtime.lastError.message);
+                            reject(chrome.runtime.lastError);
+                            return;
+                        }
 
-                    if (response && response.success) {
-                        resolve(response.data); // ✅ Success
-                    } else {
-                        console.error("TiddlyWiki request failed:", response?.error);
-                        reject(response?.error || "Unknown error");
+                        if (response && response.success) {
+                            resolve(response.data); // ✅ Success
+                        } else {
+                            console.error("TiddlyWiki request failed:", response?.error);
+                            reject(response?.error || "Unknown error");
+                        }
                     }
-                }
-            );
-        });
+                );
+            });
+        } else if (CONTEXT == "background") {
+            return do_request({
+                        from: "fetchTiddlyWikiData",
+                        url: url,
+                        method: method,
+                        data: data
+                    }).then(response => {
+                        if (response.success) {
+                            return response.data;
+                        } else {
+                            return Promise.reject(response.error || "Unknown error");
+                        }
+                    });
+        } else {
+            // Handle unknown context
+            return Promise.reject(new Error("Unknown context: " + CONTEXT));
+        }
     }
     async function status() {
         const url = `${this_host}/status`;
@@ -232,11 +308,29 @@ export function Tiddlywiki(host) {
         console.log("getTiddlerByDOI filter: " + filter);
         return getTiddler(filter);
     }
+
+
+
+
+
+    async function getTiddlerByURL(url) {
+        if (!url || url.trim() === "") {
+            //console.error("URL is undefined or empty");
+            return;
+        }
+
+        const filter = "[tag[bibtex-entry]field:bibtex-url[" + url + "]]";
+        return getTiddler(filter);
+    }
+
+
     return {
+        do_request:do_request,
         status: status,
         getTiddlers: getTiddlers,
         getTiddler: getTiddler,
         getTiddlerByDOI: getTiddlerByDOI,
+        getTiddlerByURL: getTiddlerByURL,
         putTiddler: putTiddler,
         saveScholarAuthorCites: saveScholarAuthorCites
     };

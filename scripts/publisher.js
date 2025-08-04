@@ -5,6 +5,9 @@ async function Publisher(options) {
     const this_options = options;
     const tiddlywikiHost = this_options.tiddlywikihost;
     const this_href = window.location.href;
+    const tw_api = await dynamicLoadScript('scripts/api/tiddlywiki-api.js');
+    const this_tw = tw_api.Tiddlywiki(options.tiddlywikihost);
+    
     async function execute() {
         var doi = helper.getDOI();
         if (doi === undefined) {
@@ -216,7 +219,7 @@ async function Publisher(options) {
     async function injectReferenceByDOI(element, doi, options) {
         // Make the request to TiddlyWiki
         var filter = `[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[${doi}]]`;
-        const tiddlers = await tiddlywikiGetTiddlers(filter, options.tiddlywikihost);
+        const tiddlers = await this_tw.getTiddlers(filter);
         if (tiddlers.length !== 1) {
             addPublisherLinkByDOI(element[0], doi);
         } else {
@@ -228,7 +231,7 @@ async function Publisher(options) {
     async function injectReferenceByEID(element, eid, options) {
         eid = eid.toLowerCase();
         var filter = `[tag[bibtex-entry]] :filter[get[scopus-eid]lowercase[]match[${eid}]]`;
-        const tiddlers = await tiddlywikiGetTiddlers(filter, options.tiddlywikihost);
+        const tiddlers = await this_tw.getTiddlers(filter);
         if (tiddlers.length !== 1) {
             return;
         }

@@ -1,6 +1,8 @@
 
 import { ScheduleTask } from './task_schedule.js';
+import { Tiddlywiki } from './api/tiddlywiki-api.js';
 
+const this_tw = Tiddlywiki();
 // transfer message
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
@@ -9,7 +11,7 @@ chrome.runtime.onMessage.addListener(
         }
 
         if (request.from === "fetchTiddlyWikiData") {
-            performTiddlyWikiRequest(request)
+            this_tw.do_request(request)
                 .then(response => {
                     sendResponse(response);  // Send the result back to the sender
                 })
@@ -112,8 +114,8 @@ function loadOptions() {
 
 chrome.action.onClicked.addListener(async () => {
     const options = await loadOptions();
-    const schedule = ScheduleTask(options);
-    //schedule.scholarSearchDOI();
+    const schedule = await ScheduleTask(options);
+    schedule.scholarSearchDOI();
 });
 
 // Link to TiddlyWiki
@@ -229,40 +231,40 @@ async function performBibtexRequest(request) {
 
 
 
-// Perform a TiddlyWiki API request (supports GET and PUT)
-async function performTiddlyWikiRequest(request) {
-    const { url, method = "GET", data = null } = request;
+// // Perform a TiddlyWiki API request (supports GET and PUT)
+// async function performTiddlyWikiRequest(request) {
+//     const { url, method = "GET", data = null } = request;
 
-    try {
-        const options = {
-            method,
-            headers: {
-                "Content-Type": "application/json",
-                "x-requested-with": "TiddlyWiki"
-            }
-        };
+//     try {
+//         const options = {
+//             method,
+//             headers: {
+//                 "Content-Type": "application/json",
+//                 "x-requested-with": "TiddlyWiki"
+//             }
+//         };
 
-        // Only include body for methods that allow it
-        if (method === "PUT" || method === "POST") {
-            options.body = JSON.stringify(data);
-        }
+//         // Only include body for methods that allow it
+//         if (method === "PUT" || method === "POST") {
+//             options.body = JSON.stringify(data);
+//         }
 
-        const response = await fetch(url, options);
+//         const response = await fetch(url, options);
 
-        if (!response.ok) {
-            throw new Error(`Failed TiddlyWiki ${method} request: ${response.status}`);
-        }
+//         if (!response.ok) {
+//             throw new Error(`Failed TiddlyWiki ${method} request: ${response.status}`);
+//         }
 
-        if (response.status === 204) {
-            return { success: true, data: null }
-        }
-        //const result = await response.status === 204 ? null : response.json();
-        const result = await response.json();
-        return { success: true, data: result };
-    } catch (error) {
-        return { success: false, error: error.message };
-    }
-}
+//         if (response.status === 204) {
+//             return { success: true, data: null }
+//         }
+//         //const result = await response.status === 204 ? null : response.json();
+//         const result = await response.json();
+//         return { success: true, data: result };
+//     } catch (error) {
+//         return { success: false, error: error.message };
+//     }
+// }
 
 
 

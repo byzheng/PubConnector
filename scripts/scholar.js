@@ -207,7 +207,7 @@ async function Scholar(options) {
         if (!tiddler) {
             const elementHref = item.querySelector(`a[id="${cid}"]`);
             if (elementHref) {
-                tiddler = await getTiddlerByURL(elementHref.getAttribute("href"), tiddlywikiHost);
+                tiddler = await tw.getTiddlerByURL(elementHref.getAttribute("href"));
             }
         }
         // get tiddler by matching DOI
