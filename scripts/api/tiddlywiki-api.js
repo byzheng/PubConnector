@@ -235,6 +235,19 @@ export function Tiddlywiki(host) {
         return request(url);
     }
 
+    
+    async function getTiddler(title) {
+        if (!title || typeof title !== "string" || title.trim() === "") {
+            return Promise.reject(new Error("Invalid title: Title must be a non-empty string."));
+        }
+        const path = `/recipes/default/tiddlers/${encodeURIComponent(title)}`;
+        try {
+            return await request(path);
+        } catch (e) {
+            return null;
+        }
+    }
+
     async function getTiddlers(filter) {
         if (!filter || typeof filter !== "string" || filter.trim() === "") {
             return Promise.reject(new Error("Invalid filter: Filter must be a non-empty string."));
@@ -244,7 +257,7 @@ export function Tiddlywiki(host) {
     }
 
 
-    async function getTiddler(filter) {
+    async function getTiddlerByFilter(filter) {
         const tiddlers = await getTiddlers(filter);
         if (tiddlers.length === 0) {
             return;
@@ -291,11 +304,10 @@ export function Tiddlywiki(host) {
 
     async function saveScholarAuthorCites(author, cites) {
         const path = "authors/scholar/update";
-        return request(path, "POST",
-            data = {
-                id: author,
-                works: cites
-            });
+        return request(path, "POST", {
+            id: author,
+            works: cites
+        });
     }
 
 
@@ -305,11 +317,22 @@ export function Tiddlywiki(host) {
             return;
         }
         const filter = `[tag[bibtex-entry]] :filter[get[bibtex-doi]search:title[${doi}]]`;
-        console.log("getTiddlerByDOI filter: " + filter);
-        return getTiddler(filter);
+        //console.log("getTiddlerByDOI filter: " + filter);
+        return getTiddlerByFilter(filter);
     }
 
-
+    async function getTiddlerText(title) {
+        if (!title || title.trim() === "") {
+            // console.error("Title is undefined or empty");
+            return;
+        }
+        const tiddler = await getTiddler(title);
+        if (!tiddler) {
+            // console.error("Tiddler not found for title: " + title);
+            return;
+        }
+        return tiddler.text;
+    }
 
 
 
@@ -320,17 +343,20 @@ export function Tiddlywiki(host) {
         }
 
         const filter = "[tag[bibtex-entry]field:bibtex-url[" + url + "]]";
-        return getTiddler(filter);
+        return getTiddlerByFilter(filter);
     }
 
 
     return {
         do_request:do_request,
+        request: request,
         status: status,
-        getTiddlers: getTiddlers,
         getTiddler: getTiddler,
+        getTiddlers: getTiddlers,
+        getTiddlerByFilter: getTiddlerByFilter,
         getTiddlerByDOI: getTiddlerByDOI,
         getTiddlerByURL: getTiddlerByURL,
+        getTiddlerText: getTiddlerText,
         putTiddler: putTiddler,
         saveScholarAuthorCites: saveScholarAuthorCites
     };

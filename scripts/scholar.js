@@ -249,7 +249,7 @@ async function Scholar(options) {
             return;
         }
         const filter = "[tag[bibtex-entry]field:scholar-cid[" + cid + "]]";
-        return tw.getTiddler(filter);
+        return tw.getTiddlerByFilter(filter);
     }
 
 
@@ -258,7 +258,7 @@ async function Scholar(options) {
             return;
         }
         const filter = "[tag[bibtex-entry]field:scholar-cites[" + cites + "]]";
-        return tw.getTiddler(filter);
+        return tw.getTiddlerByFilter(filter);
     }
 
 
