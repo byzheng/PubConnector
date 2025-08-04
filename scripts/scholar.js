@@ -3,7 +3,8 @@ async function Scholar(options) {
     const this_options = options;
     const tiddlywikiHost = this_options.tiddlywikihost;
     let tiddlerColleague;
-    const tw = Tiddlywiki(tiddlywikiHost);
+    const tw_api = await dynamicLoadScript('scripts/api/tiddlywiki-api.js');
+    const tw = tw_api.Tiddlywiki(options.tiddlywikihost);
     // Main function for Google Scholar
     async function execute() {
         var href = window.location.href;

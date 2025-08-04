@@ -113,7 +113,7 @@ function loadOptions() {
 chrome.action.onClicked.addListener(async () => {
     const options = await loadOptions();
     const schedule = ScheduleTask(options);
-    schedule.scholarSearchDOI();
+    //schedule.scholarSearchDOI();
 });
 
 // Link to TiddlyWiki

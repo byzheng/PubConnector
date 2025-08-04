@@ -2,7 +2,9 @@ async function Banner(options) {
     const this_helper = await dynamicLoadScript('scripts/helper.js');
 
     const this_options = options || {};
-    const this_tw = Tiddlywiki(options.tiddlywikihost);
+    
+    const tw_api = await dynamicLoadScript('scripts/api/tiddlywiki-api.js');
+    const this_tw = tw_api.Tiddlywiki(options.tiddlywikihost);
     const this_icon = Icon(options);
     const this_href = window.location.href;
     let this_container, this_tiddler;

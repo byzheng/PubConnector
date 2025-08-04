@@ -116,7 +116,7 @@ function parseStringArray(value, allowDuplicate = false) {
 
 
 
-function Tiddlywiki(host) {
+export function Tiddlywiki(host) {
     const this_host = host || "http://localhost:8080";
     function request(path, method = "GET", data = null) {
         if (typeof path !== "string" || path.trim() === "") {
@@ -213,7 +213,7 @@ function Tiddlywiki(host) {
     }
 
 
-    saveScholarAuthorCites = async function (author, cites) {
+    async function saveScholarAuthorCites(author, cites) {
         const path = "authors/scholar/update";
         return request(path, "POST",
             data = {
@@ -241,5 +241,4 @@ function Tiddlywiki(host) {
         saveScholarAuthorCites: saveScholarAuthorCites
     };
 }
-
 

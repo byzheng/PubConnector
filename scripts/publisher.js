@@ -4,7 +4,6 @@ async function Publisher(options) {
     const helper = await dynamicLoadScript('scripts/helper.js');
     const this_options = options;
     const tiddlywikiHost = this_options.tiddlywikihost;
-    const tw = Tiddlywiki(tiddlywikiHost);
     const this_href = window.location.href;
     async function execute() {
         var doi = helper.getDOI();
@@ -26,7 +25,8 @@ async function Publisher(options) {
 
         // Insert author and domain information
         if (banner.tiddler()) {
-            TagWidget(options).create(banner.tiddler());
+            const tag_widget = await TagWidget(options);
+            tag_widget.create(banner.tiddler());
         }
         // banner.setWidth();
         // inject reference

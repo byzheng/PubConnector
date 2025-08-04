@@ -1,5 +1,5 @@
 // Create spans for tags of colleagues, domains, places
-function TagWidget(options) {
+async function TagWidget(options) {
     const this_options = options || {};
     const this_host = this_options.tiddlywikihost;
     const this_selector = [
@@ -17,7 +17,9 @@ function TagWidget(options) {
         "div.al-authors-list", // oup.com
         "div.AuthorGroups" // sciencedirect.com
     ];
-    const tw = Tiddlywiki(this_host);
+    const tw_api = await dynamicLoadScript('scripts/api/tiddlywiki-api.js');
+    const tw = tw_api.Tiddlywiki(options.tiddlywikihost);
+    
     function create(target) {
         var ele = document.querySelector(this_selector.join(", "));
         if (ele === undefined) {

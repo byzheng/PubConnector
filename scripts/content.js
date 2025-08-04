@@ -51,8 +51,8 @@ async function main() {
         await publisher.execute();
     }
 
-    colleague(options.tiddlywikihost);
-    context_menu(options);
+    // colleague(options.tiddlywikihost);
+    // context_menu(options);
 
 }
 

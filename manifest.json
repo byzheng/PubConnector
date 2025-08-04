@@ -34,7 +34,8 @@
         "images/FilePdfFilled.svg",
         "images/Copy.svg",
         "images/Googlelens.svg",
-        "scripts/helper.js"
+        "scripts/helper.js",
+        "scripts/api/tiddlywiki-api.js"
       ],
       "matches": [
         "*://*/*"
@@ -64,7 +65,6 @@
         "scripts/banner.js",
         "scripts/colleague.js",
         "scripts/tags.js",
-        "scripts/api/tiddlywiki-api.js",
         "scripts/api/zotero-api.js",
         "scripts/api/crossref.js",
         "scripts/tiddlywiki_host.js",
