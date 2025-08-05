@@ -100,7 +100,35 @@ async function Scholar(options) {
                 continue;
             }
             target.appendChild(span);
+            // Update authors for this item
+            const authorLinks = items[i].querySelectorAll('div.gs_a > a');
+            authorLinks.forEach(async link => {
+                const href = link.getAttribute('href');
+                if (!href) {
+                    return;
+                }
+                const id = getScholarUserFromUrl(href);
+                if (!id) {
+                    return;
+                }
+                var filter = `[tag[Colleague]search:google-scholar[${id}]]`;
+                const tiddler = await tw.getTiddlerByFilter(filter);
+                if (!tiddler || !tiddler.title) {
+                    return;
+                }
+                link.textContent = tiddler.title;
+                link.classList.add("tw-scholar-author"); // Add class tw-tag
+            });
+
             setItemStyle(items[i]);
+        }
+    }
+    function getScholarUserFromUrl(url) {
+        try {
+            const parsedUrl = new URL(url, window.location.origin);
+            return parsedUrl.searchParams.get("user");
+        } catch (e) {
+            return null;
         }
     }
 

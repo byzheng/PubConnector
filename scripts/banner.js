@@ -25,7 +25,7 @@ async function Banner(options) {
         var filter = `[tag[Colleague]search:${field}[${id}]]`;
         this_tiddler = await this_tw.getTiddlerByFilter(filter);
         if (!this_tiddler) {
-            console.error("No tiddler found for filter: " + filter);
+            //console.error("No tiddler found for filter: " + filter);
             return;
         }
     }
