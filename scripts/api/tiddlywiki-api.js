@@ -81,38 +81,6 @@ async function tiddlywikiPutTiddler(title, tags = [], fields = {}, host) {
 }
 
 
-/**
- * parseStringArray - Parses a TiddlyWiki-style string array into a JS array.
- * 
- * Adapted from: TiddlyWiki5 $tw.utils.parseStringArray
- * Source: https://github.com/TiddlyWiki/TiddlyWiki5
- * License: BSD 3-Clause (https://github.com/TiddlyWiki/TiddlyWiki5/blob/master/LICENSE)
- * 
- * Copyright (c) 2011–2024 Jeremy Ruston
- */
-function parseStringArray(value, allowDuplicate = false) {
-    if (typeof value === "string") {
-        const memberRegExp = /(?:^|[^\S\xA0])(?:\[\[(.*?)\]\])(?=[^\S\xA0]|$)|([\S\xA0]+)/mg;
-        const results = [];
-        const names = {};
-        let match;
-        do {
-            match = memberRegExp.exec(value);
-            if (match) {
-                const item = match[1] || match[2];
-                if (item !== undefined && (!names.hasOwnProperty(item) || allowDuplicate)) {
-                    results.push(item);
-                    names[item] = true;
-                }
-            }
-        } while (match);
-        return results;
-    } else if (Array.isArray(value)) {
-        return value;
-    } else {
-        return null;
-    }
-}
 
 export function Tiddlywiki(host) {
     const this_host = host || "http://localhost:8080";
@@ -346,6 +314,40 @@ export function Tiddlywiki(host) {
         return getTiddlerByFilter(filter);
     }
 
+        
+    /**
+     * parseStringArray - Parses a TiddlyWiki-style string array into a JS array.
+     * 
+     * Adapted from: TiddlyWiki5 $tw.utils.parseStringArray
+     * Source: https://github.com/TiddlyWiki/TiddlyWiki5
+     * License: BSD 3-Clause (https://github.com/TiddlyWiki/TiddlyWiki5/blob/master/LICENSE)
+     * 
+     * Copyright (c) 2011–2024 Jeremy Ruston
+     */
+    function parseStringArray(value, allowDuplicate = false) {
+        if (typeof value === "string") {
+            const memberRegExp = /(?:^|[^\S\xA0])(?:\[\[(.*?)\]\])(?=[^\S\xA0]|$)|([\S\xA0]+)/mg;
+            const results = [];
+            const names = {};
+            let match;
+            do {
+                match = memberRegExp.exec(value);
+                if (match) {
+                    const item = match[1] || match[2];
+                    if (item !== undefined && (!names.hasOwnProperty(item) || allowDuplicate)) {
+                        results.push(item);
+                        names[item] = true;
+                    }
+                }
+            } while (match);
+            return results;
+        } else if (Array.isArray(value)) {
+            return value;
+        } else {
+            return null;
+        }
+    }
+
 
     return {
         do_request:do_request,
@@ -358,7 +360,8 @@ export function Tiddlywiki(host) {
         getTiddlerByURL: getTiddlerByURL,
         getTiddlerText: getTiddlerText,
         putTiddler: putTiddler,
-        saveScholarAuthorCites: saveScholarAuthorCites
+        saveScholarAuthorCites: saveScholarAuthorCites,
+        parseStringArray: parseStringArray
     };
 }
 

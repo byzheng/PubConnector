@@ -29,6 +29,14 @@ export async function UpdateScholar(options) {
         const limitText = await this_tw.getTiddlerText("$:/config/tw-connector/authoring/scholar/limit");
         return limitText && !isNaN(parseInt(limitText)) ? parseInt(limitText) : 5;
     }
+    async function AutoCloseTab() {
+        const enabledText = await this_tw.getTiddlerText("$:/config/tw-connector/authoring/scholar/auto-close");
+        if (!enabledText || typeof enabledText !== "string") {
+            return false;
+        }
+        return enabledText.trim().toLowerCase() === "enable" ? true : false;
+        
+    }
     async function Pending() {
         const path =  "/authors/scholar/pending";
         try {
@@ -51,22 +59,30 @@ export async function UpdateScholar(options) {
             return limit;
         }
         const limitedPendingIds = pendingIds.slice(0, Math.min(limit, pendingIds.length));
+        const autoClose = await AutoCloseTab();
         for (const scholarId of limitedPendingIds) {
             const url = `https://scholar.google.com/citations?user=${encodeURIComponent(scholarId)}`;
             const tab = await chrome.tabs.create({ url, active: false });
             await waitForTabToLoad(tab.id);
             await helper.delay(2000);
-            // Optionally: chrome.tabs.remove(tab.id);
+            if (autoClose) {
+                chrome.tabs.remove(tab.id);
+            }
         }
         const remainingLimit = Math.max(0, limit - limitedPendingIds.length);
         return remainingLimit;
     }
 
     async function DoUpdateCites(limit) {
-        if (!limit || isNaN(limit) || limit <= 0) {
+        if (limit === undefined || isNaN(limit) || limit < 0) {
             console.error("Invalid limit for scholar updates:", limit);
             return;
         }
+        if (limit === 0) {
+            return;
+        }
+        const autoClose = await AutoCloseTab();
+        
         const filter = `[tag[bibtex-entry]has[bibtex-doi]!has:field[scholar-cid]limit[${limit}]]`;
 
         const tiddlers = await this_tw.getTiddlers(filter);
@@ -80,7 +96,9 @@ export async function UpdateScholar(options) {
             const tab = await chrome.tabs.create({ url, active: false });
             await waitForTabToLoad(tab.id);
             await helper.delay(2000);
-            // chrome.tabs.remove(tab.id);
+            if (autoClose) {
+                chrome.tabs.remove(tab.id);
+            }
         }
     }
     async function DoUpdate() {

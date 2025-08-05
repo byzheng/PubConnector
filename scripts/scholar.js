@@ -129,7 +129,7 @@ async function Scholar(options) {
             }
             // Authoring this item if there are missing colleague
             if (!(tiddlerColleague && tiddler.tags && tiddler.tags.includes(tiddlerColleague.title))) {
-                const oldTags = parseStringArray(tiddler.tags);
+                const oldTags = tw.parseStringArray(tiddler.tags);
                 const mergedTags = Array.from(new Set([...oldTags, tiddlerColleague.title]));
                 await tw.putTiddler(tiddler.title, tags = mergedTags, fields = []);
             }
