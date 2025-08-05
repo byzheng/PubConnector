@@ -174,7 +174,7 @@ export async function ScheduleTask(options) {
     }
 
     function isValidMinute(minute) {
-        return minute === -1 || (Number.isInteger(minute) && minute >= 0 && minute <= 59);
+        return minute === -1 || (Number.isInteger(minute) && minute >= 0 && minute <= 58);
     }
 
     function shouldRunNow(now, hourStr, minuteStr) {
@@ -193,7 +193,7 @@ export async function ScheduleTask(options) {
         if (lastRun === key) return false;
 
         const matchHour = (hour === -1 || nowHour === hour);
-        const matchMinute = (minute === -1 || nowMinute === minute);
+        const matchMinute = (minute === -1 || nowMinute === minute + 1); // Allow one minute grace period
         
         if (matchHour && matchMinute) {
             lastRun = key;
