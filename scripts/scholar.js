@@ -101,7 +101,7 @@ async function Scholar(options) {
             }
             target.appendChild(span);
             // Update authors for this item
-            const authorLinks = items[i].querySelectorAll('div.gs_a > a');
+            const authorLinks = items[i].querySelectorAll('a');
             authorLinks.forEach(async link => {
                 const href = link.getAttribute('href');
                 if (!href) {
@@ -126,7 +126,11 @@ async function Scholar(options) {
     function getScholarUserFromUrl(url) {
         try {
             const parsedUrl = new URL(url, window.location.origin);
-            return parsedUrl.searchParams.get("user");
+            // Check if the path contains 'citations'
+            if (parsedUrl.pathname.includes('citations')) {
+                return parsedUrl.searchParams.get("user");
+            }
+            return null;
         } catch (e) {
             return null;
         }
