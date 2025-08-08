@@ -30,11 +30,16 @@ export function getDOI() {
         "meta[name='dc.Identifier' i]",
         "meta[name='citation_doi' i]",
         "meta[property='citation_doi' i]",
+        "meta[name='DC.Identifier.DOI' i]",
         'ul.nova-legacy-e-list li +li a.nova-legacy-e-link[href*="doi.org"]', // for researchgate
         'div strong +a[href*="doi.org"]', // for IEEE
         'li[data-test-id="paper-doi"] .doi__link' // for sematic
     ];
 
+    function isValidDOI(doi) {
+        const doiRegex = /^10.\d{4,9}\/[-._;()/:a-zA-Z0-9]+$/;
+        return doiRegex.test(doi);
+    }
     var doi;
     for (let i = 0; i < doi_sel.length; i++) {
 
@@ -49,18 +54,15 @@ export function getDOI() {
                 break;
             }
         }
-
+        if (!doi) {
+            continue;
+        }
         doi = doi.replace('doi:', '');
         doi = doi.replace(/^(https?:\/\/.*?doi\.org\/)?/, '');
-        break;
-    }
-    function isValidDOI(doi) {
-        const doiRegex = /^10.\d{4,9}\/[-._;()/:a-zA-Z0-9]+$/;
-        return doiRegex.test(doi);
+        if (isValidDOI(doi)) {
+            return doi;
+        }
     }
 
-    if (!isValidDOI(doi)) {
-        return;
-    }
-    return doi;
+    return;
 }

@@ -128,6 +128,7 @@ function getDOI() {
         "meta[name='dc.Identifier' i]",
         "meta[name='citation_doi' i]",
         "meta[property='citation_doi' i]",
+        "meta[name='DC.Identifier.DOI' i]",
         'ul.nova-legacy-e-list li +li a.nova-legacy-e-link[href*="doi.org"]', // for researchgate
         'div strong +a[href*="doi.org"]', // for IEEE
         'li[data-test-id="paper-doi"] .doi__link' // for sematic
