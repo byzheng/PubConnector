@@ -83,7 +83,7 @@ export async function UpdateScholar(options) {
         }
         const autoClose = await AutoCloseTab();
         
-        const filter = `[tag[bibtex-entry]has[bibtex-doi]!has:field[scholar-cites]limit[${limit}]]`;
+        const filter = `[tag[bibtex-entry]has[bibtex-doi]!has:field[scholar-cites]] [tag[bibtex-entry]has[bibtex-doi]!has:field[scholar-cid]] +[limit[${limit}]]`;
 
         const tiddlers = await this_tw.getTiddlers(filter);
         for (const tiddler of tiddlers) {
