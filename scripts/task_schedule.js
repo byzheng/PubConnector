@@ -26,7 +26,7 @@ export async function UpdateScholar(options) {
         return enabledText.trim().toLowerCase() === "enable" ? true : false;
     }
     async function Limit() {
-        const limitText = await this_tw.getTiddlerText("$:/config/tw-connector/authoring/scholar/limit");
+        const limitText = await this_tw.getTiddlerText("$:/config/tw-connector/authoring/scholar/daily-limit");
         return limitText && !isNaN(parseInt(limitText)) ? parseInt(limitText) : 5;
     }
     async function AutoCloseTab() {
