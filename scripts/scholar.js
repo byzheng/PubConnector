@@ -247,9 +247,11 @@ async function Scholar(options) {
             // Extract DOIs from item.outerHTML and from the "q" parameter in href
             const href = window.location.href;
             // Merge item.outerHTML and href for DOI extraction
-            const mergedText = item.outerHTML + " " + href;
+            //const mergedText = item.outerHTML + " " + href;
+            const mergedText = href + "" + item.outerHTML;
+            
             const dois = helper.extractDOIs(mergedText);
-            if (dois.length === 1) {
+            if (dois.length > 0) {
                 tiddler = await tw.getTiddlerByDOI(dois[0]);
             }
         }

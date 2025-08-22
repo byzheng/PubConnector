@@ -52,7 +52,7 @@ async function main() {
     }
 
     // colleague(options.tiddlywikihost);
-    // context_menu(options);
+    context_menu(options);
 
 }
 
