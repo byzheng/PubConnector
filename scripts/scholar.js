@@ -17,9 +17,9 @@ async function Scholar(options) {
             await processScholarItems();
         }
         // open all links in new tab
-        document.querySelectorAll('a').forEach(link => {
-            link.setAttribute('target', '_blank');
-        });
+        // document.querySelectorAll('a').forEach(link => {
+        //     link.setAttribute('target', '_blank');
+        // });
 
     }
     async function authorPage(sid) {
