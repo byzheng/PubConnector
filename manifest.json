@@ -63,7 +63,6 @@
         "scripts/content.js",
         "scripts/publisher.js",
         "scripts/banner.js",
-        "scripts/colleague.js",
         "scripts/tags.js",
         "scripts/api/zotero-api.js",
         "scripts/api/crossref.js",
