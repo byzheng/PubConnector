@@ -177,7 +177,7 @@ export async function ScheduleTask(options) {
         return minute === -1 || (Number.isInteger(minute) && minute >= 0 && minute <= 58);
     }
 
-    function shouldRunNow(now, hourStr, minuteStr) {
+    async function shouldRunNow(now, hourStr, minuteStr) {
         const hour = parseInt(hourStr);
         const minute = parseInt(minuteStr);
         const nowHour = now.getHours();
@@ -188,6 +188,26 @@ export async function ScheduleTask(options) {
             console.warn(`⚠️ Invalid schedule time: hour=${hourStr}, minute=${minuteStr}`);
             return false;
         }
+
+        // Check if 24 hours have passed since last update
+        const lastUpdateKey = 'tw-connector-last-update';
+        const lastUpdate = await chrome.storage.local.get(lastUpdateKey);
+        const lastUpdateTime = lastUpdate[lastUpdateKey] ? new Date(lastUpdate[lastUpdateKey]) : null;
+        console.log("Last update time:", lastUpdateTime);
+        if (lastUpdateTime) {
+            const timeDiff = now.getTime() - lastUpdateTime.getTime();
+            const hoursDiff = timeDiff / (1000 * 60 * 60);
+            
+            if (hoursDiff >= 24) {
+            console.log("⏰ 24+ hours passed since last update, triggering update");
+            await chrome.storage.local.set({ [lastUpdateKey]: now.toISOString() });
+            return true;
+            }
+        } else {
+            // First run, set initial timestamp
+            await chrome.storage.local.set({ [lastUpdateKey]: now.toISOString() });
+        }
+
 
         // Prevent repeated execution
         if (lastRun === key) return false;
@@ -205,13 +225,14 @@ export async function ScheduleTask(options) {
         console.log("⏰ Auto update scheduled to run daily at", await Hour(), ":", await Minute());
         setInterval(async () => {
             const enabled = await Enable();
+            console.log("Auto update enabled:", enabled);
             if (!enabled) return;
 
             const now = new Date();
             const hour = await Hour();
             const minute = await Minute();
-
-            if (shouldRunNow(now, hour, minute)) {
+            const shouldRun = await shouldRunNow(now, hour, minute);
+            if (shouldRun) {
                 console.log("⏰ Auto update triggered at", now.toLocaleString());
                 await this_update.doUpdate();
                 console.log("✅ Auto update caches started successfully.");

@@ -75,7 +75,7 @@
         "styles/bibtex.css"
       ],
       "run_at": "document_end",
-      "matches": ["<all_urls>"]
+      "matches": ["http://*/*", "https://*/*"]
     }
   ]
 }

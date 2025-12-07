@@ -151,7 +151,11 @@ function Icon(options, container) {
         const elements = createElementByURL("#", "images/Save.svg", container)
         elements[0].addEventListener("click", function (event) {
             event.preventDefault();
-            importBibtexToTiddlyWikiByDOI(doi, this_options);
+            importBibtexToTiddlyWikiByDOI(doi, this_options).then(() => {
+                window.location.reload();
+            }).catch(err => {
+                console.error("Failed to import bibtex: ", err);
+            });
         });
     }
 
