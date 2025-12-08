@@ -189,34 +189,40 @@ export async function ScheduleTask(options) {
             return false;
         }
 
-        // Check if 24 hours have passed since last update
         const lastUpdateKey = 'tw-connector-last-update';
         const lastUpdate = await chrome.storage.local.get(lastUpdateKey);
         const lastUpdateTime = lastUpdate[lastUpdateKey] ? new Date(lastUpdate[lastUpdateKey]) : null;
-        console.log("Last update time:", lastUpdateTime);
+        const todayDate = now.toDateString();
+
+        // Check if already run today
         if (lastUpdateTime) {
+            const lastUpdateDate = new Date(lastUpdateTime).toDateString();
+            if (lastUpdateDate === todayDate) {
+                return false;
+            }
+
+            // If 24+ hours have passed since last update, run immediately
             const timeDiff = now.getTime() - lastUpdateTime.getTime();
             const hoursDiff = timeDiff / (1000 * 60 * 60);
-            
             if (hoursDiff >= 24) {
-            console.log("⏰ 24+ hours passed since last update, triggering update");
-            await chrome.storage.local.set({ [lastUpdateKey]: now.toISOString() });
-            return true;
+                console.log("⏰ 24+ hours passed since last update, triggering catch-up update");
+                await chrome.storage.local.set({ [lastUpdateKey]: now.toISOString() });
+                lastRun = key;
+                return true;
             }
-        } else {
-            // First run, set initial timestamp
-            await chrome.storage.local.set({ [lastUpdateKey]: now.toISOString() });
         }
 
-
-        // Prevent repeated execution
+        // Prevent repeated execution within the same minute
         if (lastRun === key) return false;
 
+        // Check if current time matches scheduled time (with 2-minute grace window)
         const matchHour = (hour === -1 || nowHour === hour);
-        const matchMinute = (minute === -1 || nowMinute === minute + 1); // Allow one minute grace period
+        const matchMinute = (minute === -1 || (nowMinute >= minute && nowMinute <= minute + 2));
         
         if (matchHour && matchMinute) {
+            // Mark as run and execute
             lastRun = key;
+            await chrome.storage.local.set({ [lastUpdateKey]: now.toISOString() });
             return true;
         }
         return false;
