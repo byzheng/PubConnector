@@ -227,27 +227,37 @@ export async function ScheduleTask(options) {
         }
         return false;
     }
+    async function CheckAndRun() {
+        const enabled = await Enable();
+        console.log("Auto update enabled:", enabled);
+        if (!enabled) return;
+
+        const now = new Date();
+        const hour = await Hour();
+        const minute = await Minute();
+        const shouldRun = await shouldRunNow(now, hour, minute);
+        if (shouldRun) {
+            console.log("⏰ Auto update triggered at", now.toLocaleString());
+            await this_update.doUpdate();
+            console.log("✅ Auto update caches started successfully.");
+        }
+    }
+
     async function Update() {
-        console.log("⏰ Auto update scheduled to run daily at", await Hour(), ":", await Minute());
-        setInterval(async () => {
-            const enabled = await Enable();
-            console.log("Auto update enabled:", enabled);
-            if (!enabled) return;
-
-            const now = new Date();
-            const hour = await Hour();
-            const minute = await Minute();
-            const shouldRun = await shouldRunNow(now, hour, minute);
-            if (shouldRun) {
-                console.log("⏰ Auto update triggered at", now.toLocaleString());
-                await this_update.doUpdate();
-                console.log("✅ Auto update caches started successfully.");
-                return;
-            }
-
-       }, 60 * 1000); // Check every minute
+        const hour = await Hour();
+        const minute = await Minute();
+        console.log("⏰ Auto update scheduled to run daily at", hour, ":", minute);
+        
+        // Create a persistent alarm that checks every minute
+        chrome.alarms.create('tw-connector-schedule', {
+            periodInMinutes: 1
+        });
+        
+        // Run initial check
+        await CheckAndRun();
     }
     return {
-        Update: Update
+        Update: Update,
+        CheckAndRun: CheckAndRun
     };  
 }

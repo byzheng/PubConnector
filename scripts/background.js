@@ -118,21 +118,30 @@ function loadOptions() {
     });
 }
 
+// Global schedule object
+let scheduleTask = null;
 
 chrome.action.onClicked.addListener(async () => {
     const options = await loadOptions();
     const updateData = await UpdateData(options);
     await updateData.doUpdate();
-    
 });
 
-async function runScheduleUpdate() {
-    const options = await loadOptions();
-    const schedule = await ScheduleTask(options);
-    schedule.Update();
-}
 
-runScheduleUpdate();
+// Initialize scheduled updates on extension startup
+(async function() {
+    const options = await loadOptions();
+    scheduleTask = await ScheduleTask(options);
+    scheduleTask.Update();
+})();
+
+
+// Listen for alarms to trigger scheduled tasks
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+    if (alarm.name === 'tw-connector-schedule' && scheduleTask) {
+        await scheduleTask.CheckAndRun();
+    }
+});
 
 // Link to TiddlyWiki
 function linkTiddlywiki(request) {
