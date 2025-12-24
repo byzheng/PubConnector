@@ -49,12 +49,12 @@ async function Scholar(options) {
         const items = document.querySelectorAll("tr.gsc_a_tr");
         const allCites = [];
         for (let item of items) {
-            const cites = getCitesFromAuthorPage(item);
-            if (!cites) {
+            const item_meta = getCitesFromAuthorPage(item);
+            if (!item_meta) {
                 continue;
             }
 
-            allCites.push(...cites);
+            allCites.push(item_meta);
         }
         await tw.saveScholarAuthorCites(sid, allCites);
     }
@@ -172,6 +172,14 @@ async function Scholar(options) {
 
 
     function getCitesFromAuthorPage(item) {
+        const ele_a = item.querySelector("td.gsc_a_t > a");
+        if (!ele_a) {
+            return;
+        }
+        const link = ele_a.getAttribute("href");
+        const title = ele_a.textContent;
+        const author = ele_a.nextElementSibling ? ele_a.nextElementSibling.textContent : "";
+        const publisher = ele_a.nextElementSibling && ele_a.nextElementSibling.nextElementSibling ? ele_a.nextElementSibling.nextElementSibling.textContent : "";
         var href_cites = item.querySelector("td.gsc_a_c > a").getAttribute("href");
         if (!href_cites) {
             return;
@@ -184,16 +192,26 @@ async function Scholar(options) {
         if (!cites) {
             return;
         }
-        if (cites.includes(",")) {
-            return cites.split(",").map(s => s.trim());
-        }
-        return [cites];
+        var year = item.querySelector("td.gsc_a_y").textContent;
+        // if (cites.includes(",")) {
+        //     return cites.split(",").map(s => s.trim());
+        // }
+        return {
+            title: title, 
+            author: author,
+            publisher: publisher, 
+            link: link, 
+            year: year,
+            cites: cites
+    };
     }
     async function getTiddlerForCitationItem(item) {
-        const cites = getCitesFromAuthorPage(item);
+        let cites = getCitesFromAuthorPage(item);
         if (!cites) {
             return;
         }
+        cites = cites.cites;
+        cites = cites.split(",").map(s => s.trim());
         // if cites is an array, we will get the first one
         if (!Array.isArray(cites)) {
             return;
