@@ -19,18 +19,18 @@ export async function UpdateScholar(options) {
     const this_options = options;
     const this_tw = await Tiddlywiki(options.tiddlywikihost);
     async function Enable() {
-        const enabledText = await this_tw.getTiddlerText("$:/config/tw-connector/authoring/scholar/enable");
+        const enabledText = await this_tw.getTiddlerText("$:/config/tw-literature/authoring/scholar/enable");
         if (!enabledText || typeof enabledText !== "string") {
             return false;
         }
         return enabledText.trim().toLowerCase() === "enable" ? true : false;
     }
     async function Limit() {
-        const limitText = await this_tw.getTiddlerText("$:/config/tw-connector/authoring/scholar/daily-limit");
+        const limitText = await this_tw.getTiddlerText("$:/config/tw-literature/authoring/scholar/daily-limit");
         return limitText && !isNaN(parseInt(limitText)) ? parseInt(limitText) : 5;
     }
     async function AutoCloseTab() {
-        const enabledText = await this_tw.getTiddlerText("$:/config/tw-connector/authoring/scholar/auto-close");
+        const enabledText = await this_tw.getTiddlerText("$:/config/tw-literature/authoring/scholar/auto-close");
         if (!enabledText || typeof enabledText !== "string") {
             return false;
         }
@@ -140,9 +140,9 @@ export async function ScheduleTask(options) {
     const this_tw = await Tiddlywiki(options.tiddlywikihost);
     const this_update = await UpdateData(options);
 
-    const ENABLE_TIDDLER = "$:/config/tw-connector/authoring/auto-update/enable";
-    const HOUR_TIDDLER = "$:/config/tw-connector/authoring/auto-update/hour";
-    const MINUTE_TIDDLER = "$:/config/tw-connector/authoring/auto-update/minute";
+    const ENABLE_TIDDLER = "$:/config/tw-literature/authoring/auto-update/enable";
+    const HOUR_TIDDLER = "$:/config/tw-literature/authoring/auto-update/hour";
+    const MINUTE_TIDDLER = "$:/config/tw-literature/authoring/auto-update/minute";
 
     async function Enable() {
         const enabledText = await this_tw.getTiddlerText(ENABLE_TIDDLER);
@@ -189,7 +189,7 @@ export async function ScheduleTask(options) {
             return false;
         }
 
-        const lastUpdateKey = 'tw-connector-last-update';
+        const lastUpdateKey = 'tw-literature-last-update';
         const lastUpdate = await chrome.storage.local.get(lastUpdateKey);
         const lastUpdateTime = lastUpdate[lastUpdateKey] ? new Date(lastUpdate[lastUpdateKey]) : null;
         const todayDate = now.toDateString();
@@ -249,7 +249,7 @@ export async function ScheduleTask(options) {
         console.log("⏰ Auto update scheduled to run daily at", hour, ":", minute);
         
         // Create a persistent alarm that checks every minute
-        chrome.alarms.create('tw-connector-schedule', {
+        chrome.alarms.create('tw-literature-schedule', {
             periodInMinutes: 1
         });
         

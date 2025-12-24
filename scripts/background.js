@@ -138,7 +138,7 @@ chrome.action.onClicked.addListener(async () => {
 
 // Listen for alarms to trigger scheduled tasks
 chrome.alarms.onAlarm.addListener(async (alarm) => {
-    if (alarm.name === 'tw-connector-schedule' && scheduleTask) {
+    if (alarm.name === 'tw-literature-schedule' && scheduleTask) {
         await scheduleTask.CheckAndRun();
     }
 });

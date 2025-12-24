@@ -1,5 +1,5 @@
 function Hidden() {
-    const hidden_class = "tw-connector-hidden";
+    const hidden_class = "tw-literature-hidden";
     // Helper function to create a span to link back to Tiddlywiki
     function create(element) {
         var span = document.createElement("span");
