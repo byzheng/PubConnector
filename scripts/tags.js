@@ -15,7 +15,8 @@ async function TagWidget(options) {
         "span.editors", // publish.csiro.au
         "div.accordion-tabbed", // wiley.com
         "div.al-authors-list", // oup.com
-        "div.AuthorGroups" // sciencedirect.com
+        "div.AuthorGroups", // sciencedirect.com
+        "div.author-group" // new interface of sciencedirect.com
     ];
     const tw_api = await dynamicLoadScript('scripts/api/tiddlywiki-api.js');
     const tw = tw_api.Tiddlywiki(options.tiddlywikihost);
