@@ -109,6 +109,11 @@ async function Publisher(options) {
             const match = str.match(/^B(\d+)-/);
             return match ? `ref_${match[1]}` : null;
         }
+        function get_href_id_connectsci(element) {
+            const refId = element.getAttribute('data-modal-source-id');
+            return refId ? refId : null;            
+        }
+
 
         // Mapping of site-specific settings
         // Mapping of site-specific settings
@@ -162,6 +167,11 @@ async function Publisher(options) {
                 css_reference: 'a[href^="#B"]',
                 getRefSelector: element => `div.References:has(a[id="${get_href_id(element)}"])`,
                 getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(get_href_id(element)))
+            },
+            "connectsci.au": {
+                css_reference: 'a.link.link-ref[data-modal-source-id',
+                getRefSelector: element => `div[data-content-id="${get_href_id_connectsci(element)}" i]`,
+                getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(get_href_id_connectsci(element)))
             }
         };
 
