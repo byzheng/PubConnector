@@ -116,7 +116,11 @@ async function Publisher(options) {
 
 
         // Mapping of site-specific settings
-        // Mapping of site-specific settings
+        // For each supported site, define:
+        // - css_reference: CSS selector to find reference links
+        // - getRefSelector: function to get the selector for the full reference element
+        // - getCrossRefKey: function to find the corresponding crossref entry as crossref might contain the reference ID used in the website/publisher
+        // - extractEID: (optional) function to extract Scopus EID if applicable only for ScienceDirect
         const siteConfig = {
             "sciencedirect.com": {
                 css_reference: 'a.anchor.anchor-primary[data-xocs-content-type="reference"]',
