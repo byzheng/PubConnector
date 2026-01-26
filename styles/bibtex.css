@@ -1,18 +1,31 @@
-#tw-banner  {
-    all: initial; 
+#tw-banner {
+    all: initial;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4em;
+    white-space: nowrap;
+
     position: fixed;
     top: 1em;
     right: 2em;
     min-width: 100px;
     height: 55px;
     z-index: 99999;
+
+    box-sizing: border-box;
+    padding: 0.1em 0.3em;
     border: 1px solid #ccc;
     border-radius: 1.5em;
-    vertical-align: middle;
-    text-align: center;
-    padding: 0.1em 0.3em 0.1em 0.3em;
-    background-color:#c8ccc9;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background-color: #c8ccc9;
+    box-shadow: 0 4px 8px rgba(0,0,0,.2),
+                0 6px 20px rgba(0,0,0,.19);
+
+    /* restore typography */
+    font-size: 14px;
+    line-height: 1;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 #tw-banner:before {
