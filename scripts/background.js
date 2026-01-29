@@ -121,6 +121,43 @@ function loadOptions() {
 // Global schedule object
 let scheduleTask = null;
 
+// WebSocket connection for TiddlyWiki
+let ws = null;
+
+async function connectWebSocket() {
+    const options = await loadOptions();
+    const url = new URL(options.tiddlywikihost);
+    
+    // Use default port 80 if port is empty
+    const port = url.port ? url.port : (url.protocol === "https:" ? "443" : "80");
+    const wsUrl = `ws://${url.hostname}:${port}/ws`;
+
+    try {
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = function() {
+            console.log("WebSocket connected to TiddlyWiki");
+        };
+
+        ws.onclose = function() {
+            console.log("WebSocket disconnected, reconnecting...");
+            // Reconnect after 3 seconds
+            setTimeout(connectWebSocket, 3000);
+        };
+
+        ws.onerror = function(error) {
+            console.error("WebSocket error:", error);
+        };
+
+        ws.onmessage = function(event) {
+            console.log("Message from server:", event.data);
+        };
+    } catch (error) {
+        console.error("Failed to create WebSocket:", error);
+        setTimeout(connectWebSocket, 3000);
+    }
+}
+
 chrome.action.onClicked.addListener(async () => {
     const options = await loadOptions();
     const updateData = await UpdateData(options);
@@ -133,6 +170,9 @@ chrome.action.onClicked.addListener(async () => {
     const options = await loadOptions();
     scheduleTask = await ScheduleTask(options);
     scheduleTask.Update();
+    
+    // Initialize WebSocket connection
+    await connectWebSocket();
 })();
 
 
@@ -143,52 +183,21 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
     }
 });
 
-// Link to TiddlyWiki
+// Link to TiddlyWiki via WebSocket
 function linkTiddlywiki(request) {
-    let url = new URL("/", request.host).toString();
-
-    chrome.tabs.query({ url: url }, async function (tabs) {
-        let tab;
-
-        if (tabs.length === 0) {
-            tab = await new Promise((resolve) => {
-                chrome.tabs.create({ url: url }, resolve);
-            });
-        } else {
-            tab = tabs[0];
-        }
-
-        // Ensure tab has a windowId before updating
-        if (!tab.windowId) {
-            tab = await new Promise((resolve) => {
-                chrome.tabs.get(tab.id, resolve);
-            });
-        }
-
-        // Ensure window and tab are focused
-        await chrome.windows.update(tab.windowId, { focused: true });
-        await chrome.tabs.update(tab.id, { active: true });
-
-        // Check tab status before waiting
-        let tabInfo = await new Promise((resolve) => chrome.tabs.get(tab.id, resolve));
-
-        if (tabInfo.status !== "complete") {
-            // Wait only if the tab is still loading
-            await new Promise((resolve) => {
-                chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
-                    if (tabId === tab.id && changeInfo.status === "complete") {
-                        chrome.tabs.onUpdated.removeListener(listener);
-                        resolve();
-                    }
-                });
-            });
-        }
-        // Now send the message
-        chrome.tabs.sendMessage(tab.id, {
-            from: "worker",
-            request: request
-        });
-    });
+    // Send message via WebSocket
+    console.log("linkTiddlywiki called with request:", request);
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            type: "open-tiddler",
+            title: request.tiddler
+        }));
+        console.log("Sent open-tiddler message via WebSocket");
+    } else {
+        console.warn("WebSocket not connected, cannot send message");
+        // Optionally, try to reconnect
+        connectWebSocket();
+    }
 }
 
 

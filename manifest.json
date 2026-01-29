@@ -67,7 +67,6 @@
         "scripts/tags.js",
         "scripts/api/zotero-api.js",
         "scripts/api/crossref.js",
-        "scripts/tiddlywiki_host.js",
         "scripts/zotero.js",
         "scripts/tiddler.js",
         "scripts/icon.js"
