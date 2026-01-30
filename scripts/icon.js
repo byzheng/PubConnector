@@ -147,11 +147,11 @@ function Icon(options, container) {
         createElementByURL(url, "images/LinkOut.svg", container);
     }
 
-    function saveTwItem(doi, container) {
+    function saveTwItem(doi, container, tw_api) {
         const elements = createElementByURL("#", "images/Save.svg", container)
         elements[0].addEventListener("click", function (event) {
             event.preventDefault();
-            importBibtexToTiddlyWikiByDOI(doi, this_options).then(() => {
+            importBibtexToTiddlyWikiByDOI(doi, this_options, tw_api).then(() => {
                 window.location.reload();
             }).catch(err => {
                 console.error("Failed to import bibtex: ", err);

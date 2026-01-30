@@ -1,4 +1,4 @@
-async function importBibtexToTiddlyWikiByDOI(doi, options) {
+async function importBibtexToTiddlyWikiByDOI(doi, options, tw_api) {
 
     // Get Zotero items
     const item = await zoteroSearchItemsByDOI(doi, options.zoterohost);
@@ -46,14 +46,15 @@ async function importBibtexToTiddlyWikiByDOI(doi, options) {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     // send bibtex entry to tiddlywiki
+
+    await tw_api.addNewBibtex(bibtex);
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     chrome.runtime.sendMessage({
         from: "webpage",
-        doi: doi,
-        method: "new_bibtex_entry",
-        bibtex: bibtex,
-        title: foundCiteKey,
-        host: options.tiddlywikihost,
-        pdf_key: pdf_key
+        method: "open-tiddler",
+        tiddler: foundCiteKey
     });
 
     

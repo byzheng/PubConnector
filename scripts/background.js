@@ -66,11 +66,11 @@ chrome.runtime.onMessage.addListener(
 
 // Popup menu
 chrome.runtime.onInstalled.addListener(async () => {
-    chrome.contextMenus.create({
-        title: "Send image to Tiddlywiki",
-        id: "tw-send-image",
-        contexts: ["image"]
-    });
+    // chrome.contextMenus.create({
+    //     title: "Send image to Tiddlywiki",
+    //     id: "tw-send-image",
+    //     contexts: ["image"]
+    // });
     // chrome.contextMenus.create({
     //     parentId: "tw-research",
     //     id: "item-hidden",
@@ -83,30 +83,30 @@ chrome.runtime.onInstalled.addListener(async () => {
     // })
 });
 
-chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-    let context_menus = ['tw-send-image'];
-    if (context_menus.includes(info.menuItemId)) {
-        // Use the tab parameter if available (most reliable for context menu actions)
-        let targetTab = tab;
-        if (!targetTab) {
-            // Fallback: try to get the active tab (may not work for popout/modal windows)
-            const tabs = await chrome.tabs.query({
-                active: true,
-                lastFocusedWindow: true
-            });
-            targetTab = tabs[0];
-        }
-        if (targetTab) {
-            // send message to content script to ask for details from the DOM about the context link
-            await chrome.tabs.sendMessage(targetTab.id, {
-                from: "context-menu",
-                info: info
-            });
-        } else {
-            console.warn("No active tab found for context menu action.");
-        }
-    }
-});
+// chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+//     let context_menus = ['tw-send-image'];
+//     if (context_menus.includes(info.menuItemId)) {
+//         // Use the tab parameter if available (most reliable for context menu actions)
+//         let targetTab = tab;
+//         if (!targetTab) {
+//             // Fallback: try to get the active tab (may not work for popout/modal windows)
+//             const tabs = await chrome.tabs.query({
+//                 active: true,
+//                 lastFocusedWindow: true
+//             });
+//             targetTab = tabs[0];
+//         }
+//         if (targetTab) {
+//             // send message to content script to ask for details from the DOM about the context link
+//             await chrome.tabs.sendMessage(targetTab.id, {
+//                 from: "context-menu",
+//                 info: info
+//             });
+//         } else {
+//             console.warn("No active tab found for context menu action.");
+//         }
+//     }
+// });
 
 function loadOptions() {
     return new Promise((resolve) => {

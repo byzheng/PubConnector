@@ -278,6 +278,13 @@ export function Tiddlywiki(host) {
         });
     }
 
+    async function addNewBibtex(bibtex) {
+        const path = "literatures";
+        return request(path, "POST", {
+            bibtex: bibtex
+        });
+    }
+
 
     async function getTiddlerByDOI(doi) {
         if (!doi || doi.trim() === "") {
@@ -361,6 +368,7 @@ export function Tiddlywiki(host) {
         getTiddlerText: getTiddlerText,
         putTiddler: putTiddler,
         saveScholarAuthorCites: saveScholarAuthorCites,
+        addNewBibtex: addNewBibtex,
         parseStringArray: parseStringArray
     };
 }

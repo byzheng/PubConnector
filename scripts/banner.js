@@ -70,7 +70,7 @@ async function Banner(options) {
             //this_icon.scopusItem(doi);
             this_icon.publisherByDOI(doi);
             //this_icon.lensItem(doi);
-            this_icon.saveTwItem(doi);
+            this_icon.saveTwItem(doi, undefined, this_tw);
             this_container.style.backgroundColor = "#8f928f";
         }
         await iconZotero(doi);
