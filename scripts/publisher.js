@@ -32,20 +32,20 @@ async function Publisher(options) {
             tag_widget.create(banner.tiddler());
         }
         // Update publisher page if necessary
-        update_page();
+        await update_page();
         // banner.setWidth();
         // inject reference
         injectReference(doi, this_options);
 
     }
 
-    function update_page() {
+    async function update_page() {
         let href = this_href;
         if (href.includes("iopscience.iop.org")) {
-            update_page_iop();
+            await update_page_iop();
         }
     }
-    function update_page_iop() {
+    async function update_page_iop() {
         // Click the "Show References" button to expand references (may load late)
         const maxAttempts = 20;
         const intervalMs = 500;
@@ -71,6 +71,8 @@ async function Publisher(options) {
         };
 
         tick();
+        // Give the page time to render references after expanding
+        await helper.delay(2000);
     }
 
     // Helper function to add TiddlyWiki icons and links to the banner
