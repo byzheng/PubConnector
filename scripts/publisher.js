@@ -31,10 +31,26 @@ async function Publisher(options) {
             const tag_widget = await TagWidget(options);
             tag_widget.create(banner.tiddler());
         }
+        // Update publisher page if necessary
+        update_page();
         // banner.setWidth();
         // inject reference
         injectReference(doi, this_options);
 
+    }
+
+    function update_page() {
+        let href = this_href;
+        if (href.includes("iopscience.iop.org")) {
+            update_page_iop();
+        }
+    }
+    function update_page_iop() {
+        // Click the "Show References" button to expand references
+        const referencesButton = document.getElementById('references');
+        if (referencesButton && referencesButton.getAttribute('aria-expanded') === 'false') {
+            referencesButton.click();
+        }
     }
 
     // Helper function to add TiddlyWiki icons and links to the banner
@@ -113,6 +129,17 @@ async function Publisher(options) {
             const refId = element.getAttribute('data-modal-source-id');
             return refId ? refId : null;            
         }
+        function get_href_id_iop(element) {
+            let refId = element.getAttribute("id");
+            if (!refId) return null;
+            // Remove fnref- prefix if present
+            if (refId.startsWith("fnref-")) {
+                refId = refId.substring(6);
+            }
+            console.log("IOP: ", refId);
+            return refId ? refId : null;            
+        }
+
 
 
         // Mapping of site-specific settings
@@ -173,9 +200,14 @@ async function Publisher(options) {
                 getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(get_href_id(element)))
             },
             "connectsci.au": {
-                css_reference: 'a.link.link-ref[data-modal-source-id',
+                css_reference: 'a.link.link-ref[data-modal-source-id]',
                 getRefSelector: element => `div[data-content-id="${get_href_id_connectsci(element)}" i]`,
                 getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(get_href_id_connectsci(element)))
+            },
+            "iopscience.iop.org": {
+                css_reference: 'a.cite',
+                getRefSelector: element => `li[data-reference][id="${get_href_id_iop(element)}"]`,
+                getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(get_href_id_iop(element)))
             }
         };
 
