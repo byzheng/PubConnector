@@ -77,9 +77,14 @@ function extractDOIs(text) {
     const doiPattern = /10\.\d{4,9}\/[-._;()/:A-Z0-9]+/gi;
     const matches = text.match(doiPattern) || [];
     // Remove trailing .pdf if present
-    const cleaned = matches.map(doi => doi.replace(/(\.pdf|\/pdf|\/full|\.)$/i, ''));
+    const cleaned = matches.map(doi =>
+        doi
+            .replace(/([/.]?(full\.pdf|pdf|full|abstract|meta))$/i, '')
+            .toLowerCase()
+    );
     return [...new Set(cleaned)];
 }
+
 
 function extractScopusEID(text) {
     const scopusPattern = /eid=([\w.-]+)/;
@@ -161,7 +166,7 @@ function getDOI() {
     if (!isValidDOI(doi)) {
         return;
     }
-    return doi;
+    return doi.toLowerCase();
 }
 
 

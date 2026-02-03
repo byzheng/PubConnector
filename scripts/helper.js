@@ -3,7 +3,11 @@ export function extractDOIs(text) {
     const doiPattern = /10\.\d{4,9}\/[-._;()/:A-Z0-9]+/gi;
     const matches = text.match(doiPattern) || [];
     // Remove trailing .pdf if present
-    const cleaned = matches.map(doi => doi.replace(/([/.]?(full\.pdf|pdf|full|abstract|meta))$/i, ''));
+    const cleaned = matches.map(doi =>
+        doi
+            .replace(/([/.]?(full\.pdf|pdf|full|abstract|meta))$/i, '')
+            .toLowerCase()
+    );
     return [...new Set(cleaned)];
 }
 
@@ -60,7 +64,7 @@ export function getDOI() {
         doi = doi.replace('doi:', '');
         doi = doi.replace(/^(https?:\/\/.*?doi\.org\/)?/, '');
         if (isValidDOI(doi)) {
-            return doi;
+            return doi.toLowerCase();
         }
     }
 

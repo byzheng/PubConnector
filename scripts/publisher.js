@@ -46,11 +46,31 @@ async function Publisher(options) {
         }
     }
     function update_page_iop() {
-        // Click the "Show References" button to expand references
-        const referencesButton = document.getElementById('references');
-        if (referencesButton && referencesButton.getAttribute('aria-expanded') === 'false') {
-            referencesButton.click();
-        }
+        // Click the "Show References" button to expand references (may load late)
+        const maxAttempts = 20;
+        const intervalMs = 500;
+        let attempts = 0;
+
+        const tryClick = () => {
+            const referencesButton = document.getElementById('references');
+            if (referencesButton) {
+                if (referencesButton.getAttribute('aria-expanded') === 'false') {
+                    referencesButton.click();
+                }
+                return true;
+            }
+            return false;
+        };
+
+        const tick = () => {
+            attempts += 1;
+            if (tryClick()) return;
+            if (attempts < maxAttempts) {
+                setTimeout(tick, intervalMs);
+            }
+        };
+
+        tick();
     }
 
     // Helper function to add TiddlyWiki icons and links to the banner
@@ -136,7 +156,6 @@ async function Publisher(options) {
             if (refId.startsWith("fnref-")) {
                 refId = refId.substring(6);
             }
-            console.log("IOP: ", refId);
             return refId ? refId : null;            
         }
 
@@ -245,7 +264,7 @@ async function Publisher(options) {
             // }
 
             // Extract and process DOIs
-            dois_reference = extractDOIs(reference_text);
+            dois_reference = helper.extractDOIs(reference_text);
             // get doi from from crossres
             if (getCrossRefKey) {
                 let items_crossref = getCrossRefKey(element, crossref_reference);
