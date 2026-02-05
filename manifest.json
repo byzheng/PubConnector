@@ -69,7 +69,8 @@
         "scripts/api/crossref.js",
         "scripts/zotero.js",
         "scripts/tiddler.js",
-        "scripts/icon.js"
+        "scripts/icon.js",
+        "scripts/scopus.js"
       ],
       "css": [
         "styles/bibtex.css"

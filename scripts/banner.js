@@ -40,14 +40,14 @@ async function Banner(options) {
         }
         await getTiddlerByID(id, field);
         if (!this_tiddler) {
-            console.error("No tiddler found for id: " + id);
+            console.log("No tiddler found for id: " + id);
             return;
         }
         initContainer(); // Initialize the container
         this_icon.openTwItem(this_tiddler.title);
         this_icon.scholarAuthor(this_tiddler["google-scholar"]); // create an icon to link to google scholar author page
         this_icon.orcidAuthor(this_tiddler["orcid"]); // create an icon to link to ORCID author page
-        //this_icon.scopusAuthor(this_tiddler["scopus"]); // create an icon to link to Scopus author page
+        this_icon.scopusAuthor(this_tiddler["scopus"]); // create an icon to link to Scopus author page
         setWidth(); // Set the width of the banner
     }
 
