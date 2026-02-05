@@ -37,11 +37,12 @@ export function getDOI() {
         "meta[name='DC.Identifier.DOI' i]",
         'ul.nova-legacy-e-list li +li a.nova-legacy-e-link[href*="doi.org"]', // for researchgate
         'div strong +a[href*="doi.org"]', // for IEEE
-        'li[data-test-id="paper-doi"] .doi__link' // for sematic
+        'li[data-test-id="paper-doi"] .doi__link', // for sematic
+        "span[data-testid='publication-doi']"
     ];
 
     function isValidDOI(doi) {
-        const doiRegex = /^10.\d{4,9}\/[-._;()/:a-zA-Z0-9]+$/;
+        const doiRegex = /^10.\d{4,9}\/[-._;()/:a-zA-Z0-9]+$/i;
         return doiRegex.test(doi);
     }
     var doi;
@@ -58,11 +59,15 @@ export function getDOI() {
                 break;
             }
         }
+        // If no attribute found, try textContent (for Scopus)
+        if (!doi && ele.textContent) {
+            doi = ele.textContent.trim();
+        }
         if (!doi) {
             continue;
         }
-        doi = doi.replace('doi:', '');
-        doi = doi.replace(/^(https?:\/\/.*?doi\.org\/)?/, '');
+        doi = doi.replace(/doi:/i, '').trim();
+        doi = doi.replace(/^(https?:\/\/.*?doi\.org\/)?/i, '').trim();
         if (isValidDOI(doi)) {
             return doi.toLowerCase();
         }

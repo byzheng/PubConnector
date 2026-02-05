@@ -17,6 +17,12 @@ async function Scopus(options) {
             if (aid !== undefined && aid !== null) {
                 await authorPage(aid);
             }
+        } if (href.includes("/pages/publications/")) {
+            // Publication page 
+            // treat as a normal publication page
+            const publisher = await Publisher(options);
+            await publisher.execute();
+
         } else {
             // Other pages (search, citation, reference)
             await processOtherPages();
