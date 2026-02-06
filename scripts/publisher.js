@@ -270,7 +270,7 @@ async function Publisher(options) {
             // get doi from from crossres
             if (getCrossRefKey) {
                 let items_crossref = getCrossRefKey(element, crossref_reference);
-                if (items_crossref && items_crossref.DOI) dois_crossref = [items_crossref.DOI];
+                if (items_crossref && items_crossref.DOI) dois_crossref = [items_crossref.DOI.toLowerCase()];
             }
             let dois = [...new Set([...dois_reference, ...dois_crossref])];
             //dois = dois_crossref;
