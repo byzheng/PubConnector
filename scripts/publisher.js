@@ -13,9 +13,12 @@ async function Publisher(options) {
         if (doi === undefined) {
             return;
         }
+
         const banner = await Banner(this_options);
         // remove old banner if exists
         banner.remove();
+        // remove previously injected icons and tags
+        document.querySelectorAll(".tw-icon, .tw-icon-tiny, .tw-tag").forEach(el => el.remove());
         // Add publisher banner
         await banner.publisher(doi);
         // Add Zotero related icons
@@ -266,7 +269,7 @@ async function Publisher(options) {
             // }
 
             // Extract and process DOIs
-            dois_reference = helper.extractDOIs(reference_text);
+            dois_reference = helper.extractDOIs(reference_text).map(d => d.toLowerCase());
             // get doi from from crossres
             if (getCrossRefKey) {
                 let items_crossref = getCrossRefKey(element, crossref_reference);
