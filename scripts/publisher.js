@@ -47,7 +47,60 @@ async function Publisher(options) {
         if (href.includes("iopscience.iop.org")) {
             await update_page_iop();
         }
+        if (href.includes("onlinelibrary.wiley.com")) {
+            await update_page_wiley();
+        }
     }
+    async function update_page_wiley() {
+        // Wait for the references section accordion to appear, then click to expand
+        const maxAttempts = 20;
+        const intervalMs = 500;
+        let attempts = 0;
+
+        // Step 1: click the toggle if collapsed
+        const clicked = await new Promise(resolve => {
+            const tick = () => {
+                attempts += 1;
+                const refSection = document.querySelector(".article-section.article-section__references");
+                if (refSection) {
+                    const toggle = refSection.querySelector("div.accordion__control[aria-expanded]");
+                    if (toggle && toggle.getAttribute("aria-expanded") === "false") {
+                        toggle.click();
+                    }
+                    resolve(!!refSection);
+                    return;
+                }
+                if (attempts < maxAttempts) {
+                    setTimeout(tick, intervalMs);
+                } else {
+                    resolve(false);
+                }
+            };
+            tick();
+        });
+
+        if (!clicked) return;
+
+        // Step 2: wait for the AJAX content to load (li items appear inside the section)
+        await new Promise(resolve => {
+            let waitAttempts = 0;
+            const waitTick = () => {
+                waitAttempts += 1;
+                const refSection = document.querySelector(".article-section.article-section__references");
+                if (refSection && refSection.querySelector("li[data-bib-id]")) {
+                    resolve();
+                    return;
+                }
+                if (waitAttempts < 20) {
+                    setTimeout(waitTick, 500);
+                } else {
+                    resolve();
+                }
+            };
+            waitTick();
+        });
+    }
+
     async function update_page_iop() {
         // Click the "Show References" button to expand references (may load late)
         const maxAttempts = 20;
