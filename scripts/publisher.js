@@ -84,7 +84,7 @@ async function Publisher(options) {
             const nextElement = div.nextElementSibling;
             const hasTwSvgNext = nextElement &&
                 nextElement.tagName === 'A' &&
-                nextElement.classList.contains("tw-icon-tiny");
+                nextElement.classList.contains(tw_class);
             if (hasTwSvgNext) {
                 return;
             }
@@ -93,7 +93,7 @@ async function Publisher(options) {
             //     return;
             // }
             const icon = Icon(this_options).openTwItem(tiddler.title, undefined,
-                "tw-svg-inline");
+                tw_class);
             //icon.classList.add(tw_class);
             div.parentElement.insertBefore(icon, div.nextSibling);
         })

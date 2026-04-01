@@ -19,18 +19,18 @@ export async function UpdateScholar(options) {
     const this_options = options;
     const this_tw = await Tiddlywiki(options.tiddlywikihost);
     async function Enable() {
-        const enabledText = await this_tw.getTiddlerText("$:/config/tw-literature/authoring/scholar/enable");
+        const enabledText = await this_tw.getTiddlerText("$:/config/tw-pubconnector/authoring/scholar/enable");
         if (!enabledText || typeof enabledText !== "string") {
             return false;
         }
         return enabledText.trim().toLowerCase() === "enable" ? true : false;
     }
     async function Limit() {
-        const limitText = await this_tw.getTiddlerText("$:/config/tw-literature/authoring/scholar/daily-limit");
+        const limitText = await this_tw.getTiddlerText("$:/config/tw-pubconnector/authoring/scholar/daily-limit");
         return limitText && !isNaN(parseInt(limitText)) ? parseInt(limitText) : 5;
     }
     async function AutoCloseTab() {
-        const enabledText = await this_tw.getTiddlerText("$:/config/tw-literature/authoring/scholar/auto-close");
+        const enabledText = await this_tw.getTiddlerText("$:/config/tw-pubconnector/authoring/scholar/auto-close");
         if (!enabledText || typeof enabledText !== "string") {
             return false;
         }
@@ -140,9 +140,9 @@ export async function ScheduleTask(options) {
     const this_tw = await Tiddlywiki(options.tiddlywikihost);
     const this_update = await UpdateData(options);
 
-    const ENABLE_TIDDLER = "$:/config/tw-literature/authoring/auto-update/enable";
-    const HOUR_TIDDLER = "$:/config/tw-literature/authoring/auto-update/hour";
-    const MINUTE_TIDDLER = "$:/config/tw-literature/authoring/auto-update/minute";
+    const ENABLE_TIDDLER = "$:/config/tw-pubconnector/authoring/auto-update/enable";
+    const HOUR_TIDDLER = "$:/config/tw-pubconnector/authoring/auto-update/hour";
+    const MINUTE_TIDDLER = "$:/config/tw-pubconnector/authoring/auto-update/minute";
 
     async function Enable() {
         const enabledText = await this_tw.getTiddlerText(ENABLE_TIDDLER);
