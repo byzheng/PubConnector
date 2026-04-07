@@ -36,14 +36,7 @@ async function importBibtexToTiddlyWikiByDOI(doi, options, tw_api) {
     if (bibtex === null) {
         return;
     }
-    //console.log("bibtex", bibtex);
-    // trigger single file save
-    const singlefileid = options.singlefileid;
-    if (singlefileid) {
-        chrome.runtime.sendMessage(singlefileid, "save-page");
-    }
-    // Pause for 1 second before proceeding
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     
     // send bibtex entry to tiddlywiki
 
@@ -58,5 +51,46 @@ async function importBibtexToTiddlyWikiByDOI(doi, options, tw_api) {
     });
 
     
+    
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
+    //console.log("bibtex", bibtex);
+    // trigger single file save
+    const singlefileid = options.singlefileid;
+    if (singlefileid) {
+        const saveCompleted = await requestSingleFileSave(singlefileid);
+        if (saveCompleted) {
+            window.location.reload();
+        }
+    }
+    // Pause for 1 second before proceeding
+}
+
+async function requestSingleFileSave(singlefileid) {
+    try {
+        const response = await Promise.race([
+            chrome.runtime.sendMessage(singlefileid, "save-page"),
+            new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 10000))
+        ]);
+
+        if (response?.timeout) {
+            console.warn('SingleFile did not finish within 10 seconds. Continuing without waiting longer.');
+            return true;
+        }
+
+        if (response === undefined) {
+            console.warn('SingleFile did not provide a completion response. Page reload skipped.');
+            return false;
+        }
+
+        if (response?.ok === false) {
+            console.warn('SingleFile reported a save failure:', response);
+            return false;
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Failed to send save request to SingleFile:', error);
+        return false;
+    }
 }
