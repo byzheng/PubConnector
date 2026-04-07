@@ -90,7 +90,7 @@ async function requestSingleFileSave(singlefileid) {
 
         return true;
     } catch (error) {
-        console.error('Failed to send save request to SingleFile:', error);
+        console.warn('Failed to send save request to SingleFile:', error);
         return false;
     }
 }
