@@ -58,10 +58,7 @@ async function importBibtexToTiddlyWikiByDOI(doi, options, tw_api) {
     // trigger single file save
     const singlefileid = options.singlefileid;
     if (singlefileid) {
-        const saveCompleted = await requestSingleFileSave(singlefileid);
-        if (saveCompleted) {
-            window.location.reload();
-        }
+        chrome.runtime.sendMessage(singlefileid, "save-page")
     }
     // Pause for 1 second before proceeding
 }

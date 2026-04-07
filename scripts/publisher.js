@@ -273,7 +273,7 @@ async function Publisher(options) {
             },
             "frontiersin.org": {
                 css_reference: 'a[href^="#B"]',
-                getRefSelector: element => `div.References:has(a[id="${get_href_id(element)}"])`,
+                getRefSelector: element => `div.References:has(a[id="${get_href_id(element)}"]),li.References__item[id="${get_href_id(element)}"]`,
                 getCrossRefKey: (element, crossref_work) => crossref_work.find(item => item.key.endsWith(get_href_id(element)))
             },
             "connectsci.au": {
