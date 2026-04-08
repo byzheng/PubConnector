@@ -12,7 +12,7 @@ async function Banner(options) {
     let this_container, this_content, this_toggle, this_tiddler, collapseTimer, attentionTimer, expandedWidth;
 
     // Function to create and append the banner to the document
-    function initContainer() {
+    function initContainer(toggleIconPath = "images/Tiddlywiki.svg", toggleAlt = "PubConnector") {
         this_container = document.createElement("div");
         this_container.id = "tw-banner";
         this_toggle = document.createElement("button");
@@ -21,8 +21,8 @@ async function Banner(options) {
         this_toggle.setAttribute("aria-label", "Toggle PubConnector banner");
 
         const toggleIcon = document.createElement("img");
-        toggleIcon.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
-        toggleIcon.alt = "PubConnector";
+        toggleIcon.src = chrome.runtime.getURL(toggleIconPath);
+        toggleIcon.alt = toggleAlt;
         toggleIcon.className = "tw-banner-toggle-icon";
         this_toggle.appendChild(toggleIcon);
 
@@ -155,19 +155,22 @@ async function Banner(options) {
         this_tiddler = await this_tw.getTiddlerByDOI(doi);
         initContainer();
         if (this_tiddler) {
-            this_icon.copyTwCitation(this_tiddler.title);
+
             this_icon.openTwItem(this_tiddler.title);
+            this_icon.copyTwCitation(this_tiddler.title);
             this_icon.scholarSearchDOI(doi);
             //this_icon.scopusItem(doi, this_tiddler["scopus-eid"]);
             //this_icon.lensItem(doi, this_tiddler["lens"]);
         } else {
+            this_toggle.querySelector("img").src = chrome.runtime.getURL("images/Save.svg");
+            this_toggle.querySelector("img").alt = "Save to TiddlyWiki";
             // If no tiddler found, create default links
+            //this_icon.lensItem(doi);
+            this_icon.saveTwItem(doi, undefined, this_tw);
             this_icon.scholarSearchDOI(doi);
             //this_icon.scopusItem(doi);
             this_icon.publisherByDOI(doi);
-            //this_icon.lensItem(doi);
-            this_icon.saveTwItem(doi, undefined, this_tw);
-            this_container.style.backgroundColor = "#8f928f";
+            
         }
         await iconZotero(doi);
         setWidth(); // Set the width of the banner
@@ -194,14 +197,10 @@ async function Banner(options) {
         if (!this_content) {
             return;
         }
-        let totalWidth = 0;
-        for (const child of this_content.children) {
-            totalWidth += child.offsetWidth;
-        }
-
-        // Optionally add padding or margins
-        const padding = 72;
-        expandedWidth = totalWidth + padding;
+        const styles = window.getComputedStyle(this_container);
+        const horizontalPadding = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+        const horizontalBorder = parseFloat(styles.borderLeftWidth) + parseFloat(styles.borderRightWidth);
+        expandedWidth = Math.ceil(this_content.scrollWidth + horizontalPadding + horizontalBorder + 2);
         if (!isCollapsed()) {
             this_container.style.width = `${expandedWidth}px`;
         }
