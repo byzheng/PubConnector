@@ -2,21 +2,116 @@ async function Banner(options) {
     const this_helper = await dynamicLoadScript('scripts/helper.js');
 
     const this_options = options || {};
+    const collapseDelayMs = this_options.bannerCollapseDelayMs || 3000;
+    const collapsedAttentionMs = this_options.bannerAttentionMs || 5000;
     
     const tw_api = await dynamicLoadScript('scripts/api/tiddlywiki-api.js');
     const this_tw = tw_api.Tiddlywiki(options.tiddlywikihost);
     const this_icon = Icon(options);
     const this_href = window.location.href;
-    let this_container, this_tiddler;
+    let this_container, this_content, this_toggle, this_tiddler, collapseTimer, attentionTimer, expandedWidth;
 
     // Function to create and append the banner to the document
     function initContainer() {
         this_container = document.createElement("div");
         this_container.id = "tw-banner";
+        this_toggle = document.createElement("button");
+        this_toggle.type = "button";
+        this_toggle.className = "tw-banner-toggle";
+        this_toggle.setAttribute("aria-label", "Toggle PubConnector banner");
+
+        const toggleIcon = document.createElement("img");
+        toggleIcon.src = chrome.runtime.getURL("images/Tiddlywiki.svg");
+        toggleIcon.alt = "PubConnector";
+        toggleIcon.className = "tw-banner-toggle-icon";
+        this_toggle.appendChild(toggleIcon);
+
+        this_content = document.createElement("div");
+        this_content.className = "tw-banner-content";
+
+        this_toggle.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        this_container.addEventListener("mouseenter", function () {
+            clearAutoCollapse();
+            if (isCollapsed()) {
+                setCollapsed(false);
+            }
+        });
+        this_container.addEventListener("mouseleave", function () {
+            if (!isCollapsed()) {
+                scheduleAutoCollapse(200);
+            }
+        });
+
+        this_container.appendChild(this_toggle);
+        this_container.appendChild(this_content);
         document.body.appendChild(this_container);
         // Enable dragging functionality for the banner
         dragElement(this_container);
-        this_icon.setContainer(this_container);
+        this_icon.setContainer(this_content);
+        setCollapsed(false);
+    }
+
+    function isCollapsed() {
+        return this_container && this_container.classList.contains("tw-banner-collapsed");
+    }
+
+    function clearAutoCollapse() {
+        if (collapseTimer) {
+            clearTimeout(collapseTimer);
+            collapseTimer = undefined;
+        }
+    }
+
+    function clearAttentionTimer() {
+        if (attentionTimer) {
+            clearTimeout(attentionTimer);
+            attentionTimer = undefined;
+        }
+    }
+
+    function startCollapsedAttention() {
+        if (!this_container) {
+            return;
+        }
+        clearAttentionTimer();
+        this_container.classList.add("tw-banner-attention");
+        attentionTimer = window.setTimeout(function () {
+            if (this_container) {
+                this_container.classList.remove("tw-banner-attention");
+            }
+            attentionTimer = undefined;
+        }, collapsedAttentionMs);
+    }
+
+    function scheduleAutoCollapse(delay = collapseDelayMs) {
+        clearAutoCollapse();
+        collapseTimer = window.setTimeout(function () {
+            setCollapsed(true);
+        }, delay);
+    }
+
+    function setCollapsed(collapsed) {
+        if (!this_container || !this_toggle) {
+            return;
+        }
+        this_container.classList.toggle("tw-banner-collapsed", collapsed);
+        this_toggle.setAttribute("aria-expanded", String(!collapsed));
+        this_toggle.title = collapsed ? "Expand PubConnector banner" : "Collapse PubConnector banner";
+        if (collapsed) {
+            this_container.style.width = "";
+            startCollapsedAttention();
+            clearAutoCollapse();
+            return;
+        }
+        clearAttentionTimer();
+        this_container.classList.remove("tw-banner-attention");
+        if (expandedWidth) {
+            this_container.style.width = `${expandedWidth}px`;
+        }
     }
 
 
@@ -49,6 +144,7 @@ async function Banner(options) {
         this_icon.orcidAuthor(this_tiddler["orcid"]); // create an icon to link to ORCID author page
         this_icon.scopusAuthor(this_tiddler["scopus"]); // create an icon to link to Scopus author page
         setWidth(); // Set the width of the banner
+        scheduleAutoCollapse();
     }
 
     async function publisher(doi) {
@@ -75,11 +171,14 @@ async function Banner(options) {
         }
         await iconZotero(doi);
         setWidth(); // Set the width of the banner
+        scheduleAutoCollapse();
         return;
     }
 
     // remove
     function remove() {
+        clearAutoCollapse();
+        clearAttentionTimer();
         const banner = this_container || document.getElementById('tw-banner');
         if (banner) {
             banner.remove(); // Removes the element from the DOM
@@ -92,14 +191,20 @@ async function Banner(options) {
 
     // Helper function to set width of banner
     function setWidth() {
+        if (!this_content) {
+            return;
+        }
         let totalWidth = 0;
-        for (const child of this_container.children) {
+        for (const child of this_content.children) {
             totalWidth += child.offsetWidth;
         }
 
         // Optionally add padding or margins
-        const padding = 100; // Example padding
-        this_container.style.width = `${totalWidth + padding}px`;
+        const padding = 72;
+        expandedWidth = totalWidth + padding;
+        if (!isCollapsed()) {
+            this_container.style.width = `${expandedWidth}px`;
+        }
     }
 
 

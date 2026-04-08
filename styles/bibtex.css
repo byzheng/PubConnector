@@ -3,14 +3,16 @@
 
     display: flex;
     align-items: center;
-    justify-content: center;
+  justify-content: flex-start;
     gap: 0.4em;
     white-space: nowrap;
+  overflow: hidden;
+  transition: width 0.18s ease, padding 0.18s ease, border-radius 0.18s ease;
 
     position: fixed;
     top: 1em;
     right: 2em;
-    min-width: 100px;
+  min-width: 0;
     height: 55px;
     z-index: 99999;
 
@@ -29,12 +31,85 @@
 }
 
 #tw-banner:before {
-    content: '\2807';
-    font-size: 40px;
-    padding-left: 0.3em;
-    text-align: center;
-    vertical-align: middle;
+    content: none;
 }
+
+  #tw-banner.tw-banner-collapsed {
+    width: 44px !important;
+    height: 44px;
+    padding: 0.2em;
+    border-radius: 999px;
+    border-color: #2f3133;
+    background: linear-gradient(135deg, #f7f8f7 0%, #c8ccc9 100%);
+    box-shadow: 0 0 0 3px rgba(47, 49, 51, 0.12),
+          0 10px 24px rgba(0, 0, 0, 0.22);
+  }
+
+  #tw-banner.tw-banner-collapsed.tw-banner-attention {
+    animation: tw-banner-pulse 1.8s ease-in-out infinite;
+  }
+
+  .tw-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+  }
+
+  #tw-banner.tw-banner-collapsed .tw-banner-content {
+    display: none;
+  }
+
+  .tw-banner-toggle {
+    all: unset;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.45);
+  }
+
+  #tw-banner.tw-banner-collapsed .tw-banner-toggle {
+    display: inline-flex;
+  }
+
+  .tw-banner-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+
+  #tw-banner.tw-banner-collapsed .tw-banner-toggle {
+    background-color: rgba(47, 49, 51, 0.08);
+  }
+
+  #tw-banner.tw-banner-collapsed .tw-banner-toggle:hover {
+    background-color: rgba(47, 49, 51, 0.16);
+  }
+
+  .tw-banner-toggle-icon {
+    width: 24px;
+    height: 24px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+  }
+
+  @keyframes tw-banner-pulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 0 3px rgba(47, 49, 51, 0.12),
+            0 10px 24px rgba(0, 0, 0, 0.22);
+    }
+    50% {
+      transform: scale(1.06);
+      box-shadow: 0 0 0 6px rgba(47, 49, 51, 0.08),
+            0 12px 28px rgba(0, 0, 0, 0.28);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 3px rgba(47, 49, 51, 0.12),
+            0 10px 24px rgba(0, 0, 0, 0.22);
+    }
+  }
 
 #tw-banner-header {
   padding: 2px;

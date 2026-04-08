@@ -13,6 +13,9 @@ function dragElement(elmnt) {
         pos4 = 0;
     elmnt.onmousedown = dragMouseDown;
     function dragMouseDown(e) {
+        if (e.target.closest("a, button")) {
+            return;
+        }
 
         e.preventDefault();
         // get the mouse cursor position at startup:
