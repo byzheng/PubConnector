@@ -9,7 +9,7 @@ async function Banner(options) {
     const this_tw = tw_api.Tiddlywiki(options.tiddlywikihost);
     const this_icon = Icon(options);
     const this_href = window.location.href;
-    let this_container, this_shadow, this_panel, this_content, this_toggle, this_tiddler, collapseTimer, attentionTimer, expandedWidth;
+    let this_container, this_shadow, this_panel, this_content, this_toggle, this_tiddler, collapseTimer, attentionTimer, expandedWidth, resizeObserver;
 
     function bannerStyles() {
         return `
@@ -200,6 +200,14 @@ async function Banner(options) {
         // Enable dragging functionality for the banner
         dragElement(this_container);
         this_icon.setContainer(this_content);
+        if (typeof ResizeObserver !== "undefined") {
+            resizeObserver = new ResizeObserver(function () {
+                if (!isCollapsed()) {
+                    setWidth();
+                }
+            });
+            resizeObserver.observe(this_content);
+        }
         setCollapsed(true, true);
     }
 
@@ -259,9 +267,9 @@ async function Banner(options) {
         }
         clearAttentionTimer();
         this_panel.classList.remove("tw-banner-attention");
-        if (expandedWidth) {
-            this_panel.style.width = `${expandedWidth}px`;
-        }
+        window.requestAnimationFrame(function () {
+            setWidth();
+        });
     }
 
 
@@ -330,6 +338,10 @@ async function Banner(options) {
     function remove() {
         clearAutoCollapse();
         clearAttentionTimer();
+        if (resizeObserver) {
+            resizeObserver.disconnect();
+            resizeObserver = undefined;
+        }
         const banner = this_container || document.getElementById('tw-banner');
         if (banner) {
             banner.remove(); // Removes the element from the DOM

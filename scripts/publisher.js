@@ -7,9 +7,20 @@ async function Publisher(options) {
     const this_href = window.location.href;
     const tw_api = await dynamicLoadScript('scripts/api/tiddlywiki-api.js');
     const this_tw = tw_api.Tiddlywiki(options.tiddlywikihost);
+
+    async function waitForDOI(maxAttempts = 10, delayMs = 500) {
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            const doi = helper.getDOI();
+            if (doi !== undefined) {
+                return doi;
+            }
+            await helper.delay(delayMs);
+        }
+        return;
+    }
     
     async function execute() {
-        var doi = helper.getDOI();
+        var doi = await waitForDOI();
         if (doi === undefined) {
             return;
         }

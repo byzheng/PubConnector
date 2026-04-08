@@ -52,8 +52,10 @@ async function main() {
             await scopus.execute();
         });
     } else {
-        const publisher = await Publisher(options);
-        await publisher.execute();
+        onPageLoad(async () => {
+            const publisher = await Publisher(options);
+            await publisher.execute();
+        });
     }
 
     // colleague(options.tiddlywikihost);
