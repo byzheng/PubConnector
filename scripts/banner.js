@@ -9,12 +9,152 @@ async function Banner(options) {
     const this_tw = tw_api.Tiddlywiki(options.tiddlywikihost);
     const this_icon = Icon(options);
     const this_href = window.location.href;
-    let this_container, this_content, this_toggle, this_tiddler, collapseTimer, attentionTimer, expandedWidth;
+    let this_container, this_shadow, this_panel, this_content, this_toggle, this_tiddler, collapseTimer, attentionTimer, expandedWidth;
+
+    function bannerStyles() {
+        return `
+            .tw-banner-shell {
+                all: initial;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 0.4em;
+                white-space: nowrap;
+                overflow: hidden;
+                transition: width 0.18s ease, padding 0.18s ease, border-radius 0.18s ease;
+                min-width: 0;
+                height: 55px;
+                box-sizing: border-box;
+                padding: 0.1em 0.3em;
+                border: 1px solid #ccc;
+                border-radius: 1.5em;
+                background-color: #c8ccc9;
+                box-shadow: 0 4px 8px rgba(0,0,0,.2), 0 6px 20px rgba(0,0,0,.19);
+                font-size: 14px;
+                line-height: 1;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            }
+
+            .tw-banner-shell.tw-banner-collapsed {
+                width: 44px !important;
+                height: 44px;
+                padding: 0.2em;
+                border-radius: 999px;
+                border-color: #2f3133;
+                background: linear-gradient(135deg, #f7f8f7 0%, #c8ccc9 100%);
+                box-shadow: 0 0 0 3px rgba(47, 49, 51, 0.12), 0 10px 24px rgba(0, 0, 0, 0.22);
+            }
+
+            .tw-banner-shell.tw-banner-collapsed.tw-banner-attention {
+                animation: tw-banner-pulse 1.8s ease-in-out infinite;
+            }
+
+            .tw-banner-content {
+                all: initial;
+                display: flex;
+                align-items: center;
+                gap: 0.4em;
+                box-sizing: border-box;
+            }
+
+            .tw-banner-shell.tw-banner-collapsed .tw-banner-content {
+                display: none;
+            }
+
+            .tw-banner-toggle {
+                all: unset;
+                width: 40px;
+                height: 40px;
+                border-radius: 999px;
+                cursor: pointer;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                background-color: rgba(255, 255, 255, 0.45);
+            }
+
+            .tw-banner-shell.tw-banner-collapsed .tw-banner-toggle {
+                display: inline-flex;
+                background-color: rgba(47, 49, 51, 0.08);
+            }
+
+            .tw-banner-toggle:hover {
+                background-color: rgba(255, 255, 255, 0.7);
+            }
+
+            .tw-banner-shell.tw-banner-collapsed .tw-banner-toggle:hover {
+                background-color: rgba(47, 49, 51, 0.16);
+            }
+
+            .tw-banner-toggle-icon {
+                display: block;
+                width: 24px;
+                height: 24px;
+                filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+            }
+
+            .tw-icon {
+                all: initial;
+                color: #7096b3;
+                margin: 0em 0.2em;
+                padding: 0em 0.2em;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                vertical-align: middle;
+                text-decoration: none;
+                line-height: 0;
+                cursor: pointer;
+                box-sizing: border-box;
+            }
+
+            .tw-svg {
+                display: block;
+                width: 40px;
+                height: 50px;
+                max-width: none;
+            }
+
+            @keyframes tw-banner-pulse {
+                0% {
+                    transform: scale(1);
+                    box-shadow: 0 0 0 3px rgba(47, 49, 51, 0.12), 0 10px 24px rgba(0, 0, 0, 0.22);
+                }
+                50% {
+                    transform: scale(1.06);
+                    box-shadow: 0 0 0 6px rgba(47, 49, 51, 0.08), 0 12px 28px rgba(0, 0, 0, 0.28);
+                }
+                100% {
+                    transform: scale(1);
+                    box-shadow: 0 0 0 3px rgba(47, 49, 51, 0.12), 0 10px 24px rgba(0, 0, 0, 0.22);
+                }
+            }
+        `;
+    }
 
     // Function to create and append the banner to the document
     function initContainer(toggleIconPath = "images/Tiddlywiki.svg", toggleAlt = "PubConnector") {
         this_container = document.createElement("div");
         this_container.id = "tw-banner";
+        this_container.style.all = "initial";
+        this_container.style.position = "fixed";
+        this_container.style.top = "1em";
+        this_container.style.right = "2em";
+        this_container.style.zIndex = "99999";
+        this_container.style.display = "block";
+        this_container.style.padding = "0";
+        this_container.style.margin = "0";
+        this_container.style.border = "0";
+        this_container.style.background = "transparent";
+        this_container.style.overflow = "visible";
+        this_shadow = this_container.attachShadow({ mode: "open" });
+
+        const style = document.createElement("style");
+        style.textContent = bannerStyles();
+
+        this_panel = document.createElement("div");
+        this_panel.className = "tw-banner-shell";
+
         this_toggle = document.createElement("button");
         this_toggle.type = "button";
         this_toggle.className = "tw-banner-toggle";
@@ -34,29 +174,37 @@ async function Banner(options) {
             event.stopPropagation();
         });
 
-        this_container.addEventListener("mouseenter", function () {
+        this_shadow.addEventListener("mousedown", function (event) {
+            if (event.target.closest("a, button")) {
+                event.stopPropagation();
+            }
+        });
+
+        this_panel.addEventListener("mouseenter", function () {
             clearAutoCollapse();
             if (isCollapsed()) {
                 setCollapsed(false);
             }
         });
-        this_container.addEventListener("mouseleave", function () {
+        this_panel.addEventListener("mouseleave", function () {
             if (!isCollapsed()) {
                 scheduleAutoCollapse(200);
             }
         });
 
-        this_container.appendChild(this_toggle);
-        this_container.appendChild(this_content);
+        this_panel.appendChild(this_toggle);
+        this_panel.appendChild(this_content);
+        this_shadow.appendChild(style);
+        this_shadow.appendChild(this_panel);
         document.body.appendChild(this_container);
         // Enable dragging functionality for the banner
         dragElement(this_container);
         this_icon.setContainer(this_content);
-        setCollapsed(false);
+        setCollapsed(true, true);
     }
 
     function isCollapsed() {
-        return this_container && this_container.classList.contains("tw-banner-collapsed");
+        return this_panel && this_panel.classList.contains("tw-banner-collapsed");
     }
 
     function clearAutoCollapse() {
@@ -74,14 +222,14 @@ async function Banner(options) {
     }
 
     function startCollapsedAttention() {
-        if (!this_container) {
+        if (!this_panel) {
             return;
         }
         clearAttentionTimer();
-        this_container.classList.add("tw-banner-attention");
+        this_panel.classList.add("tw-banner-attention");
         attentionTimer = window.setTimeout(function () {
-            if (this_container) {
-                this_container.classList.remove("tw-banner-attention");
+            if (this_panel) {
+                this_panel.classList.remove("tw-banner-attention");
             }
             attentionTimer = undefined;
         }, collapsedAttentionMs);
@@ -94,23 +242,25 @@ async function Banner(options) {
         }, delay);
     }
 
-    function setCollapsed(collapsed) {
-        if (!this_container || !this_toggle) {
+    function setCollapsed(collapsed, suppressAttention = false) {
+        if (!this_panel || !this_toggle) {
             return;
         }
-        this_container.classList.toggle("tw-banner-collapsed", collapsed);
+        this_panel.classList.toggle("tw-banner-collapsed", collapsed);
         this_toggle.setAttribute("aria-expanded", String(!collapsed));
         this_toggle.title = collapsed ? "Expand PubConnector banner" : "Collapse PubConnector banner";
         if (collapsed) {
-            this_container.style.width = "";
-            startCollapsedAttention();
+            this_panel.style.width = "";
+            if (!suppressAttention) {
+                startCollapsedAttention();
+            }
             clearAutoCollapse();
             return;
         }
         clearAttentionTimer();
-        this_container.classList.remove("tw-banner-attention");
+        this_panel.classList.remove("tw-banner-attention");
         if (expandedWidth) {
-            this_container.style.width = `${expandedWidth}px`;
+            this_panel.style.width = `${expandedWidth}px`;
         }
     }
 
@@ -144,7 +294,6 @@ async function Banner(options) {
         this_icon.orcidAuthor(this_tiddler["orcid"]); // create an icon to link to ORCID author page
         this_icon.scopusAuthor(this_tiddler["scopus"]); // create an icon to link to Scopus author page
         setWidth(); // Set the width of the banner
-        scheduleAutoCollapse();
     }
 
     async function publisher(doi) {
@@ -174,7 +323,6 @@ async function Banner(options) {
         }
         await iconZotero(doi);
         setWidth(); // Set the width of the banner
-        scheduleAutoCollapse();
         return;
     }
 
@@ -197,12 +345,12 @@ async function Banner(options) {
         if (!this_content) {
             return;
         }
-        const styles = window.getComputedStyle(this_container);
+        const styles = window.getComputedStyle(this_panel);
         const horizontalPadding = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
         const horizontalBorder = parseFloat(styles.borderLeftWidth) + parseFloat(styles.borderRightWidth);
         expandedWidth = Math.ceil(this_content.scrollWidth + horizontalPadding + horizontalBorder + 2);
         if (!isCollapsed()) {
-            this_container.style.width = `${expandedWidth}px`;
+            this_panel.style.width = `${expandedWidth}px`;
         }
     }
 
