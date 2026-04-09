@@ -23,6 +23,7 @@ function Icon(options, container) {
     const this_options = options || {};
     let this_container = container;
     const this_href = window.location.href;
+    let notificationTimer;
     function setContainer(container) {
         if (container) {
             this_container = container;
@@ -61,6 +62,23 @@ function Icon(options, container) {
         return notification;
     }
 
+    function showNotification(message, duration = 2000) {
+        let notification = document.getElementById("tw-notification");
+        if (!notification) {
+            notification = noticationBox();
+        }
+        if (notificationTimer) {
+            clearTimeout(notificationTimer);
+            notificationTimer = undefined;
+        }
+        notification.textContent = message;
+        notification.style.display = "block";
+        notificationTimer = setTimeout(() => {
+            notification.style.display = "none";
+            notificationTimer = undefined;
+        }, duration);
+    }
+
     function copyTwCitation(title, container) {
         if (!title) {
 
@@ -76,17 +94,7 @@ function Icon(options, container) {
             }
             navigator.clipboard.writeText(textToCopy).then(() => {
 
-                let notification = document.getElementById("tw-notification");
-                if (!notification) {
-                    notification = noticationBox();
-                }
-                notification.textContent = `Copied: ${textToCopy}`;
-                notification.style.display = "block";
-
-                // Hide after 1 second
-                setTimeout(() => {
-                    notification.style.display = "none";
-                }, 1500);
+                showNotification(`Copied: ${textToCopy}`, 1500);
             }).catch(err => {
                 console.error("Failed to copy text: ", err);
             });
@@ -149,11 +157,30 @@ function Icon(options, container) {
 
     function saveTwItem(doi, container, tw_api, onSaved) {
         const elements = createElementByURL("#", "images/Save.svg", container)
+        let isSaving = false;
         elements[0].addEventListener("click", async function (event) {
             event.preventDefault();
-            const savedTitle = await importBibtexToTiddlyWikiByDOI(doi, this_options, tw_api);
-            if (savedTitle && typeof onSaved === "function") {
-                await onSaved(savedTitle);
+            if (isSaving) {
+                showNotification("Save already in progress...", 2000);
+                return;
+            }
+            isSaving = true;
+            showNotification("Saving to TiddlyWiki...", 2000);
+            try {
+                const savedTitle = await importBibtexToTiddlyWikiByDOI(doi, this_options, tw_api);
+                if (!savedTitle) {
+                    showNotification("Save failed. Check the console for details.", 4000);
+                    return;
+                }
+                if (typeof onSaved === "function") {
+                    await onSaved(savedTitle);
+                }
+            } catch (error) {
+                console.error("Failed to save DOI to TiddlyWiki:", error);
+                const message = error instanceof Error ? error.message : String(error);
+                showNotification(`Save failed: ${message}`, 4000);
+            } finally {
+                isSaving = false;
             }
         });
     }

@@ -1,15 +1,17 @@
 async function importBibtexToTiddlyWikiByDOI(doi, options, tw_api) {
+    console.info('Starting DOI import to TiddlyWiki', { doi });
 
     // Get Zotero items
     const item = await zoteroSearchItemsByDOI(doi, options.zoterohost);
 
     if (!item) {
-        console.log('No item found with matching DOI');
+        console.warn('No Zotero item found with matching DOI', { doi });
         return null;
     }
     // get item key
     var item_key = getZoteroItemKey(item);
     if (item_key === null) {
+        console.warn('Zotero item key was missing', { doi });
         return null;
     }
     // get the pdf attachement key
@@ -25,22 +27,27 @@ async function importBibtexToTiddlyWikiByDOI(doi, options, tw_api) {
     const cite_key = await getBibtexCiteKey(zotero_bibtex_host, item_key);
 
     if (cite_key === null) {
+        console.warn('Could not retrieve Better BibTeX cite key', { doi, item_key });
         return null;
     }
     const foundCiteKey = cite_key[item_key];
     if (foundCiteKey === null) {
+        console.warn('Better BibTeX cite key not found for item', { doi, item_key });
         return null;
     }
     // get bibtex entry according to cite key
     const bibtex = await getBibtexByCiteKey(zotero_bibtex_host, foundCiteKey);
     if (bibtex === null) {
+        console.warn('Could not retrieve BibTeX entry for cite key', { doi, foundCiteKey });
         return null;
     }
     
     
     // send bibtex entry to tiddlywiki
 
+    console.info('Sending BibTeX entry to TiddlyWiki', { doi, foundCiteKey });
     await tw_api.addNewBibtex(bibtex);
+    console.info('BibTeX entry saved to TiddlyWiki', { doi, foundCiteKey });
 
     await new Promise(resolve => setTimeout(resolve, 1000));
     
@@ -58,9 +65,11 @@ async function importBibtexToTiddlyWikiByDOI(doi, options, tw_api) {
     // trigger single file save
     const singlefileid = options.singlefileid;
     if (singlefileid) {
+        console.info('Requesting SingleFile page save', { doi, foundCiteKey });
         chrome.runtime.sendMessage(singlefileid, "save-page")
     }
     // Pause for 1 second before proceeding
+    console.info('Completed DOI import to TiddlyWiki', { doi, foundCiteKey });
     return foundCiteKey;
 }
 
