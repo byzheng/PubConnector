@@ -10,7 +10,7 @@ async function Banner(options) {
     const this_icon = Icon(options);
     const this_href = window.location.href;
     const bannerStyleText = await loadBannerStyles();
-    let this_container, this_shadow, this_panel, this_content, this_toggle, this_tiddler, collapseTimer, attentionTimer, expandedWidth, resizeObserver;
+    let this_container, this_shadow, this_panel, this_content, this_toggle, this_tiddler, collapseTimer, attentionTimer, expandedWidth, resizeObserver, publisherRenderToken = 0;
 
     async function loadBannerStyles() {
         const cssUrl = chrome.runtime.getURL("styles/bibtex.css");
@@ -166,6 +166,70 @@ async function Banner(options) {
         });
     }
 
+    function clearContent() {
+        if (!this_content) {
+            return;
+        }
+        this_content.replaceChildren();
+    }
+
+    function setToggleIcon(iconPath, altText) {
+        if (!this_toggle) {
+            return;
+        }
+        const toggleIcon = this_toggle.querySelector("img");
+        if (!toggleIcon) {
+            return;
+        }
+        toggleIcon.src = chrome.runtime.getURL(iconPath);
+        toggleIcon.alt = altText;
+    }
+
+    async function rebuildPublisher(doi, expand = false) {
+        if (!doi) {
+            console.error("Banner requires a DOI");
+            return;
+        }
+        const renderToken = ++publisherRenderToken;
+        if (!this_container || !this_container.isConnected) {
+            initContainer();
+        }
+
+        this_tiddler = await this_tw.getTiddlerByDOI(doi);
+        if (renderToken !== publisherRenderToken) {
+            return;
+        }
+        clearContent();
+
+        if (this_tiddler) {
+            setToggleIcon("images/Tiddlywiki.svg", "PubConnector");
+            this_icon.openTwItem(this_tiddler.title);
+            this_icon.copyTwCitation(this_tiddler.title);
+            this_icon.scholarSearchDOI(doi);
+            //this_icon.scopusItem(doi, this_tiddler["scopus-eid"]);
+            //this_icon.lensItem(doi, this_tiddler["lens"]);
+        } else {
+            setToggleIcon("images/Save.svg", "Save to TiddlyWiki");
+            // If no tiddler found, create default links
+            //this_icon.lensItem(doi);
+            this_icon.saveTwItem(doi, undefined, this_tw, async function () {
+                await rebuildPublisher(doi, true);
+            });
+            this_icon.scholarSearchDOI(doi);
+            //this_icon.scopusItem(doi);
+            this_icon.publisherByDOI(doi);
+        }
+
+        await iconZotero(doi, renderToken);
+        if (renderToken !== publisherRenderToken) {
+            return;
+        }
+        setWidth();
+        if (expand) {
+            setCollapsed(false);
+        }
+    }
+
 
 
     async function getTiddlerByID(id, field) {
@@ -199,33 +263,7 @@ async function Banner(options) {
     }
 
     async function publisher(doi) {
-        if (!doi) {
-            console.error("Banner requires a DOI");
-            return;
-        }
-        this_tiddler = await this_tw.getTiddlerByDOI(doi);
-        initContainer();
-        if (this_tiddler) {
-
-            this_icon.openTwItem(this_tiddler.title);
-            this_icon.copyTwCitation(this_tiddler.title);
-            this_icon.scholarSearchDOI(doi);
-            //this_icon.scopusItem(doi, this_tiddler["scopus-eid"]);
-            //this_icon.lensItem(doi, this_tiddler["lens"]);
-        } else {
-            this_toggle.querySelector("img").src = chrome.runtime.getURL("images/Save.svg");
-            this_toggle.querySelector("img").alt = "Save to TiddlyWiki";
-            // If no tiddler found, create default links
-            //this_icon.lensItem(doi);
-            this_icon.saveTwItem(doi, undefined, this_tw);
-            this_icon.scholarSearchDOI(doi);
-            //this_icon.scopusItem(doi);
-            this_icon.publisherByDOI(doi);
-            
-        }
-        await iconZotero(doi);
-        setWidth(); // Set the width of the banner
-        return;
+        await rebuildPublisher(doi);
     }
 
     // remove
@@ -263,32 +301,39 @@ async function Banner(options) {
 
 
     // Helper function to add TiddlyWiki icons and links to the banner
-    async function iconZotero(doi) {
+    async function iconZotero(doi, renderToken = publisherRenderToken) {
+
+        if (renderToken !== publisherRenderToken) {
+            return;
+        }
 
         const zotero = Zotero(this_options.zoterohost);
         const item = await zotero.searchItemsByDOI(doi);
-        if (!item) {
+        if (renderToken !== publisherRenderToken || !item) {
             return;
         }
 
         var item_key = zotero.getItemKey(item);
-        if (item_key === null) {
+        if (renderToken !== publisherRenderToken || item_key === null) {
             return;
         }
         this_icon.zeteroItem(item_key); // Add icon to zotero item
 
         // Get children for pdfs
         const items_children = await zotero.children(item_key);
-        if (!Array.isArray(items_children) || items_children.length === 0) {
+        if (renderToken !== publisherRenderToken || !Array.isArray(items_children) || items_children.length === 0) {
             return;
         }
         for (let i = 0; i < items_children.length; i++) {
+            if (renderToken !== publisherRenderToken) {
+                return;
+            }
             const item = items_children[i];
 
             // Check if the contentType is "application/pdf"
             if (item.data && item.data.contentType === "application/pdf") {
                 var pdf_key = zotero.getItemKey(item);
-                if (pdf_key === null) {
+                if (renderToken !== publisherRenderToken || pdf_key === null) {
                     return;
                 }
                 this_icon.zeteroPDF(pdf_key);

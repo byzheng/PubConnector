@@ -147,11 +147,14 @@ function Icon(options, container) {
         createElementByURL(url, "images/LinkOut.svg", container);
     }
 
-    function saveTwItem(doi, container, tw_api) {
+    function saveTwItem(doi, container, tw_api, onSaved) {
         const elements = createElementByURL("#", "images/Save.svg", container)
-        elements[0].addEventListener("click", function (event) {
+        elements[0].addEventListener("click", async function (event) {
             event.preventDefault();
-            importBibtexToTiddlyWikiByDOI(doi, this_options, tw_api);
+            const savedTitle = await importBibtexToTiddlyWikiByDOI(doi, this_options, tw_api);
+            if (savedTitle && typeof onSaved === "function") {
+                await onSaved(savedTitle);
+            }
         });
     }
 

@@ -5,12 +5,12 @@ async function importBibtexToTiddlyWikiByDOI(doi, options, tw_api) {
 
     if (!item) {
         console.log('No item found with matching DOI');
-        return;
+        return null;
     }
     // get item key
     var item_key = getZoteroItemKey(item);
     if (item_key === null) {
-        return;
+        return null;
     }
     // get the pdf attachement key
     const attachmentHref = item?.links?.attachment?.href;
@@ -25,16 +25,16 @@ async function importBibtexToTiddlyWikiByDOI(doi, options, tw_api) {
     const cite_key = await getBibtexCiteKey(zotero_bibtex_host, item_key);
 
     if (cite_key === null) {
-        return;
+        return null;
     }
     const foundCiteKey = cite_key[item_key];
     if (foundCiteKey === null) {
-        return;
+        return null;
     }
     // get bibtex entry according to cite key
     const bibtex = await getBibtexByCiteKey(zotero_bibtex_host, foundCiteKey);
     if (bibtex === null) {
-        return;
+        return null;
     }
     
     
@@ -61,6 +61,7 @@ async function importBibtexToTiddlyWikiByDOI(doi, options, tw_api) {
         chrome.runtime.sendMessage(singlefileid, "save-page")
     }
     // Pause for 1 second before proceeding
+    return foundCiteKey;
 }
 
 async function requestSingleFileSave(singlefileid) {
