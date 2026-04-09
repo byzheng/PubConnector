@@ -35,6 +35,7 @@
         "images/FilePdfFilled.svg",
         "images/Copy.svg",
         "images/Googlelens.svg",
+        "styles/bibtex.css",
         "scripts/helper.js",
         "scripts/api/tiddlywiki-api.js"
       ],

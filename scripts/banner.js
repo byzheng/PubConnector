@@ -9,127 +9,21 @@ async function Banner(options) {
     const this_tw = tw_api.Tiddlywiki(options.tiddlywikihost);
     const this_icon = Icon(options);
     const this_href = window.location.href;
+    const bannerStyleText = await loadBannerStyles();
     let this_container, this_shadow, this_panel, this_content, this_toggle, this_tiddler, collapseTimer, attentionTimer, expandedWidth, resizeObserver;
 
-    function bannerStyles() {
-        return `
-            .tw-banner-shell {
-                all: initial;
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-                gap: 0.4em;
-                white-space: nowrap;
-                overflow: hidden;
-                transition: width 0.18s ease, padding 0.18s ease, border-radius 0.18s ease;
-                min-width: 0;
-                height: 55px;
-                box-sizing: border-box;
-                padding: 0.1em 0.3em;
-                border: 1px solid #ccc;
-                border-radius: 1.5em;
-                background-color: #c8ccc9;
-                box-shadow: 0 4px 8px rgba(0,0,0,.2), 0 6px 20px rgba(0,0,0,.19);
-                font-size: 14px;
-                line-height: 1;
-                font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-            }
-
-            .tw-banner-shell.tw-banner-collapsed {
-                width: 44px !important;
-                height: 44px;
-                padding: 0.2em;
-                border-radius: 999px;
-                border-color: #2f3133;
-                background: linear-gradient(135deg, #f7f8f7 0%, #c8ccc9 100%);
-                box-shadow: 0 0 0 3px rgba(47, 49, 51, 0.12), 0 10px 24px rgba(0, 0, 0, 0.22);
-            }
-
-            .tw-banner-shell.tw-banner-collapsed.tw-banner-attention {
-                animation: tw-banner-pulse 1.8s ease-in-out infinite;
-            }
-
-            .tw-banner-content {
-                all: initial;
-                display: flex;
-                align-items: center;
-                gap: 0.4em;
-                box-sizing: border-box;
-            }
-
-            .tw-banner-shell.tw-banner-collapsed .tw-banner-content {
-                display: none;
-            }
-
-            .tw-banner-toggle {
-                all: unset;
-                width: 40px;
-                height: 40px;
-                border-radius: 999px;
-                cursor: pointer;
-                display: none;
-                align-items: center;
-                justify-content: center;
-                background-color: rgba(255, 255, 255, 0.45);
-            }
-
-            .tw-banner-shell.tw-banner-collapsed .tw-banner-toggle {
-                display: inline-flex;
-                background-color: rgba(47, 49, 51, 0.08);
-            }
-
-            .tw-banner-toggle:hover {
-                background-color: rgba(255, 255, 255, 0.7);
-            }
-
-            .tw-banner-shell.tw-banner-collapsed .tw-banner-toggle:hover {
-                background-color: rgba(47, 49, 51, 0.16);
-            }
-
-            .tw-banner-toggle-icon {
-                display: block;
-                width: 24px;
-                height: 24px;
-                filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
-            }
-
-            .tw-icon {
-                all: initial;
-                color: #7096b3;
-                margin: 0em 0.2em;
-                padding: 0em 0.2em;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                vertical-align: middle;
-                text-decoration: none;
-                line-height: 0;
-                cursor: pointer;
-                box-sizing: border-box;
-            }
-
-            .tw-svg {
-                display: block;
-                width: 40px;
-                height: 50px;
-                max-width: none;
-            }
-
-            @keyframes tw-banner-pulse {
-                0% {
-                    transform: scale(1);
-                    box-shadow: 0 0 0 3px rgba(47, 49, 51, 0.12), 0 10px 24px rgba(0, 0, 0, 0.22);
-                }
-                50% {
-                    transform: scale(1.06);
-                    box-shadow: 0 0 0 6px rgba(47, 49, 51, 0.08), 0 12px 28px rgba(0, 0, 0, 0.28);
-                }
-                100% {
-                    transform: scale(1);
-                    box-shadow: 0 0 0 3px rgba(47, 49, 51, 0.12), 0 10px 24px rgba(0, 0, 0, 0.22);
-                }
-            }
-        `;
+    async function loadBannerStyles() {
+        const cssUrl = chrome.runtime.getURL("styles/bibtex.css");
+        const response = await fetch(cssUrl);
+        const cssText = await response.text();
+        const startMarker = "/* BEGIN_SHADOW_BANNER */";
+        const endMarker = "/* END_SHADOW_BANNER */";
+        const startIndex = cssText.indexOf(startMarker);
+        const endIndex = cssText.indexOf(endMarker);
+        if (startIndex === -1 || endIndex === -1 || endIndex <= startIndex) {
+            throw new Error("Shadow banner styles not found in styles/bibtex.css");
+        }
+        return cssText.slice(startIndex + startMarker.length, endIndex).trim();
     }
 
     // Function to create and append the banner to the document
@@ -150,7 +44,7 @@ async function Banner(options) {
         this_shadow = this_container.attachShadow({ mode: "open" });
 
         const style = document.createElement("style");
-        style.textContent = bannerStyles();
+        style.textContent = bannerStyleText;
 
         this_panel = document.createElement("div");
         this_panel.className = "tw-banner-shell";
