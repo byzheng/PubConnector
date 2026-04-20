@@ -165,7 +165,7 @@ function Icon(options, container) {
                 return;
             }
             isSaving = true;
-            showNotification("Saving to TiddlyWiki...", 2000);
+            showNotification("Saving to TiddlyWiki. Don't leave this page until the save is complete by TiddlyWiki and SingleFile...", 2000);
             try {
                 const savedTitle = await importBibtexToTiddlyWikiByDOI(doi, this_options, tw_api);
                 if (!savedTitle) {
