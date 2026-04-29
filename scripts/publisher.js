@@ -61,6 +61,38 @@ async function Publisher(options) {
         if (href.includes("onlinelibrary.wiley.com")) {
             await update_page_wiley();
         }
+        if (href.includes("nature.com")) {
+            await update_page_nature();
+        }
+    }
+    async function update_page_nature() {
+        // Click the "Show more" button in the references section if present
+        const maxAttempts = 10;
+        const intervalMs = 500;
+        let attempts = 0;
+
+        await new Promise(resolve => {
+            const tick = () => {
+                attempts += 1;
+                // Find the button with the correct aria attributes and span text
+                const button = Array.from(document.querySelectorAll('button[aria-expanded="false"][aria-describedby]'))
+                    .find(btn => {
+                        const span = btn.querySelector('span.c-article-box__button-text[data-expandable-label]');
+                        return span && /show more/i.test(span.textContent);
+                    });
+                if (button) {
+                    button.click();
+                    resolve();
+                    return;
+                }
+                if (attempts < maxAttempts) {
+                    setTimeout(tick, intervalMs);
+                } else {
+                    resolve();
+                }
+            };
+            tick();
+        });
     }
     async function update_page_wiley() {
         // Wait for the references section accordion to appear, then click to expand
