@@ -107,6 +107,7 @@ function isValidGoogleScholarID(url) {
 
 function getURL() {
     var urlSelt = [
+        "meta[name='citation_xml_url' i]",
         "meta[name='prism.url' i]",
         "meta[property='og:url' i]",
         "link[rel='canonical' i]"
